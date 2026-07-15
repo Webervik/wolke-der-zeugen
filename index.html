@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="description" content="Wolke der Zeugen — das Begegnungsspiel der Ev. Kirchengemeinde Staaken: Besuche die Orte deiner Gemeinde und begegne biblischen Zeug:innen.">
+  <meta name="theme-color" content="#131a30">
+  <title>Wolke der Zeugen</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="assets/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="assets/icon.svg">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <div id="app-laedt" class="laedt">☁️ Die Wolke sammelt sich …</div>
+
+  <main id="app">
+    <section class="view" id="view-onboarding"></section>
+    <section class="view" id="view-home"></section>
+    <section class="view" id="view-ort"></section>
+    <section class="view" id="view-begegnung"></section>
+    <section class="view" id="view-wolke"></section>
+    <section class="view" id="view-figur"></section>
+    <section class="view" id="view-einstellungen"></section>
+  </main>
+
+  <nav id="nav" hidden>
+    <button data-nav="home" class="aktiv"><span>🗺️</span>Karte</button>
+    <button data-nav="wolke"><span>☁️</span>Wolke</button>
+    <button data-nav="einstellungen"><span>⚙️</span>Mehr</button>
+  </nav>
+
+  <div id="meilenstein-overlay" hidden></div>
+  <div id="toast" role="status" aria-live="polite"></div>
+
+  <script src="js/storage.js"></script>
+  <script src="js/rotation.js"></script>
+  <script src="js/geo.js"></script>
+  <script src="js/karte.js"></script>
+  <script src="js/wolke.js"></script>
+  <script src="js/encounter.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

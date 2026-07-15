@@ -1,0 +1,18 @@
+{
+  "name": "Wolke der Zeugen",
+  "short_name": "Wolke",
+  "description": "Das Begegnungsspiel der Ev. Kirchengemeinde Staaken: Besuche die Orte deiner Gemeinde und begegne biblischen Zeug:innen.",
+  "lang": "de",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#131a30",
+  "theme_color": "#131a30",
+  "icons": [
+    {
+      "src": "assets/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}

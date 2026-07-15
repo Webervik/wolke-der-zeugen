@@ -1,0 +1,47 @@
+{
+  "version": 1,
+  "jahresStart": "2026-09-06",
+  "wochenAnker": "sonntag",
+  "leiterCode": "ZEUGEN-LEITUNG",
+  "eventCodes": [
+    { "code": "RALLYE-2026", "name": "Konfi-Tag Rallye" }
+  ],
+  "qrGueltigkeit": "kalendertag",
+  "basisUrl": "https://webervik.github.io/wolke-der-zeugen/",
+  "rahmen": {
+    "sendung": [
+      "Hey. Schön, dass du da bist.",
+      "Du bist nicht allein unterwegs. Vor dir waren viele — Menschen, die gezweifelt, gelacht, gekämpft und gehofft haben. Die Bibel nennt sie eine ganze »Wolke von Zeugen«, die dich umgibt und anfeuert.",
+      "Ich schicke dich los: Geh hin zu den Orten deiner Gemeinde, hör ihnen zu. Sie haben dir was zu erzählen. Und ich? Ich bin dabei. Versprochen.",
+      "— Jesus"
+    ],
+    "sendungBibelstelle": "Hebräer 12,1-2",
+    "sendungBibellink": "https://www.die-bibel.de/bibel/BB/HEB.12.1-HEB.12.2",
+    "meilensteine": [
+      {
+        "id": "meilenstein-3",
+        "bei": 3,
+        "text": "Drei Stimmen in deiner Wolke. Merkst du, wie sie dich anfeuern? Jede von ihnen war mal genau da, wo du jetzt bist: am Anfang. Weiter. — Jesus"
+      },
+      {
+        "id": "meilenstein-9",
+        "bei": 9,
+        "text": "Die Hälfte deiner Wolke ist versammelt. Fällt dir was auf? Keine:r von ihnen war perfekt. Genau deshalb sind sie Zeug:innen — nicht trotz ihrer Geschichten, sondern wegen ihnen. — Jesus"
+      },
+      {
+        "id": "meilenstein-ort",
+        "beiOrtKomplett": true,
+        "text": "Du hast allen Stimmen dieses Ortes zugehört. Orte speichern Geschichten — und jetzt gehört deine dazu. Das Siegel ist dein Zeichen dafür. — Jesus"
+      },
+      {
+        "id": "meilenstein-alle",
+        "beiAllen": true,
+        "text": "Deine Wolke ist voll. Achtzehn Zeug:innen, die dich anfeuern. Und jetzt sieh auf: Lauf deinen Lauf. Ich bin der Anfang und das Ziel. (Hebräer 12,1-2) — Jesus"
+      }
+    ]
+  },
+  "datenschutz": {
+    "kurz": "📍 Dein Standort bleibt auf deinem Handy. Er wird nie gespeichert und nie verschickt — die App rechnet nur aus, wie weit du von den Orten weg bist. Kein Konto, keine Cloud, alles bleibt bei dir.",
+    "lang": "Diese App speichert alles nur auf deinem eigenen Gerät (im sogenannten localStorage deines Browsers): deinen Vornamen, deine gesammelten Begegnungen und deine privaten Notizen. Nichts davon wird ins Internet geschickt. Wenn du der App erlaubst, deinen Standort zu nutzen, passiert das nur direkt auf deinem Handy: Die App rechnet aus, wie weit du von den Gemeindeorten entfernt bist — dein Standort wird nie gespeichert, nie an einen Server übertragen und nie mit anderen geteilt. Es gibt kein Konto, keine Anmeldung und keine Werbung. Links zu externen Seiten (z. B. die-bibel.de oder staaken-evangelisch.de) öffnen sich nur, wenn du sie selbst antippst. Unter Einstellungen → »Alles löschen« kannst du jederzeit alle Daten der App von deinem Gerät entfernen."
+  }
+}

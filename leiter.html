@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex">
+  <title>Wolke der Zeugen — Leitungsbereich</title>
+  <link rel="icon" href="assets/icon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/print.css">
+</head>
+<body>
+  <main id="app" class="leiter">
+    <section id="leiter-gate">
+      <h1>🔑 Leitungsbereich</h1>
+      <p class="dezent">Für Teamer:innen und Hauptamtliche. Der Zugangscode steht in den Team-Unterlagen.</p>
+      <input type="text" id="gate-code" placeholder="Zugangscode" autocomplete="off" autocapitalize="characters">
+      <button class="btn btn-gold" id="gate-btn">Öffnen</button>
+      <p><a class="link-gold" href="index.html">‹ Zurück zur App</a></p>
+    </section>
+
+    <section id="leiter-inhalt" hidden>
+      <div class="kein-druck">
+        <h1>🔑 Leitungsbereich</h1>
+        <p><a class="link-gold" href="index.html">‹ Zurück zur App</a></p>
+
+        <div class="panel-nacht einstellung">
+          <h3>🖨️ QR-Bögen drucken</h3>
+          <p class="dezent">Ein A4-Bogen pro Ort. Wichtig: Erst drucken, wenn die App unter ihrer endgültigen
+            Adresse erreichbar ist — die QR-Codes enthalten diese URL. Die Konfis können den Klartext-Code
+            alternativ von Hand eintippen (funktioniert unabhängig von der URL).</p>
+          <label class="dezent" for="basis-url">Basis-URL der App:</label>
+          <input type="text" id="basis-url">
+          <button class="btn btn-sekundaer" id="url-uebernehmen">QR-Codes neu erzeugen</button>
+          <button class="btn btn-gold" id="drucken">🖨️ Bögen drucken</button>
+        </div>
+
+        <div class="panel-nacht einstellung">
+          <h3>📍 Koordinaten-Check (vor Ort)</h3>
+          <p class="dezent">Zeigt live deine Distanz zu allen Orten — zum Prüfen der Radien beim Feldtest.
+            Die Position bleibt auf dem Gerät.</p>
+          <button class="btn btn-sekundaer" id="koord-start">Live-Distanzen starten</button>
+          <div id="koord-tabelle"></div>
+        </div>
+      </div>
+
+      <div id="qr-boegen"></div>
+    </section>
+  </main>
+
+  <script src="vendor/qrcode.js"></script>
+  <script>
+  (function () {
+    let config = null, orte = null;
+
+    function esc(s) {
+      return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+    }
+
+    function qrSVG(text) {
+      var qr = qrcode(0, "M");
+      qr.addData(text);
+      qr.make();
+      return qr.createSvgTag({ cellSize: 6, margin: 4, scalable: true });
+    }
+
+    function baueBoegen() {
+      var basis = document.getElementById("basis-url").value.trim().replace(/\/+$/, "") + "/";
+      var html = orte.orte.map(function (ort) {
+        var url = basis + "?ort=" + encodeURIComponent(ort.id) + "&k=" + encodeURIComponent(ort.qrCode);
+        return '<div class="qr-bogen">' +
+          '<div class="qr-bogen-kopf">' + ort.icon + ' ' + esc(ort.name) + '</div>' +
+          '<div class="qr-bogen-titel">Wolke der Zeugen</div>' +
+          '<div class="qr-code">' + qrSVG(url) + '</div>' +
+          '<div class="qr-bogen-anleitung">📷 Scanne mich mit deiner Kamera-App —<br>dann ist dieser Ort für heute freigeschaltet.</div>' +
+          '<div class="qr-bogen-code">Oder tipp den Code in der App ein:<br><strong>' + esc(ort.qrCode) + '</strong></div>' +
+          '<div class="qr-bogen-fuss">Ev. Kirchengemeinde Staaken · ' + esc(url) + '</div>' +
+          '</div>';
+      });
+      (config.eventCodes || []).forEach(function (ev) {
+        var url = basis + "?event=" + encodeURIComponent(ev.code);
+        html.push('<div class="qr-bogen">' +
+          '<div class="qr-bogen-kopf">🎉 ' + esc(ev.name) + '</div>' +
+          '<div class="qr-bogen-titel">Wolke der Zeugen — Aktionstag</div>' +
+          '<div class="qr-code">' + qrSVG(url) + '</div>' +
+          '<div class="qr-bogen-anleitung">📷 Scannen = Rallye-Modus für heute aktivieren:<br>Alle Zeug:innen sind an allen Orten unterwegs!</div>' +
+          '<div class="qr-bogen-code">Oder Code in den Einstellungen eingeben:<br><strong>' + esc(ev.code) + '</strong></div>' +
+          '<div class="qr-bogen-fuss">Ev. Kirchengemeinde Staaken · ' + esc(url) + '</div>' +
+          '</div>');
+      });
+      document.getElementById("qr-boegen").innerHTML = html.join("");
+    }
+
+    /* Live-Distanzen für den Feldtest (nur auf diesem Gerät, nichts wird gesendet) */
+    function koordCheck() {
+      var ziel = document.getElementById("koord-tabelle");
+      if (!("geolocation" in navigator)) { ziel.textContent = "Kein GPS verfügbar."; return; }
+      navigator.geolocation.watchPosition(function (pos) {
+        var rad = Math.PI / 180, R = 6371000;
+        var zeilen = orte.orte.map(function (ort) {
+          if (ort.lat === null || ort.lng === null) {
+            return "<tr><td>" + ort.icon + " " + esc(ort.name) + "</td><td colspan='2'>⚠️ Koordinaten fehlen (orte.json)</td></tr>";
+          }
+          var dLat = (ort.lat - pos.coords.latitude) * rad;
+          var dLng = (ort.lng - pos.coords.longitude) * rad;
+          var a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+            Math.cos(pos.coords.latitude * rad) * Math.cos(ort.lat * rad) * Math.sin(dLng / 2) * Math.sin(dLng / 2);
+          var d = Math.round(2 * R * Math.asin(Math.sqrt(a)));
+          var drin = d <= ort.radiusMeter;
+          return "<tr><td>" + ort.icon + " " + esc(ort.name) + "</td><td>" + d + " m</td><td>" +
+            (drin ? "✅ im Radius (" + ort.radiusMeter + " m)" : "– (Radius " + ort.radiusMeter + " m)") + "</td></tr>";
+        }).join("");
+        ziel.innerHTML = "<p class='dezent'>GPS-Genauigkeit: ±" + Math.round(pos.coords.accuracy) + " m</p>" +
+          "<table class='koord'><tr><th>Ort</th><th>Distanz</th><th>Status</th></tr>" + zeilen + "</table>";
+      }, function () {
+        ziel.textContent = "GPS nicht verfügbar oder abgelehnt.";
+      }, { enableHighAccuracy: true });
+    }
+
+    function oeffne() {
+      document.getElementById("leiter-gate").hidden = true;
+      document.getElementById("leiter-inhalt").hidden = false;
+      document.getElementById("basis-url").value = config.basisUrl || (location.origin + location.pathname.replace(/leiter\.html$/, ""));
+      baueBoegen();
+    }
+
+    Promise.all([
+      fetch("data/config.json").then(function (r) { return r.json(); }),
+      fetch("data/orte.json").then(function (r) { return r.json(); })
+    ]).then(function (res) {
+      config = res[0]; orte = res[1];
+      document.getElementById("gate-btn").addEventListener("click", function () {
+        var code = document.getElementById("gate-code").value.trim().toUpperCase();
+        if (code === config.leiterCode.toUpperCase()) {
+          sessionStorage.setItem("wdz.leiter", "1");
+          oeffne();
+        } else {
+          alert("Dieser Code passt nicht.");
+        }
+      });
+      document.getElementById("url-uebernehmen").addEventListener("click", baueBoegen);
+      document.getElementById("drucken").addEventListener("click", function () { window.print(); });
+      document.getElementById("koord-start").addEventListener("click", koordCheck);
+      if (sessionStorage.getItem("wdz.leiter") === "1") oeffne();
+    });
+  })();
+  </script>
+</body>
+</html>

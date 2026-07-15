@@ -1,0 +1,599 @@
+{
+  "version": 1,
+  "figuren": [
+    {
+      "id": "abraham",
+      "name": "Abraham",
+      "beiname": "Vater des Aufbruchs",
+      "ortId": "dorfkirche",
+      "thema": "aufbruch",
+      "themaLabel": "Aufbrechen & Vertrauen",
+      "seltenheit": "gewoehnlich",
+      "emoji": "🥾",
+      "farbe": "#8a6d3b",
+      "muster": "weg",
+      "kurzvorstellung": "Mit 75 alles hinter sich gelassen — wegen eines Versprechens.",
+      "dialog": [
+        { "sprecher": "figur", "text": "Fünfundsiebzig war ich. Fünfundsiebzig! Und dann sagt Gott: Zieh los. Verlass alles, was du kennst. Kein Ziel auf der Karte, nur ein Versprechen." },
+        { "sprecher": "du", "optionen": [
+          { "text": "Ohne Navi? Niemals. 😅", "reaktion": "Ha! Mein Navi war ein einziger Satz: »Ich zeige dir das Land.« Mehr hatte ich nicht. Manchmal reicht ein Satz — wenn der Richtige ihn sagt." },
+          { "text": "Was hat dir den Mut gegeben?", "reaktion": "Ehrlich? Ich weiß es bis heute nicht genau. Ich glaube, Vertrauen ist kein Gefühl. Es ist ein erster Schritt, obwohl die Knie zittern." }
+        ]},
+        { "sprecher": "figur", "text": "Und weißt du, was das Verrückteste ist? Der Segen war nicht nur für mich. »Du sollst ein Segen sein« — für andere. Aufbrechen lohnt sich nie nur für dich selbst." }
+      ],
+      "impuls": "Aufbrechen heißt nicht immer umziehen. Manchmal heißt es: ein Gespräch anfangen, etwas Neues wagen, eine Gewohnheit loslassen. Wo wartet gerade ein erster Schritt auf dich?",
+      "frage": {
+        "typ": "multiple-choice",
+        "schwierigkeit": 1,
+        "frage": "Wie alt war Abram (Abraham), als er aufbrach?",
+        "antworten": ["25 Jahre", "45 Jahre", "75 Jahre", "99 Jahre"],
+        "richtig": 2,
+        "erklaerung": "75 Jahre — Aufbrechen hat kein Verfallsdatum. Auf Abraham berufen sich bis heute Juden, Christen und Muslime: Seine Geschichte verbindet.",
+        "bibelstelle": "1. Mose 12,1-4",
+        "bibellink": "https://www.die-bibel.de/bibel/BB/GEN.12.1-GEN.12.4"
+      },
+      "kartenspruch": "Vertrauen ist ein Schritt, bevor du den Weg siehst."
+    },
+    {
+      "id": "sara",
+      "name": "Sara",
+      "beiname": "Mutter des Lachens",
+      "ortId": "dorfkirche",
+      "thema": "verheissung",
+      "themaLabel": "Lachen & Verheißung",
+      "seltenheit": "besonders",
+      "emoji": "🌠",
+      "farbe": "#b08a2e",
+      "muster": "sterne",
+      "kurzvorstellung": "Sie lachte über Gottes Versprechen — und nannte ihren Sohn danach.",
+      "dialog": [
+        { "sprecher": "figur", "text": "Ich hab gelacht. Hinter der Zeltwand, heimlich — als die fremden Besucher sagten, ich würde noch ein Kind bekommen. Ich war neunzig! Sollte ich da etwa nicht lachen?" },
+        { "sprecher": "du", "optionen": [
+          { "text": "Fair. Ich hätte auch gelacht. 😂", "reaktion": "Danke! Und weißt du was? Gott hat's gehört. Und statt beleidigt zu sein, hat er das Lachen behalten: Mein Sohn heißt Isaak — »er lacht«." },
+          { "text": "War das Lachen aus Zweifel oder aus Hoffnung?", "reaktion": "Gute Frage. Erst war es Zweifel, glaub ich. Aber Gott hat aus meinem Zweifel-Lachen ein Freuden-Lachen gemacht. Das kann er erstaunlich gut." }
+        ]},
+        { "sprecher": "figur", "text": "Merk dir das: Gott ist nicht beleidigt, wenn du lachst. Auch nicht, wenn du zweifelst. Er kann aus beidem etwas machen, das du nie erwartet hättest." }
+      ],
+      "impuls": "»Sollte Gott irgendetwas unmöglich sein?« — das ist die Frage aus meiner Geschichte. Gibt es etwas, das du längst abgeschrieben hast? Schreib es auf. Nur für dich.",
+      "frage": {
+        "typ": "multiple-choice",
+        "schwierigkeit": 2,
+        "frage": "Was bedeutet der Name Isaak?",
+        "antworten": ["Gott hilft", "Er lacht", "Der Gesegnete", "Das Geschenk"],
+        "richtig": 1,
+        "erklaerung": "Isaak (hebräisch Jizchak) heißt »er lacht«. Saras Lachen wurde Teil des Namens ihres Sohnes — aus skeptischem Lachen wurde Freude.",
+        "bibelstelle": "1. Mose 18,9-15",
+        "bibellink": "https://www.die-bibel.de/bibel/BB/GEN.18.9-GEN.18.15"
+      },
+      "kartenspruch": "Gott kann aus Zweifel-Lachen Freuden-Lachen machen."
+    },
+    {
+      "id": "jakob",
+      "name": "Jakob",
+      "beiname": "Der Gotteskämpfer",
+      "ortId": "dorfkirche",
+      "thema": "ringen",
+      "themaLabel": "Mit Gott ringen",
+      "seltenheit": "legende",
+      "emoji": "🌄",
+      "farbe": "#9c7420",
+      "muster": "strahlen",
+      "kurzvorstellung": "Er kämpfte eine ganze Nacht mit Gott — und ließ nicht los.",
+      "dialog": [
+        { "sprecher": "figur", "text": "Eine ganze Nacht hab ich gekämpft. Am Fluss Jabbok, im Dunkeln, mit einem Fremden, der… na ja. Am Ende wusste ich: Das war Gott. Es war der härteste Kampf meines Lebens." },
+        { "sprecher": "du", "optionen": [
+          { "text": "Moment — man darf mit Gott kämpfen?!", "reaktion": "Darf man nicht nur. Manchmal muss man. Glaube ist kein Stillhalten. Ich hab geschrien: »Ich lasse dich nicht los, du segnest mich denn!« Und weißt du was? Er hat mich gesegnet." },
+          { "text": "Und wer hat gewonnen?", "reaktion": "Beide. Keiner. Ich hab seitdem eine ausgerenkte Hüfte und einen neuen Namen. Manche Segen humpeln — aber es sind Segen." }
+        ]},
+        { "sprecher": "figur", "text": "Seit dieser Nacht heiße ich Israel — »Gotteskämpfer«. Wenn du also mal mit Gott ringst, mit Fragen, mit Wut, mit deinem Warum: Dann bist du nicht weit weg vom Glauben. Du bist mittendrin." }
+      ],
+      "impuls": "Womit ringst du gerade? Eine Frage an Gott, auf die keine Antwort kommt? Du darfst sie festhalten wie ich damals: »Ich lasse dich nicht los …« Schreib deine Ring-Frage auf.",
+      "frage": {
+        "typ": "multiple-choice",
+        "schwierigkeit": 2,
+        "frage": "Welchen neuen Namen erhält Jakob nach dem Kampf am Jabbok?",
+        "antworten": ["Israel", "Abraham", "Immanuel", "Isaak"],
+        "richtig": 0,
+        "erklaerung": "Israel bedeutet so viel wie »Gotteskämpfer«. Ein ganzes Volk trägt diesen Namen — als Erinnerung: Mit Gott ringen gehört zum Glauben dazu.",
+        "bibelstelle": "1. Mose 32,23-31",
+        "bibellink": "https://www.die-bibel.de/bibel/BB/GEN.32.23-GEN.32.31"
+      },
+      "kartenspruch": "Ich lasse dich nicht los, du segnest mich denn."
+    },
+    {
+      "id": "maria-magdalena",
+      "name": "Maria Magdalena",
+      "beiname": "Zeugin der Hoffnung",
+      "ortId": "gartenstadt",
+      "thema": "hoffnung",
+      "themaLabel": "Hoffnung",
+      "seltenheit": "legende",
+      "emoji": "🌅",
+      "farbe": "#c56a2b",
+      "muster": "strahlen",
+      "kurzvorstellung": "Sie stand weinend am Grab — und wurde die erste Zeugin der Auferstehung.",
+      "dialog": [
+        { "sprecher": "figur", "text": "Ich hab ihn für den Gärtner gehalten. Ehrlich. Ich stand heulend vor dem leeren Grab — und hab den, auf den ich alles gesetzt hatte, nicht erkannt." },
+        { "sprecher": "du", "optionen": [
+          { "text": "Wie peinlich ist das denn? 😅", "reaktion": "Haha, ja. Aber weißt du was? Hoffnung sieht am Anfang oft ganz normal aus. Wie ein Gärtner eben." },
+          { "text": "Das kenn ich. Wenn man traurig ist, sieht man nichts.", "reaktion": "Genau. Trauer macht die Augen eng. Deshalb hat er auch nicht diskutiert — er hat nur ein einziges Wort gesagt." }
+        ]},
+        { "sprecher": "figur", "text": "Er hat meinen Namen gesagt. »Maria.« Ein Wort — und die Welt stand wieder richtig herum. Ich bin losgerannt und hab es allen erzählt. Ich! Eine Frau, auf die keiner gehört hat. Die erste Predigerin der Weltgeschichte, wenn du so willst. 😄" }
+      ],
+      "impuls": "Hoffnung fängt oft klein an: mit einem Wort, mit deinem Namen. Wann hat dich zuletzt jemand so angesprochen, dass sich etwas gedreht hat? Du kannst dir hier eine private Notiz machen — die sieht niemand außer dir.",
+      "frage": {
+        "typ": "multiple-choice",
+        "schwierigkeit": 1,
+        "frage": "Wo begegnet Maria Magdalena dem Auferstandenen zuerst?",
+        "antworten": ["Im Tempel in Jerusalem", "In einem Garten beim Grab", "Auf einem Berg in Galiläa", "Am See, beim Fischen"],
+        "richtig": 1,
+        "erklaerung": "Johannes erzählt es als Gartenszene — deshalb passt Maria so gut zur Kirche Gartenstadt: Auferstehung beginnt dort, wo etwas wächst.",
+        "bibelstelle": "Johannes 20,11-18",
+        "bibellink": "https://www.die-bibel.de/bibel/BB/JHN.20.11-JHN.20.18"
+      },
+      "kartenspruch": "Hoffnung erkennt man manchmal erst, wenn sie deinen Namen sagt."
+    },
+    {
+      "id": "thomas",
+      "name": "Thomas",
+      "beiname": "Der ehrliche Frager",
+      "ortId": "gartenstadt",
+      "thema": "zweifel",
+      "themaLabel": "Zweifel & ehrliche Fragen",
+      "seltenheit": "gewoehnlich",
+      "emoji": "✋",
+      "farbe": "#4f7d6b",
+      "muster": "weg",
+      "kurzvorstellung": "Er wollte erst anfassen, bevor er glaubt — und wurde ernst genommen.",
+      "dialog": [
+        { "sprecher": "figur", "text": "Alle waren völlig aus dem Häuschen: »Wir haben ihn gesehen! Er lebt!« Und ich so: Nein. Ich glaube das erst, wenn ich die Wunden anfassen kann. Nennt mich ruhig den Zweifler — ich wollte einfach ehrlich sein." },
+        { "sprecher": "du", "optionen": [
+          { "text": "Verständlich. Ich glaub auch nicht alles sofort.", "reaktion": "Eben! Zweifeln heißt nicht, dass dir der Glaube egal ist. Es heißt, dass er dir wichtig genug ist, um nachzufragen." },
+          { "text": "Und? Durftest du anfassen?", "reaktion": "Ja. Eine Woche später stand er plötzlich da und hielt mir die Hände hin. Kein Vorwurf, kein »Hab ich's dir doch gesagt«. Nur: »Komm her, Thomas.«" }
+        ]},
+        { "sprecher": "figur", "text": "Und aus mir, dem angeblichen Zweifler, ist der mit dem größten Bekenntnis geworden: »Mein Herr und mein Gott!« Manchmal ist der Weg über den Zweifel der direkteste." }
+      ],
+      "impuls": "Welche Frage traust du dich im Konfi-Unterricht (noch) nicht zu stellen? Schreib sie hier auf — vielleicht ist es deine wichtigste.",
+      "frage": {
+        "typ": "multiple-choice",
+        "schwierigkeit": 1,
+        "frage": "Wie reagiert Jesus auf Thomas' Zweifel?",
+        "antworten": ["Er schließt ihn aus der Gruppe aus", "Er zeigt ihm seine Wunden", "Er ignoriert ihn", "Er verlangt eine Entschuldigung"],
+        "richtig": 1,
+        "erklaerung": "Jesus macht Zweifel nicht klein — er kommt Thomas entgegen. Ehrliche Fragen sind im Glauben ausdrücklich erlaubt.",
+        "bibelstelle": "Johannes 20,24-29",
+        "bibellink": "https://www.die-bibel.de/bibel/BB/JHN.20.24-JHN.20.29"
+      },
+      "kartenspruch": "Zweifeln heißt: Es ist dir nicht egal."
+    },
+    {
+      "id": "ruth",
+      "name": "Ruth",
+      "beiname": "Die treue Fremde",
+      "ortId": "gartenstadt",
+      "thema": "treue",
+      "themaLabel": "Fremdsein & Treue",
+      "seltenheit": "besonders",
+      "emoji": "🌾",
+      "farbe": "#5d9e5d",
+      "muster": "ranken",
+      "kurzvorstellung": "Die Migrantin aus Moab, die im Stammbaum von Jesus steht.",
+      "dialog": [
+        { "sprecher": "figur", "text": "Ich war die Ausländerin. Die aus Moab. Als mein Mann starb, hätte ich zurückgehen können — zu meiner Familie, meiner Sprache, meinen Göttern. Alle haben genau das erwartet." },
+        { "sprecher": "du", "optionen": [
+          { "text": "Warum bist du geblieben?", "reaktion": "Wegen Noomi, meiner Schwiegermutter. Sie hatte alles verloren. Ich hab ihr gesagt: »Wo du hingehst, da will ich auch hingehen. Dein Volk ist mein Volk, und dein Gott ist mein Gott.« Manchmal ist Treue die mutigste Entscheidung von allen." },
+          { "text": "War es schwer, fremd zu sein?", "reaktion": "Jeden Tag. Fremd sein heißt: auffallen, auch wenn du es gar nicht willst. Getragen haben mich ein paar Menschen, die MICH gesehen haben — nicht meine Herkunft." }
+        ]},
+        { "sprecher": "figur", "text": "Und die Pointe meiner Geschichte? Ich, die Fremde, wurde die Urgroßmutter von König David. Im Stammbaum von Jesus stehe ich auch. Gottes Geschichte war noch nie nur für ein Volk." }
+      ],
+      "impuls": "Wer ist bei euch »fremd« — in der Schule, im Kiez? Und was würde sich ändern, wenn jemand den ersten Schritt macht, so wie damals die Menschen in Bethlehem bei mir?",
+      "frage": {
+        "typ": "multiple-choice",
+        "schwierigkeit": 1,
+        "frage": "Was verspricht Ruth ihrer Schwiegermutter Noomi?",
+        "antworten": ["Reich zu werden", "»Dein Volk ist mein Volk, dein Gott ist mein Gott«", "Nach Moab zurückzukehren", "Einen Tempel zu bauen"],
+        "richtig": 1,
+        "erklaerung": "Ruths Satz ist einer der schönsten Treueschwüre der Bibel — gesprochen von einer Migrantin, die zur Urgroßmutter Davids wurde.",
+        "bibelstelle": "Rut 1,16-17",
+        "bibellink": "https://www.die-bibel.de/bibel/BB/RUT.1.16-RUT.1.17"
+      },
+      "kartenspruch": "Wo du hingehst, da will ich auch hingehen."
+    },
+    {
+      "id": "amos",
+      "name": "Amos",
+      "beiname": "Stimme der Gerechtigkeit",
+      "ortId": "heerstrasse-nord",
+      "thema": "gerechtigkeit",
+      "themaLabel": "Gerechtigkeit & Klartext",
+      "seltenheit": "gewoehnlich",
+      "emoji": "⚖️",
+      "farbe": "#b85c38",
+      "muster": "wellen",
+      "kurzvorstellung": "Der Schafhirt, der den Mächtigen die Meinung sagte.",
+      "dialog": [
+        { "sprecher": "figur", "text": "Ich war kein Priester und kein Prophet vom Fach. Ich war Schafhirt und hab Maulbeerfeigen geritzt. Aber was ich gesehen hab, konnte ich irgendwann nicht mehr aushalten: Die einen feiern fromme Feste — und die anderen hungern direkt vor ihrer Tür." },
+        { "sprecher": "du", "optionen": [
+          { "text": "Klingt ziemlich nach heute.", "reaktion": "Sag ich doch. Deshalb reden Leute wie ich nicht in Watte. Gott sagt durch mich: »Ich kann eure Feste nicht ausstehen« — solange nebenan Unrecht läuft. Frömmigkeit ohne Gerechtigkeit ist Deko." },
+          { "text": "Warst du nicht ein bisschen zu krass drauf?", "reaktion": "Vielleicht. Aber Unrecht ist krasser. Wer beim Unrecht höflich bleibt, hilft dem Unrecht. Gott wollte keine schöneren Lieder — er wollte, dass sich etwas ändert." }
+        ]},
+        { "sprecher": "figur", "text": "Mein wichtigster Satz? »Das Recht ströme wie Wasser und die Gerechtigkeit wie ein Bach, der niemals versiegt.« Nicht tröpfeln. Strömen." }
+      ],
+      "impuls": "Wo siehst du Unrecht, bei dem alle wegschauen — in der Schule, im Kiez, in der Welt? Und was wäre dein »Jetzt-bin-ich-mal-nicht-höflich«-Moment?",
+      "frage": {
+        "typ": "multiple-choice",
+        "schwierigkeit": 2,
+        "frage": "Was soll laut Amos »strömen wie Wasser«?",
+        "antworten": ["Der Segen", "Das Recht", "Die Opfergaben", "Der Weihrauch"],
+        "richtig": 1,
+        "erklaerung": "Amos 5,24 — diesen Satz hat auch Martin Luther King in seiner berühmten »I have a dream«-Rede zitiert. Prophetenworte veralten nicht.",
+        "bibelstelle": "Amos 5,21-24",
+        "bibellink": "https://www.die-bibel.de/bibel/BB/AMO.5.21-AMO.5.24"
+      },
+      "kartenspruch": "Frömmigkeit ohne Gerechtigkeit ist nur Deko."
+    },
+    {
+      "id": "zachaeus",
+      "name": "Zachäus",
+      "beiname": "Mann des zweiten Anfangs",
+      "ortId": "heerstrasse-nord",
+      "thema": "zweite-chance",
+      "themaLabel": "Umkehr & zweite Chance",
+      "seltenheit": "gewoehnlich",
+      "emoji": "🌳",
+      "farbe": "#6b8e3d",
+      "muster": "ranken",
+      "kurzvorstellung": "Der Abzocker auf dem Baum, bei dem Jesus zu Gast sein wollte.",
+      "dialog": [
+        { "sprecher": "figur", "text": "Okay, peinliche Geschichte: Ich bin auf einen Baum geklettert. Als erwachsener Mann, im teuren Gewand. Ich war zu klein für die Menge — und die Menge hat mich sowieso gehasst. Ich war Zöllner. Ich hab sie jahrelang abgezockt." },
+        { "sprecher": "du", "optionen": [
+          { "text": "Warum wolltest du Jesus überhaupt sehen?", "reaktion": "Keine Ahnung, ehrlich. Irgendwas in mir wusste: So wie es läuft, will ich nicht weitermachen. Manchmal klettert man auf einen Baum, bevor man sich das selbst eingesteht." },
+          { "text": "Und dann hat er dich entdeckt?", "reaktion": "Er blieb stehen, schaut hoch und sagt: »Zachäus, komm schnell runter — ich muss heute bei DIR zu Gast sein.« Bei mir! Die Menge war empört. Und ich war… auf einmal neu." }
+        ]},
+        { "sprecher": "figur", "text": "Noch am selben Tag hab ich die Hälfte von allem verschenkt und vierfach zurückgezahlt, was ich erpresst hatte. Nicht weil ich musste. Sondern weil zum ersten Mal jemand nicht meinen Fehler gesehen hat — sondern mich." }
+      ],
+      "impuls": "Zweite Chancen: Wem würdest du eine geben? Und — brauchst du gerade selbst eine? Umkehr fängt oft mit einer Einladung an, nicht mit einer Predigt.",
+      "frage": {
+        "typ": "multiple-choice",
+        "schwierigkeit": 1,
+        "frage": "Was tut Zachäus nach der Begegnung mit Jesus?",
+        "antworten": ["Er flieht aus Jericho", "Er gibt die Hälfte seines Besitzes den Armen", "Er wird Priester", "Er lädt die Menge zum Fest ein"],
+        "richtig": 1,
+        "erklaerung": "Umkehr zeigt sich bei Zachäus nicht in schönen Worten, sondern ganz konkret: teilen und zurückzahlen. Glaube verändert Verhalten.",
+        "bibelstelle": "Lukas 19,1-10",
+        "bibellink": "https://www.die-bibel.de/bibel/BB/LUK.19.1-LUK.19.10"
+      },
+      "kartenspruch": "Gesehen werden verändert mehr als jede Predigt."
+    },
+    {
+      "id": "bartimaeus",
+      "name": "Bartimäus",
+      "beiname": "Der laut Hoffende",
+      "ortId": "heerstrasse-nord",
+      "thema": "gesehen-werden",
+      "themaLabel": "Gesehen werden",
+      "seltenheit": "besonders",
+      "emoji": "👁️",
+      "farbe": "#96622d",
+      "muster": "weg",
+      "kurzvorstellung": "Er saß am Straßenrand und schrie so lange, bis Jesus stehen blieb.",
+      "dialog": [
+        { "sprecher": "figur", "text": "Mein Platz war der Straßenrand. Blind, bettelnd, für die meisten einfach Luft. Als ich hörte, dass Jesus vorbeikommt, hab ich geschrien. Richtig geschrien: »Jesus, hab Erbarmen mit mir!«" },
+        { "sprecher": "du", "optionen": [
+          { "text": "Haben die Leute dich nicht zum Schweigen gebracht?", "reaktion": "Doch, klar: »Halt den Mund, du störst!« Und weißt du, was ich gemacht hab? Noch LAUTER geschrien. Wenn es um alles geht, ist Scham ein schlechter Ratgeber." },
+          { "text": "Was hat Jesus gemacht?", "reaktion": "Er ist stehen geblieben. Mitten im Getümmel — wegen mir. Und dann kam die Frage, die ich nie vergessen werde: »Was willst du, das ich für dich tun soll?« Mich hatte noch NIE jemand gefragt, was ich will." }
+        ]},
+        { "sprecher": "figur", "text": "»Rabbuni, dass ich sehen kann.« Und dann konnte ich. Das Erste, was ich gesehen habe? Sein Gesicht. Ich bin ihm nachgefolgt, die Straße entlang — vom Straßenrand mitten auf den Weg." }
+      ],
+      "impuls": "»Was willst du, das ich für dich tun soll?« — Stell dir vor, Gott stellt dir heute genau diese Frage. Was antwortest du? Schreib es auf.",
+      "frage": {
+        "typ": "multiple-choice",
+        "schwierigkeit": 1,
+        "frage": "Was fragt Jesus den blinden Bartimäus?",
+        "antworten": ["Warum schreist du so?", "Was willst du, das ich für dich tun soll?", "Wer sind deine Eltern?", "Wie lange bist du schon blind?"],
+        "richtig": 1,
+        "erklaerung": "Jesus entscheidet nicht über Bartimäus' Kopf hinweg — er fragt ihn. Würde heißt: gefragt werden, statt übergangen zu werden.",
+        "bibelstelle": "Markus 10,46-52",
+        "bibellink": "https://www.die-bibel.de/bibel/BB/MRK.10.46-MRK.10.52"
+      },
+      "kartenspruch": "Schrei ruhig lauter. Würde beginnt mit deiner Stimme."
+    },
+    {
+      "id": "mirjam",
+      "name": "Mirjam",
+      "beiname": "Prophetin mit Tamburin",
+      "ortId": "ernst-lange-haus",
+      "thema": "musik",
+      "themaLabel": "Musik & Befreiung",
+      "seltenheit": "gewoehnlich",
+      "emoji": "🥁",
+      "farbe": "#8256a8",
+      "muster": "noten",
+      "kurzvorstellung": "Sie sang das erste Befreiungslied der Bibel — direkt nach der Rettung.",
+      "dialog": [
+        { "sprecher": "figur", "text": "Weißt du, welches das älteste Befreiungslied der Bibel ist? Meins. Direkt nach der Rettung am Schilfmeer. Wir waren gerade der Sklaverei entkommen — und ich hab mir mein Tamburin gegriffen." },
+        { "sprecher": "du", "optionen": [
+          { "text": "Einfach mitten in der Wüste Party?", "reaktion": "Genau da! Eine Befreiung, die man nicht feiert, glaubt einem doch keiner. Musik ist Erinnerung, die man tanzen kann." },
+          { "text": "Warum Musik — und nicht einfach Worte?", "reaktion": "Weil manche Dinge zu groß für Sätze sind. Wo Worte aufhören, fängt Singen an. Frag mal die Leute bei der Music and Spirit Night." }
+        ]},
+        { "sprecher": "figur", "text": "Alle Frauen zogen mit Tamburinen hinter mir her, und wir sangen: »Singt dem Herrn, denn er ist hoch erhaben!« Merk dir eins: Glaube hat einen Beat." }
+      ],
+      "impuls": "Welcher Song ist für dich mehr als nur Musik — einer, der dich schon mal aus einem Tief gezogen hat? Das ist vielleicht dein Psalm. Schreib ihn auf.",
+      "frage": {
+        "typ": "multiple-choice",
+        "schwierigkeit": 1,
+        "frage": "Was feiern Mirjam und die Frauen mit ihren Tamburinen?",
+        "antworten": ["Die Ernte", "Die Rettung am Schilfmeer", "Ein Hochzeitsfest", "Den Einzug in Jerusalem"],
+        "richtig": 1,
+        "erklaerung": "Nach dem Durchzug durchs Schilfmeer singt Mirjam das älteste Befreiungslied der Bibel — Musik und Glaube gehören von Anfang an zusammen.",
+        "bibelstelle": "2. Mose 15,20-21",
+        "bibellink": "https://www.die-bibel.de/bibel/BB/EXO.15.20-EXO.15.21"
+      },
+      "kartenspruch": "Glaube hat einen Beat."
+    },
+    {
+      "id": "david",
+      "name": "David",
+      "beiname": "Poet der ehrlichen Gebete",
+      "ortId": "ernst-lange-haus",
+      "thema": "beten",
+      "themaLabel": "Ehrlich beten",
+      "seltenheit": "legende",
+      "emoji": "🎸",
+      "farbe": "#5b4a9e",
+      "muster": "noten",
+      "kurzvorstellung": "Nicht nur Goliath: Seine Psalmen sind die ehrlichste Playlist der Bibel.",
+      "dialog": [
+        { "sprecher": "figur", "text": "Alle denken bei mir sofort an Goliath. Aber soll ich dir sagen, was mein härtester Kampf war? Der mit meinen eigenen dunklen Tagen. Lies mal Psalm 13: »Wie lange noch, Gott? Hast du mich für immer vergessen?«" },
+        { "sprecher": "du", "optionen": [
+          { "text": "So darf man mit Gott reden?!", "reaktion": "So MUSS man manchmal mit Gott reden. Die Psalmen sind keine braven Gedichte — das ist Wut, Angst, Sehnsucht, Freude. Alles ungefiltert. Gott will keine Show. Er will dich." },
+          { "text": "Und? Hilft das?", "reaktion": "Nicht immer sofort. Aber fast jeder Klagepsalm dreht sich irgendwann. Meiner auch: »Ich aber vertraue darauf, dass du gnädig bist.« Erst wenn alles raus ist, wird Platz für Vertrauen." }
+        ]},
+        { "sprecher": "figur", "text": "Ich hab für alles Lieder geschrieben: Siege, Schuld, Verzweiflung, pure Freude. Nenn es meine Playlist. Und deine? Die darfst du genauso ehrlich füllen." }
+      ],
+      "impuls": "Schreib deine eigene Psalm-Zeile. Sie darf mit »Wie lange noch …« anfangen oder mit »Danke für …«. Ungefiltert — Gott kann das ab.",
+      "frage": {
+        "typ": "multiple-choice",
+        "schwierigkeit": 2,
+        "frage": "Wie beginnt Psalm 13?",
+        "antworten": ["Der Herr ist mein Hirte", "Wie lange noch, Gott?", "Aus der Tiefe rufe ich zu dir", "Lobe den Herrn, meine Seele"],
+        "richtig": 1,
+        "erklaerung": "Psalm 13 beginnt mit einer viermaligen Klage: »Wie lange noch?« — und endet trotzdem mit Vertrauen. Beten darf ehrlich sein.",
+        "bibelstelle": "Psalm 13",
+        "bibellink": "https://www.die-bibel.de/bibel/BB/PSA.13"
+      },
+      "kartenspruch": "Gott will keine Show. Er will dich — ungefiltert."
+    },
+    {
+      "id": "esther",
+      "name": "Esther",
+      "beiname": "Königin des Mutes",
+      "ortId": "ernst-lange-haus",
+      "thema": "mut",
+      "themaLabel": "Mut & Stimme erheben",
+      "seltenheit": "besonders",
+      "emoji": "👑",
+      "farbe": "#a83a6b",
+      "muster": "sterne",
+      "kurzvorstellung": "Sie riskierte ihr Leben mit einem einzigen ungerufenen Gang zum König.",
+      "dialog": [
+        { "sprecher": "figur", "text": "Ich war Königin — klingt nach Macht, war aber ein goldener Käfig. Und dann kam der Moment: Mein Volk sollte vernichtet werden, und ich war die Einzige, die zum König konnte. Nur: Ungerufen zu ihm zu gehen stand unter Todesstrafe." },
+        { "sprecher": "du", "optionen": [
+          { "text": "Hattest du Angst?", "reaktion": "Panische. Ich hab drei Tage gefastet und gezittert. Mut ist nicht, keine Angst zu haben. Mut ist: zitternd trotzdem gehen. »Und wenn ich umkomme, so komme ich um.«" },
+          { "text": "Was hat den Ausschlag gegeben?", "reaktion": "Ein Satz meines Onkels Mordechai: »Wer weiß — vielleicht bist du genau für so eine Zeit wie diese Königin geworden.« Vielleicht bist DU genau für so eine Zeit genau hier. Denk mal drüber nach." }
+        ]},
+        { "sprecher": "figur", "text": "Ich bin gegangen. Ungerufen. Und mein Volk hat überlebt. Übrigens: In meinem ganzen Buch wird Gott kein einziges Mal beim Namen genannt — und ist doch auf jeder Seite da. Manchmal wirkt er durch Menschen, die den Mund aufmachen." }
+      ],
+      "impuls": "»Vielleicht bist du genau für so eine Zeit hier.« Wo wärst du gerade die richtige Person, um den Mund aufzumachen — auch mit Herzklopfen?",
+      "frage": {
+        "typ": "multiple-choice",
+        "schwierigkeit": 3,
+        "frage": "Was ist eine Besonderheit des Buches Esther?",
+        "antworten": ["Es ist das kürzeste Buch der Bibel", "Gott wird darin nie direkt erwähnt", "Es kommt ohne Hauptfigur aus", "Es spielt in Ägypten"],
+        "richtig": 1,
+        "erklaerung": "Im ganzen Buch Esther fällt der Name Gottes nicht ein einziges Mal — und trotzdem erzählt es von Rettung. Gott wirkt auch verborgen, durch mutige Menschen.",
+        "bibelstelle": "Ester 4,13-16",
+        "bibellink": "https://www.die-bibel.de/bibel/BB/EST.4.13-EST.4.16"
+      },
+      "kartenspruch": "Mut ist: zitternd trotzdem gehen."
+    },
+    {
+      "id": "johannes-der-taeufer",
+      "name": "Johannes der Täufer",
+      "beiname": "Rufer in der Wüste",
+      "ortId": "waldhaus",
+      "thema": "umkehr",
+      "themaLabel": "Umkehr & Unbequem-sein",
+      "seltenheit": "gewoehnlich",
+      "emoji": "💧",
+      "farbe": "#2f6b57",
+      "muster": "wellen",
+      "kurzvorstellung": "Kamelhaar, Heuschrecken, Klartext — und trotzdem kamen alle zu ihm.",
+      "dialog": [
+        { "sprecher": "figur", "text": "Ja, ich weiß, wie ich rüberkomme: Typ aus der Wüste, Kamelhaarmantel, isst Heuschrecken mit wildem Honig. Instagram-tauglich war ich nicht. Musste ich auch nicht sein." },
+        { "sprecher": "du", "optionen": [
+          { "text": "Warum so radikal?", "reaktion": "Weil Weichspüler nichts ändert. Ich hab den Leuten zugerufen: Kehrt um! Nicht, um sie fertigzumachen — sondern weil Umkehren heißt: Es ist noch nicht zu spät. Das ist eine gute Nachricht, keine Drohung." },
+          { "text": "Warst du nie versucht, selbst der Star zu sein?", "reaktion": "Klar kamen alle zu MIR an den Jordan. Aber mein Job war ein anderer: »Nach mir kommt einer, der ist stärker als ich.« Auf jemand anderen zeigen können, ohne sich kleiner zu fühlen — das ist Freiheit." }
+        ]},
+        { "sprecher": "figur", "text": "Ich hab Menschen im Jordan untergetaucht — als Zeichen: Altes darf absaufen, Neues fängt an. Deine Taufe steht übrigens in genau dieser Linie. Ziemlich große Sache, falls du sie mal klein findest." }
+      ],
+      "impuls": "Was dürfte in deinem Leben mal »absaufen« — eine Gewohnheit, ein Druck, ein ständiger Vergleich? Und was soll stattdessen auftauchen?",
+      "frage": {
+        "typ": "multiple-choice",
+        "schwierigkeit": 1,
+        "frage": "Wovon lebte Johannes der Täufer in der Wüste?",
+        "antworten": ["Brot und Wein", "Heuschrecken und wildem Honig", "Fisch und Fladenbrot", "Datteln und Ziegenmilch"],
+        "richtig": 1,
+        "erklaerung": "Johannes lebte radikal einfach — sein ganzes Leben war ein einziges Zeichen: Es geht um Umkehr, nicht um Show.",
+        "bibelstelle": "Markus 1,1-8",
+        "bibellink": "https://www.die-bibel.de/bibel/BB/MRK.1.1-MRK.1.8"
+      },
+      "kartenspruch": "Umkehren heißt: Es ist noch nicht zu spät."
+    },
+    {
+      "id": "elia",
+      "name": "Elia",
+      "beiname": "Hörer der leisen Stimme",
+      "ortId": "waldhaus",
+      "thema": "stille",
+      "themaLabel": "Erschöpfung & Stille",
+      "seltenheit": "besonders",
+      "emoji": "🌬️",
+      "farbe": "#4a8a96",
+      "muster": "weg",
+      "kurzvorstellung": "Der große Prophet, der ausgebrannt unter einem Strauch lag.",
+      "dialog": [
+        { "sprecher": "figur", "text": "Ich war der große Prophet. Feuer vom Himmel, Sieg auf ganzer Linie — und einen Tag später lag ich unter einem Wüstenstrauch und wollte nur noch, dass alles aufhört. »Es ist genug, Herr.« Ausgebrannt. Komplett leer." },
+        { "sprecher": "du", "optionen": [
+          { "text": "Das klingt nach Burnout.", "reaktion": "Nenn es, wie du willst — es fühlte sich an wie das Ende. Und weißt du, was Gott als Erstes geschickt hat? Keine Predigt. Einen Engel mit frischem Brot und Wasser. Und Schlaf. Manchmal ist essen und schlafen das Frömmste, was du tun kannst." },
+          { "text": "Und wie ging es weiter?", "reaktion": "Ich bin zum Berg Horeb. Erst kam ein Sturm — Gott war nicht im Sturm. Dann ein Erdbeben — Gott war nicht im Beben. Dann Feuer — nichts. Und dann: ein Ton leisen Schwebens. Da war er." }
+        ]},
+        { "sprecher": "figur", "text": "Seitdem weiß ich: Gott brüllt selten. Wenn du ihn suchst, such nicht das Spektakel. Werd leise. Er ist eher ein Flüstern als ein Feuerwerk." }
+      ],
+      "impuls": "Wann warst du zuletzt richtig still — ohne Handy, ohne Sound? Probier es hier draußen: zwei Minuten. Was hörst du, wenn es leise wird? Schreib es auf.",
+      "frage": {
+        "typ": "multiple-choice",
+        "schwierigkeit": 2,
+        "frage": "Worin begegnet Gott dem Propheten Elia am Berg Horeb?",
+        "antworten": ["Im Sturm", "Im Erdbeben", "Im Feuer", "In einem leisen Säuseln"],
+        "richtig": 3,
+        "erklaerung": "Nach Sturm, Beben und Feuer kommt Gott im leisen Säuseln — einem »Ton verschwebenden Schweigens«. Stille ist ein Gottesort.",
+        "bibelstelle": "1. Könige 19,1-13",
+        "bibellink": "https://www.die-bibel.de/bibel/BB/1KI.19.1-1KI.19.13"
+      },
+      "kartenspruch": "Gott ist eher ein Flüstern als ein Feuerwerk."
+    },
+    {
+      "id": "hagar",
+      "name": "Hagar",
+      "beiname": "Die Gott einen Namen gab",
+      "ortId": "waldhaus",
+      "thema": "gesehen-werden",
+      "themaLabel": "Gesehen werden",
+      "seltenheit": "legende",
+      "emoji": "⛲",
+      "farbe": "#2c8577",
+      "muster": "strahlen",
+      "kurzvorstellung": "Die geflohene Sklavin — der erste Mensch der Bibel, der Gott einen Namen gibt.",
+      "dialog": [
+        { "sprecher": "figur", "text": "Ich war Sklavin. Schwanger, schlecht behandelt, weggelaufen — mitten in die Wüste, wo man allein nicht überlebt. Ich war die, die niemand sah. Bis zu dieser Quelle." },
+        { "sprecher": "du", "optionen": [
+          { "text": "Wer hat dich gefunden?", "reaktion": "Der Engel Gottes. Er hat mich beim Namen genannt — »Hagar« — und gefragt: »Woher kommst du? Wohin gehst du?« Zwei Fragen, die dir nur jemand stellt, den du wirklich interessierst." },
+          { "text": "Was hast du dann getan?", "reaktion": "Etwas, das sich vor mir noch niemand getraut hatte: Ich habe Gott einen Namen gegeben. Ich, die ägyptische Sklavin. »El Roï« — du bist ein Gott, der mich sieht." }
+        ]},
+        { "sprecher": "figur", "text": "Denk mal drüber nach: Die erste Person der Bibel, die Gott einen Namen gibt, ist keine Priesterin und kein König — sondern ich. Eine Geflüchtete ohne Rechte. So einer ist Gott: Er sieht die, die sonst keiner sieht." }
+      ],
+      "impuls": "»Du bist ein Gott, der mich sieht.« Fühlst du dich gerade gesehen — zu Hause, in der Schule, in der Gemeinde? Von wem? Und: Wen übersiehst du vielleicht gerade?",
+      "frage": {
+        "typ": "multiple-choice",
+        "schwierigkeit": 3,
+        "frage": "Welchen Namen gibt Hagar Gott in der Wüste?",
+        "antworten": ["El Roï — Gott, der mich sieht", "Jahwe Zebaoth — Herr der Heere", "El Schaddai — der Allmächtige", "Immanuel — Gott mit uns"],
+        "richtig": 0,
+        "erklaerung": "Hagar ist die erste Person der Bibel, die Gott einen Namen gibt: »El Roï«, Gott, der mich sieht. Ausgerechnet eine geflüchtete Sklavin.",
+        "bibelstelle": "1. Mose 16,7-13",
+        "bibellink": "https://www.die-bibel.de/bibel/BB/GEN.16.7-GEN.16.13"
+      },
+      "kartenspruch": "Du bist ein Gott, der mich sieht."
+    },
+    {
+      "id": "hiob",
+      "name": "Hiob",
+      "beiname": "Der Gott die Wahrheit sagte",
+      "ortId": "zuversichtskirche",
+      "thema": "klage",
+      "themaLabel": "Klagen dürfen",
+      "seltenheit": "besonders",
+      "emoji": "🌪️",
+      "farbe": "#4a6fa5",
+      "muster": "sterne",
+      "kurzvorstellung": "Er verlor alles, klagte Gott an — und bekam am Ende recht.",
+      "dialog": [
+        { "sprecher": "figur", "text": "Ich habe alles verloren. Kinder, Gesundheit, Besitz — alles, in kürzester Zeit. Und dann saßen da meine Freunde und meinten, mir erklären zu müssen, warum: »Bestimmt hast du irgendwas falsch gemacht.« Danke für nichts." },
+        { "sprecher": "du", "optionen": [
+          { "text": "Was hätten sie stattdessen tun sollen?", "reaktion": "Das, was sie die ersten sieben Tage getan haben: dasitzen und schweigen. Das war ihr bester Move. Aushalten statt erklären. Wer trauert, braucht keine Antworten. Nur Nähe." },
+          { "text": "Warst du nie wütend auf Gott?", "reaktion": "Und wie! Ich hab den Tag meiner Geburt verflucht. Ich hab Gott angeklagt wie vor Gericht. Und am Ende sagt Gott ausgerechnet zu meinen frommen Freunden: Ihr habt nicht recht von mir geredet — Hiob schon." }
+        ]},
+        { "sprecher": "figur", "text": "Das ist das Verrückteste an meiner Geschichte: Meine Klage war Gott lieber als ihre glatten Erklärungen. Du darfst schreien, fragen, anklagen. Das ist kein Mangel an Glauben. Das IST Glaube — mit offener Wunde." }
+      ],
+      "impuls": "Gerade hier, wo eine Kirche abgerissen wurde: Was hast du schon verloren — einen Menschen, einen Ort, eine Sicherheit? Du darfst es hinschreiben. Klage zählt als Gebet.",
+      "frage": {
+        "typ": "multiple-choice",
+        "schwierigkeit": 2,
+        "frage": "Wie reagieren Hiobs Freunde zuerst — bevor sie anfangen zu reden?",
+        "antworten": ["Sie schweigen sieben Tage bei ihm", "Sie beten laut für ihn", "Sie bringen Opfergaben", "Sie holen einen Arzt"],
+        "richtig": 0,
+        "erklaerung": "Sieben Tage sitzen sie schweigend bei Hiob — Beistand ohne Worte. Erst als sie anfangen, alles zu erklären, geht es schief.",
+        "bibelstelle": "Hiob 2,13; 42,7",
+        "bibellink": "https://www.die-bibel.de/bibel/BB/JOB.42.7-JOB.42.10"
+      },
+      "kartenspruch": "Klage zählt als Gebet."
+    },
+    {
+      "id": "jeremia",
+      "name": "Jeremia",
+      "beiname": "Käufer der Hoffnung",
+      "ortId": "zuversichtskirche",
+      "thema": "hoffnung",
+      "themaLabel": "Hoffnung investieren",
+      "seltenheit": "legende",
+      "emoji": "📜",
+      "farbe": "#34558c",
+      "muster": "ranken",
+      "kurzvorstellung": "Mitten im Untergang kaufte er einen Acker — als Zeichen der Zukunft.",
+      "dialog": [
+        { "sprecher": "figur", "text": "Stell dir vor: Die Stadt ist umzingelt, die Feinde stehen vor den Mauern, alles bricht zusammen. Und was mache ich? Ich kaufe einen Acker. Mitten im Untergang. Mit Vertrag, Zeugen und Siegel, ganz offiziell." },
+        { "sprecher": "du", "optionen": [
+          { "text": "Bist du irre? Wer kauft denn da Land?!", "reaktion": "Haha — genau das haben damals auch alle gesagt! Aber der Kauf WAR die Botschaft: »Man wird wieder Häuser, Äcker und Weinberge kaufen in diesem Land.« Hoffnung ist kein Gefühl. Hoffnung ist eine Handlung mit Unterschrift." },
+          { "text": "Woher hast du die Sicherheit genommen?", "reaktion": "Sicherheit? Hatte ich keine. Ich saß währenddessen selbst im Gefängnis. Aber Gott hatte es zugesagt — und manchmal heißt Glauben: in eine Zukunft investieren, die du selbst vielleicht nie zu sehen bekommst." }
+        ]},
+        { "sprecher": "figur", "text": "Die Kaufurkunde habe ich in einem Tonkrug versiegeln lassen, damit sie lange hält. Und genau hier, wo eine Kirche abgerissen wurde, sage ich dir: Gott baut weiter — nur manchmal anders, als wir denken. Kauf du ruhig schon mal den Acker." }
+      ],
+      "impuls": "Was wäre dein »Acker« — eine Sache, in die du heute Hoffnung investierst, obwohl gerade vieles unsicher ist? Für dich, für deine Gemeinde, für diese Welt?",
+      "frage": {
+        "typ": "multiple-choice",
+        "schwierigkeit": 2,
+        "frage": "Warum kauft Jeremia während der Belagerung Jerusalems einen Acker?",
+        "antworten": ["Als Geldanlage", "Als Zeichen der Hoffnung auf Zukunft", "Um dorthin zu fliehen", "Weil der Preis günstig war"],
+        "richtig": 1,
+        "erklaerung": "Der Ackerkauf ist gelebte Hoffnung: »Man wird wieder Häuser und Äcker kaufen in diesem Land« (Jeremia 32,15) — ein Zeichen mitten im Zusammenbruch.",
+        "bibelstelle": "Jeremia 32,6-15",
+        "bibellink": "https://www.die-bibel.de/bibel/BB/JER.32.6-JER.32.15"
+      },
+      "kartenspruch": "Hoffnung ist eine Handlung mit Unterschrift."
+    },
+    {
+      "id": "noomi",
+      "name": "Noomi",
+      "beiname": "Frau des Neuanfangs",
+      "ortId": "zuversichtskirche",
+      "thema": "neuanfang",
+      "themaLabel": "Verlust & Neuanfang",
+      "seltenheit": "gewoehnlich",
+      "emoji": "🍞",
+      "farbe": "#7488ad",
+      "muster": "weg",
+      "kurzvorstellung": "»Nennt mich Mara — die Bittere.« Und dann wuchs doch neues Leben.",
+      "dialog": [
+        { "sprecher": "figur", "text": "Als ich nach Bethlehem zurückkam, riefen alle: »Noomi ist wieder da!« Noomi heißt »die Liebliche«. Ich hab gesagt: Nennt mich nicht mehr so. Nennt mich Mara — »die Bittere«. Denn mein Leben war bitter geworden." },
+        { "sprecher": "du", "optionen": [
+          { "text": "Du hast deinen Schmerz einfach so ausgesprochen?", "reaktion": "Mitten auf dem Platz, vor allen. Ich hatte meinen Mann und meine beiden Söhne verloren. Warum hätte ich so tun sollen, als wäre alles okay? Wer Verlust kleinredet, macht ihn nur schwerer." },
+          { "text": "Und wie ging es weiter?", "reaktion": "Langsam. Über Gerstenfelder und eine Schwiegertochter, die nicht von meiner Seite wich. Der Neuanfang kam nicht als Blitz — er kam als Ernte, als Brot, als Kind auf meinem Schoß. Stück für Stück." }
+        ]},
+        { "sprecher": "figur", "text": "Am Ende sagten die Frauen von Bethlehem zu mir: »Deine Schwiegertochter ist mehr wert für dich als sieben Söhne.« Aus Mara wurde wieder Noomi. Nicht, weil der Verlust weg war — sondern weil daneben neues Leben gewachsen ist." }
+      ],
+      "impuls": "Musst du gerade etwas hinter dir lassen — einen Ort, eine Freundschaft, eine Version von dir selbst? Du darfst beides fühlen: bitter UND hoffnungsvoll. Wie würdest du dich gerade nennen?",
+      "frage": {
+        "typ": "multiple-choice",
+        "schwierigkeit": 2,
+        "frage": "Welchen Namen wählt Noomi für sich nach ihrem Verlust?",
+        "antworten": ["Mara — die Bittere", "Rahel — das Mutterschaf", "Hanna — die Anmutige", "Debora — die Biene"],
+        "richtig": 0,
+        "erklaerung": "Noomi benennt ihren Schmerz offen — die Bibel gibt Trauer Raum. Und erzählt trotzdem weiter: bis zum Neuanfang.",
+        "bibelstelle": "Rut 1,19-21",
+        "bibellink": "https://www.die-bibel.de/bibel/BB/RUT.1.19-RUT.1.21"
+      },
+      "kartenspruch": "Neuanfang kommt selten als Blitz. Meistens als Ernte."
+    }
+  ]
+}

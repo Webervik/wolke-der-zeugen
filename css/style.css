@@ -1,0 +1,636 @@
+/* ============================================================
+   Wolke der Zeugen — Designsystem „Illuminierte Sammelkarten"
+   Nachthimmel (die Wolke der Zeugen über dir) + Pergament + Gold
+   ============================================================ */
+
+:root {
+  /* Grund */
+  --nacht: #131a30;
+  --nacht-hell: #1e2947;
+  --sternennebel: #2a3a63;
+  --wolke: #aeb9d9;
+  --weiss: #f2f4fb;
+  /* Karte / Pergament */
+  --pergament: #f6ecd7;
+  --pergament-tief: #e6d5b0;
+  --tinte: #2b241d;
+  /* Illumination */
+  --gold: #d4a73a;
+  --gold-hell: #f0d284;
+  --gold-tief: #9c7420;
+  /* Status */
+  --segen: #4f9e6b;
+  --hinweis: #c8553d;
+  /* Form */
+  --radius: 14px;
+  --radius-karte: 18px;
+  --schatten: 0 18px 50px rgba(4, 8, 24, 0.45);
+  --font-display: Georgia, "Times New Roman", serif;
+  --font-text: system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+[hidden] { display: none !important; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  font-family: var(--font-text);
+  font-size: 16px;
+  line-height: 1.55;
+  color: var(--weiss);
+  background:
+    radial-gradient(1px 1px at 12% 22%, rgba(240, 210, 132, 0.9) 50%, transparent 51%),
+    radial-gradient(1.5px 1.5px at 78% 12%, rgba(242, 244, 251, 0.8) 50%, transparent 51%),
+    radial-gradient(1px 1px at 55% 38%, rgba(240, 210, 132, 0.6) 50%, transparent 51%),
+    radial-gradient(1px 1px at 32% 64%, rgba(242, 244, 251, 0.55) 50%, transparent 51%),
+    radial-gradient(1.5px 1.5px at 88% 52%, rgba(240, 210, 132, 0.7) 50%, transparent 51%),
+    radial-gradient(1px 1px at 8% 86%, rgba(242, 244, 251, 0.5) 50%, transparent 51%),
+    radial-gradient(1px 1px at 66% 80%, rgba(240, 210, 132, 0.55) 50%, transparent 51%),
+    radial-gradient(ellipse 120% 80% at 50% -10%, var(--sternennebel), var(--nacht) 65%);
+  background-attachment: fixed;
+  min-height: 100dvh;
+}
+
+#app {
+  max-width: 560px;
+  margin: 0 auto;
+  padding: 16px 16px calc(84px + env(safe-area-inset-bottom));
+}
+
+.laedt {
+  text-align: center;
+  padding: 40vh 24px 0;
+  color: var(--wolke);
+  font-family: var(--font-display);
+  font-size: 18px;
+}
+
+/* ---------- Views ---------- */
+.view { display: none; }
+.view.aktiv { display: block; animation: einblenden 0.25s ease; }
+
+@keyframes einblenden {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: none; }
+}
+
+/* ---------- Typografie ---------- */
+h1, h2, h3, .app-titel {
+  font-family: var(--font-display);
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+h1 { font-size: 26px; margin-bottom: 6px; }
+h2 { font-size: 20px; margin: 18px 0 10px; }
+h3 { font-size: 17px; margin-bottom: 6px; }
+p { margin-bottom: 10px; }
+.dezent { color: var(--wolke); font-size: 14px; }
+
+/* ---------- Panels ---------- */
+.panel-pergament {
+  background: linear-gradient(160deg, var(--pergament), var(--pergament-tief));
+  color: var(--tinte);
+  border: 1.5px solid var(--gold-tief);
+  border-radius: var(--radius);
+  padding: 18px;
+  box-shadow: var(--schatten);
+}
+.panel-nacht {
+  background: var(--nacht-hell);
+  border: 1px solid var(--sternennebel);
+  border-radius: var(--radius);
+  padding: 16px;
+}
+
+/* ---------- Buttons ---------- */
+.btn {
+  display: block;
+  width: 100%;
+  min-height: 48px;
+  padding: 12px 18px;
+  margin: 10px 0;
+  border: none;
+  border-radius: var(--radius);
+  font-family: var(--font-text);
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.12s ease, filter 0.12s ease;
+}
+.btn:active { transform: scale(0.98); }
+.btn:disabled { opacity: 0.45; cursor: default; }
+
+.btn-gold {
+  background: linear-gradient(160deg, var(--gold-hell), var(--gold));
+  color: var(--tinte);
+  border: 1.5px solid var(--gold-tief);
+  box-shadow: 0 6px 20px rgba(212, 167, 58, 0.25);
+}
+.btn-gold:hover { filter: brightness(1.05); }
+
+.btn-sekundaer {
+  background: var(--nacht-hell);
+  color: var(--weiss);
+  border: 1.5px solid var(--sternennebel);
+}
+.btn-warnung {
+  background: transparent;
+  color: var(--hinweis);
+  border: 1.5px solid var(--hinweis);
+}
+.btn-wahl {
+  background: var(--nacht-hell);
+  color: var(--weiss);
+  border: 1.5px solid var(--gold-tief);
+  text-align: left;
+  font-weight: 500;
+}
+.btn-wahl:hover { border-color: var(--gold); }
+
+.btn-antwort {
+  background: var(--nacht);
+  color: var(--weiss);
+  border: 1.5px solid var(--sternennebel);
+  text-align: left;
+  font-weight: 500;
+}
+.btn-antwort.richtig { border-color: var(--segen); background: rgba(79, 158, 107, 0.18); }
+.btn-antwort.falsch { border-color: var(--hinweis); background: rgba(200, 85, 61, 0.14); opacity: 0.8; }
+
+.zurueck {
+  background: none;
+  border: none;
+  color: var(--gold);
+  font-size: 17px;
+  font-weight: 600;
+  padding: 8px 4px;
+  margin-bottom: 8px;
+  cursor: pointer;
+  min-height: 44px;
+}
+
+/* ---------- Links & Chips ---------- */
+.link-gold { color: var(--gold); font-weight: 600; text-decoration: none; }
+.link-gold:hover { text-decoration: underline; }
+.link-tinte { color: var(--gold-tief); font-weight: 600; text-decoration: none; }
+
+.chip {
+  display: inline-block;
+  padding: 5px 12px;
+  margin: 3px 4px 3px 0;
+  border-radius: 999px;
+  background: var(--nacht-hell);
+  border: 1px solid var(--sternennebel);
+  color: var(--wolke);
+  font-size: 13.5px;
+}
+.chip-gold { border-color: var(--gold-tief); color: var(--gold-hell); }
+.chips { margin: 6px 0; }
+
+/* ---------- Formulare ---------- */
+input[type="text"], textarea {
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: var(--radius);
+  border: 1.5px solid var(--sternennebel);
+  background: var(--nacht);
+  color: var(--weiss);
+  font-family: var(--font-text);
+  font-size: 16px;
+}
+input[type="text"]:focus, textarea:focus { outline: 2px solid var(--gold); border-color: var(--gold); }
+textarea { resize: vertical; margin: 8px 0; }
+.panel-pergament textarea {
+  background: rgba(255, 255, 255, 0.55);
+  color: var(--tinte);
+  border-color: var(--gold-tief);
+}
+
+.schalter {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 44px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.schalter input { width: 22px; height: 22px; accent-color: var(--gold); }
+
+/* ---------- Bottom-Navigation ---------- */
+#nav[hidden] { display: none; }
+#nav {
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  display: flex;
+  justify-content: center;
+  gap: 4px;
+  background: rgba(19, 26, 48, 0.92);
+  backdrop-filter: blur(10px);
+  border-top: 1px solid var(--sternennebel);
+  padding: 6px 8px calc(6px + env(safe-area-inset-bottom));
+  z-index: 40;
+}
+#nav button {
+  flex: 1;
+  max-width: 160px;
+  min-height: 56px;
+  background: none;
+  border: none;
+  border-radius: var(--radius);
+  color: var(--wolke);
+  font-family: var(--font-text);
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+}
+#nav button span { font-size: 22px; }
+#nav button.aktiv { color: var(--gold-hell); background: rgba(212, 167, 58, 0.12); }
+
+/* ---------- Onboarding ---------- */
+.onboarding { padding-top: 8vh; text-align: center; }
+.onboarding-wolke { font-size: 64px; animation: schweben 5s ease-in-out infinite; }
+.app-titel { font-size: 32px; margin: 8px 0 22px; color: var(--gold-hell); }
+.sendung { text-align: left; margin-bottom: 18px; }
+.sendung p { font-family: var(--font-display); font-size: 17px; }
+.sendung p:last-of-type { text-align: right; font-style: italic; }
+.onboarding h2 { margin-bottom: 8px; }
+.onboarding input { margin: 14px 0; text-align: center; font-size: 18px; }
+.datenschutz-panel { text-align: left; margin: 12px 0; }
+
+@keyframes schweben {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+/* ---------- Home ---------- */
+.home-kopf {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 6px 2px 12px;
+}
+.home-gruss { font-family: var(--font-display); font-size: 24px; font-weight: 700; }
+.home-sub { color: var(--wolke); font-size: 14.5px; }
+.home-sub strong { color: var(--gold-hell); }
+.home-logo { font-size: 38px; animation: schweben 6s ease-in-out infinite; }
+
+.demo-band, .event-band, .hinweis-band, .denkmal-band {
+  border-radius: var(--radius);
+  padding: 9px 14px;
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+.demo-band { background: rgba(130, 86, 168, 0.25); border: 1px solid #8256a8; }
+.event-band { background: rgba(212, 167, 58, 0.18); border: 1px solid var(--gold-tief); color: var(--gold-hell); }
+.hinweis-band { background: var(--nacht-hell); border: 1px solid var(--sternennebel); color: var(--wolke); font-weight: 500; }
+.denkmal-band { background: rgba(74, 111, 165, 0.2); border: 1px solid #4a6fa5; }
+
+/* ---------- Pilgerkarte (SVG) ---------- */
+#karte-container { margin: 4px 0 6px; }
+.pilgerkarte {
+  width: 100%;
+  height: auto;
+  display: block;
+  filter: drop-shadow(0 14px 34px rgba(4, 8, 24, 0.5));
+}
+.karte-titel {
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 700;
+  fill: var(--tinte);
+  letter-spacing: 0.06em;
+}
+.karte-kompass-n { font-family: var(--font-display); font-size: 14px; fill: var(--gold-tief); font-weight: 700; }
+.medaillon { cursor: pointer; }
+.medaillon:focus { outline: none; }
+.medaillon:focus circle:not(.medaillon-puls) { stroke-width: 5; }
+.medaillon-icon { font-size: 26px; }
+.medaillon-name { font-size: 15px; font-weight: 700; fill: var(--tinte); font-family: var(--font-text); }
+.medaillon-jahre, .medaillon-distanz { font-size: 12px; fill: var(--gold-tief); font-family: var(--font-text); font-weight: 600; }
+.medaillon-siegel { font-size: 12px; fill: var(--tinte); }
+.medaillon-ring.denkmal { stroke-dasharray: 5 4; }
+
+.medaillon-puls, .spieler-puls {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: puls 2s ease-out infinite;
+}
+@keyframes puls {
+  0% { transform: scale(0.85); opacity: 0.55; }
+  100% { transform: scale(1.7); opacity: 0; }
+}
+
+/* ---------- „Diese Woche unterwegs" ---------- */
+.woche h2 { margin-top: 14px; }
+.woche-chips { display: flex; flex-direction: column; gap: 8px; }
+.woche-chip {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  min-height: 56px;
+  padding: 8px 14px;
+  background: var(--nacht-hell);
+  border: 1px solid var(--sternennebel);
+  border-radius: var(--radius);
+  color: var(--weiss);
+  font-family: var(--font-text);
+  font-size: 15px;
+  cursor: pointer;
+  text-align: left;
+}
+.woche-chip.hat { border-color: var(--gold-tief); }
+.woche-chip-emoji { font-size: 26px; width: 36px; text-align: center; }
+.woche-chip-text { display: flex; flex-direction: column; }
+.woche-chip-text small { color: var(--wolke); font-size: 12.5px; }
+
+/* ---------- Ort-Detail ---------- */
+.ort-kopf {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 10px;
+}
+.ort-icon {
+  font-size: 30px;
+  width: 58px; height: 58px;
+  flex: 0 0 58px;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--pergament);
+  border: 3px solid var(--ort-farbe, var(--gold));
+  border-radius: 50%;
+}
+.ort-untertitel { color: var(--wolke); font-size: 14px; margin: 0; }
+.ort-adresse { color: var(--gold); font-size: 13px; margin: 2px 0 0; }
+.ort-siegel {
+  margin-left: auto;
+  width: 34px; height: 34px;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--gold);
+  color: var(--tinte);
+  border-radius: 50%;
+  font-size: 16px;
+  border: 2px solid var(--gold-tief);
+}
+.ort-beschreibung { color: var(--wolke); font-size: 15px; }
+.ort-info { margin: 12px 0; }
+.ort-distanz { font-weight: 700; color: var(--gold-hell); }
+.ort-code label { font-size: 14px; color: var(--wolke); }
+.ort-code-zeile { display: flex; gap: 8px; margin-top: 6px; }
+.ort-code-zeile input { flex: 1; }
+.ort-code-zeile .btn { width: auto; margin: 0; padding: 12px 16px; }
+.ort-links { display: flex; flex-direction: column; gap: 10px; margin: 18px 0; }
+
+.ort-begegnung {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 8px;
+  margin: 14px 0;
+}
+.wartet-panel { border-width: 2.5px; border-color: var(--gold); }
+.ort-begegnung-emoji {
+  font-size: 40px;
+  width: 84px; height: 84px;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--pergament);
+  border: 4px solid var(--gold);
+  border-radius: 50%;
+}
+.ort-begegnung-text small { display: block; color: rgba(43, 36, 29, 0.75); margin-top: 4px; }
+.ort-begegnung .btn { margin-bottom: 0; }
+
+/* ---------- Begegnung ---------- */
+#view-begegnung.aktiv { display: flex; flex-direction: column; min-height: calc(100dvh - 60px); }
+.begegnung-kopf {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--sternennebel);
+  margin-bottom: 12px;
+}
+.begegnung-kopf .zurueck { margin: 0; font-size: 24px; }
+.begegnung-titel { display: flex; align-items: center; gap: 12px; }
+.begegnung-emoji {
+  font-size: 26px;
+  width: 52px; height: 52px;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--pergament);
+  border: 3px solid var(--gold);
+  border-radius: 50%;
+}
+.begegnung-name { font-family: var(--font-display); font-size: 19px; font-weight: 700; }
+.begegnung-ort { font-size: 13px; color: var(--wolke); }
+.begegnung-inhalt { flex: 1; display: flex; flex-direction: column; }
+
+.chat { flex: 1; display: flex; flex-direction: column; gap: 10px; padding-bottom: 12px; }
+.bubble {
+  max-width: 86%;
+  padding: 12px 16px;
+  border-radius: 16px;
+  animation: einblenden 0.3s ease;
+}
+.bubble-figur {
+  align-self: flex-start;
+  background: linear-gradient(160deg, var(--pergament), var(--pergament-tief));
+  color: var(--tinte);
+  font-family: var(--font-display);
+  font-size: 16.5px;
+  border: 1px solid var(--gold-tief);
+  border-bottom-left-radius: 4px;
+}
+.bubble-du {
+  align-self: flex-end;
+  background: var(--sternennebel);
+  color: var(--weiss);
+  border-bottom-right-radius: 4px;
+}
+.chat-aktionen { position: sticky; bottom: 0; padding-top: 4px; background: transparent; }
+
+.impuls { text-align: center; margin-bottom: 4px; }
+.impuls-zeichen { color: var(--gold-tief); font-size: 22px; margin-bottom: 4px; }
+.impuls p { font-family: var(--font-display); font-size: 16.5px; text-align: left; }
+.impuls .dezent { color: rgba(43, 36, 29, 0.7); font-size: 13px; margin: 0; }
+
+.frage-label { color: var(--wolke); font-size: 14px; margin-bottom: 6px; }
+.frage h3 { font-size: 19px; margin-bottom: 12px; }
+.frage-feedback p { margin: 8px 0; }
+.feedback-richtig { color: var(--gold-hell); font-weight: 700; font-size: 16.5px; margin: 10px 0 6px; }
+.feedback-hinweis { color: var(--wolke); font-weight: 600; margin: 10px 0 6px; }
+
+.zeremonie { text-align: center; padding-top: 8px; }
+.zeremonie-karte {
+  max-width: 260px;
+  margin: 0 auto 14px;
+  animation: kartenankunft 0.8s cubic-bezier(0.2, 0.8, 0.3, 1.1);
+}
+@keyframes kartenankunft {
+  0% { opacity: 0; transform: translateY(40px) rotateY(70deg) scale(0.8); }
+  100% { opacity: 1; transform: none; }
+}
+.zeremonie-titel { font-size: 22px; margin-bottom: 8px; }
+.zeremonie-spruch { font-family: var(--font-display); font-style: italic; color: var(--wolke); }
+
+/* ---------- Zeugenkarten (SVG) ---------- */
+.zeugenkarte { width: 100%; height: auto; display: block; border-radius: var(--radius-karte); }
+.karte-emoji { font-size: 62px; }
+.karte-name { font-family: var(--font-display); font-size: 28px; font-weight: 700; fill: var(--tinte); }
+.karte-beiname { font-family: var(--font-display); font-style: italic; font-size: 15px; fill: var(--gold-tief); }
+.karte-thema { font-family: var(--font-text); font-size: 14.5px; font-weight: 700; }
+.karte-ort { font-family: var(--font-text); font-size: 14px; fill: rgba(43, 36, 29, 0.7); }
+.karte-seltenheit { font-family: var(--font-display); font-style: italic; font-size: 13px; fill: var(--gold-tief); }
+.karte-probelauf { font-family: var(--font-text); font-size: 12px; font-weight: 700; fill: var(--wolke); }
+.karte-frage { font-family: var(--font-display); font-size: 64px; fill: var(--wolke); }
+.karte-nebel-text { font-family: var(--font-display); font-size: 19px; fill: var(--wolke); }
+.karte-nebel-hinweis { font-family: var(--font-text); font-size: 15px; font-weight: 600; fill: var(--gold); }
+.karte-nebel-hinweis.klein { font-size: 13px; fill: var(--wolke); font-weight: 500; }
+
+.zeugenkarte.glanz .foil { animation: foil 3.5s ease-in-out infinite; }
+@keyframes foil {
+  0%, 100% { opacity: 0.25; }
+  50% { opacity: 0.9; }
+}
+.zeugenkarte.s-legende { filter: drop-shadow(0 0 14px rgba(212, 167, 58, 0.35)); }
+
+/* ---------- Album (Wolke) ---------- */
+.album-kopf { margin-bottom: 12px; }
+.album-zaehler { font-family: var(--font-display); font-size: 18px; margin: 6px 0 10px; }
+.album-zaehler strong { color: var(--gold-hell); font-size: 24px; }
+.album-tabs { display: flex; gap: 8px; }
+.tab {
+  flex: 1;
+  min-height: 44px;
+  background: var(--nacht-hell);
+  border: 1px solid var(--sternennebel);
+  border-radius: 999px;
+  color: var(--wolke);
+  font-family: var(--font-text);
+  font-size: 14.5px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.tab.aktiv { background: rgba(212, 167, 58, 0.15); border-color: var(--gold-tief); color: var(--gold-hell); }
+
+.album-wolke {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+.album-karte {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  transform: rotate(var(--drehung, 0deg));
+  transition: transform 0.15s ease;
+}
+.album-karte:hover, .album-karte:focus { transform: rotate(0deg) scale(1.03); }
+
+.fenster-wrap { text-align: center; padding: 10px 0; }
+.kirchenfenster { max-width: 300px; width: 90%; height: auto; }
+.fenster-emoji { font-size: 24px; }
+.fenster-text { color: var(--wolke); margin-top: 10px; }
+
+.finale { text-align: center; margin-bottom: 16px; border-width: 2.5px; }
+.finale-titel { font-family: var(--font-display); font-size: 22px; font-weight: 700; margin-bottom: 8px; }
+.finale p { font-family: var(--font-display); font-size: 16px; }
+.finale-quelle { font-size: 14px; color: rgba(43, 36, 29, 0.75); }
+
+/* ---------- Figuren-Detail / Kartenflip ---------- */
+.flip-buehne { max-width: 300px; margin: 0 auto; perspective: 1200px; }
+.flip-karte { position: relative; width: 100%; aspect-ratio: 300 / 420; transform-style: preserve-3d; transition: transform 0.6s ease; cursor: pointer; }
+.flip-karte.gedreht { transform: rotateY(180deg); }
+.flip-vorn, .flip-hinten {
+  position: absolute;
+  inset: 0;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+.flip-hinten { transform: rotateY(180deg); display: flex; }
+.karte-rueckseite {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 14px;
+}
+.rueck-spruch { font-family: var(--font-display); font-size: 19px; font-style: italic; }
+.rueck-bibel { font-weight: 700; color: var(--gold-tief); }
+.flip-hinweis { text-align: center; color: var(--wolke); font-size: 13px; margin: 8px 0 14px; }
+.detail-meta { text-align: center; margin-bottom: 12px; }
+.detail-block { margin: 12px 0; }
+.detail-hinweis { text-align: center; color: var(--wolke); margin-top: 14px; }
+
+/* ---------- Einstellungen ---------- */
+.einstellung { margin-bottom: 12px; }
+.datenschutz-lang { font-size: 14px; color: var(--wolke); }
+.einstellung-fuss { text-align: center; color: var(--wolke); font-size: 13.5px; margin-top: 22px; }
+
+/* ---------- Meilenstein-Overlay ---------- */
+#meilenstein-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(10, 14, 30, 0.82);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  z-index: 60;
+}
+#meilenstein-overlay[hidden] { display: none; }
+.meilenstein { max-width: 420px; text-align: center; animation: einblenden 0.35s ease; }
+.meilenstein-zeichen { font-size: 26px; color: var(--gold-tief); margin-bottom: 10px; }
+.meilenstein p { font-family: var(--font-display); font-size: 17.5px; }
+
+/* ---------- Toast ---------- */
+#toast {
+  position: fixed;
+  left: 50%;
+  bottom: calc(96px + env(safe-area-inset-bottom));
+  transform: translateX(-50%) translateY(20px);
+  background: var(--pergament);
+  color: var(--tinte);
+  border: 1.5px solid var(--gold-tief);
+  border-radius: 999px;
+  padding: 10px 20px;
+  font-weight: 600;
+  font-size: 14.5px;
+  max-width: 90vw;
+  text-align: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease, transform 0.25s ease;
+  z-index: 70;
+  box-shadow: var(--schatten);
+}
+#toast.sichtbar { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+/* ---------- Reduzierte Bewegung ---------- */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  .medaillon-puls, .spieler-puls { animation: none; opacity: 0.25; }
+  .zeugenkarte.glanz .foil { animation: none; opacity: 0.5; }
+}
+
+/* ---------- Größere Screens ---------- */
+@media (min-width: 700px) {
+  #app { max-width: 640px; }
+  .album-wolke { grid-template-columns: repeat(3, 1fr); }
+}
