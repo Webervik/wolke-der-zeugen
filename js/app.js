@@ -85,7 +85,7 @@
     if (view) view.classList.add("aktiv");
 
     const nav = document.getElementById("nav");
-    nav.hidden = (name === "onboarding" || name === "begegnung");
+    nav.hidden = (name === "onboarding" || name === "begegnung" || name === "ar");
     nav.querySelectorAll("[data-nav]").forEach(b => {
       b.classList.toggle("aktiv", b.getAttribute("data-nav") === name);
     });
@@ -254,6 +254,7 @@
             <small>${esc(f.kurzvorstellung)}</small>
           </div>
           <button class="btn btn-gold" data-begegnung="${f.id}">✨ Begegnung beginnen</button>
+          <button class="btn btn-sekundaer" data-ar="${f.id}">📷 In AR sehen</button>
         </div>`).join("");
     } else if (status.frei) {
       begegnungsBereich = `<div class="panel-nacht ort-info">
@@ -317,6 +318,12 @@
       b.addEventListener("click", () => {
         const f = window.Daten.figuren.find(x => x.id === b.getAttribute("data-begegnung"));
         if (f) window.Encounter.start(f);
+      });
+    });
+    view.querySelectorAll("[data-ar]").forEach(b => {
+      b.addEventListener("click", () => {
+        const f = window.Daten.figuren.find(x => x.id === b.getAttribute("data-ar"));
+        if (f) window.AR.oeffne(f, { zurueck: "ort" });
       });
     });
     const beam = view.querySelector("#ort-beam");
