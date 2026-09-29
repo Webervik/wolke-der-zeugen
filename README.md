@@ -25,18 +25,23 @@
 
 ## So funktioniert das Spiel
 
-1. **Karte:** Eine stilisierte Pilgerkarte zeigt die 6 Orte (echte Geo-Projektion, keine externen Kartendienste).
-2. **Hingehen:** Per GPS schaltet sich ein Ort im Umkreis von ~75 m frei — oder per **QR-Code am Ort** (mit der normalen Kamera-App scannen) bzw. Code-Eingabe.
-3. **Begegnung:** Dialog mit Wahlmomenten → Impuls mit privater Notiz → Frage (mit zweiter Chance) → Aufnahme in die Wolke.
-4. **Rotation:** Pro Woche (Wechsel sonntags) ist an jedem Ort eine andere Figur „unterwegs" — Grund, immer wieder zu kommen.
-5. **Sammeln:** Album als Wolke, Orts-Siegel, ein **Kirchenfenster**, das sich Scheibe für Scheibe füllt, Finale bei 18/18.
-6. **Rallye-Modus:** Per Event-Code (z. B. am Konfi-Tag) sind alle 18 Figuren gleichzeitig aktiv — der Ortsbesuch bleibt Pflicht.
+1. **Karte:** Eine Pilgerkarte im Pergament-Stil zeigt die 6 Orte mit echten Straßen, Bahn und Grünflächen (aus OpenStreetMap, fest eingebacken — keine externen Kartendienste zur Laufzeit). Ein **Kompass-Hinweis** oben nennt die nächste offene Begegnung mit Entfernung und meldet „Du bist da!".
+2. **Hingehen:** Per GPS schaltet sich ein Ort im Umkreis von ~75 m frei — oder per **QR-Code am Ort** (mit der normalen Kamera-App scannen) bzw. Code-Eingabe (tolerant: Bindestriche/Leerzeichen egal, kyrillische Doppelgänger-Buchstaben werden erkannt).
+3. **AR-Suche (optional):** „📷 In AR sehen" öffnet die Kamera. Die Figur steht als **Lichtgestalt** fest an einer Stelle im Raum (Lagesensor) — man muss sich umschauen, sie finden und antippen; sie grüßt mit Namen. Ohne Sensor/Kamera steht sie einfach mittig bzw. vor Sternenhimmel.
+4. **Begegnung:** Dialog mit Wahlmomenten → Impuls mit privater Notiz → Frage (mit zweiter Chance) → Aufnahme in die Wolke mit Funkenregen.
+5. **Rotation:** Pro Woche (Wechsel sonntags) ist an jedem Ort eine andere Figur „unterwegs" — Grund, immer wieder zu kommen. Bekannten Figuren kann man „Nochmal zuhören".
+6. **Sammeln:** Karten als Buntglas-Heiligenbildchen (Rahmen je nach Bedeutsamkeit), Orts-Siegel, ein **Kirchenfenster**, das sich Scheibe für Scheibe füllt, Finale bei 18/18.
+7. **Rallye-Modus:** Per Event-Code (z. B. am Konfi-Tag) sind alle 18 Figuren gleichzeitig aktiv — der Ortsbesuch bleibt Pflicht.
+
+**Lichtgestalten** (`js/gestalt.js`): Jede Figur wird als Kirchenfenster-Gestalt in ihrer Farbe gezeichnet und hält ihr Symbol wie ein Attribut vor der Brust — bewusst ohne Gesichtszüge. Reines SVG, keine Bilddateien; die Glasfacetten sind pro Figur zufällig, aber reproduzierbar.
 
 ## Datenschutz (wichtig: Minderjährige!)
 
 - **Kein Backend, kein Konto, keine Cloud.** Alles liegt im localStorage des Geräts.
 - **GPS nur auf dem Gerät:** Die Position wird nie gespeichert, nie übertragen — die App rechnet lokal die Distanz aus. Standortfreigabe ist optional (QR-Codes als vollwertiger Weg).
-- **Keine Fremd-Requests zur Laufzeit** (deshalb eigene SVG-Karte statt Google/OSM-Tiles). Links (die-bibel.de, staaken-evangelisch.de) öffnen nur auf aktiven Tipp.
+- **Keine Fremd-Requests zur Laufzeit** (deshalb eigene SVG-Karte statt Google/OSM-Tiles; die OSM-Daten liegen fest in `data/karte-hintergrund.json`). Links (die-bibel.de, staaken-evangelisch.de) öffnen nur auf aktiven Tipp.
+- **Kamera und Lagesensor (AR)** laufen nur in der AR-Ansicht, bleiben auf dem Gerät und werden beim Verlassen sofort gestoppt.
+- **Offline:** Ein Service Worker hält die App-Dateien vor (Strategie „Netz zuerst", Cache nach 4 s ohne Netz). Er speichert keine Nutzerdaten.
 - Nur der Vorname wird erfragt; „Alles löschen" in den Einstellungen entfernt sämtliche Daten.
 - Die QR-/Event-Codes im JSON sind eine Fairness-Hürde, keine Security — wer sie ausliest, betrügt nur sich selbst.
 
@@ -72,8 +77,8 @@ npx serve -l 3457 .
 
 ## Ideen für später („größer bauen")
 
-AR-Kamera-Overlays · Karten untereinander zeigen/tauschen („Zeugnis teilen") · weitere Figuren (Tabita, Lydia, Magnificat-Maria als Adventsspezial) · Audio-Stimmen · Service Worker für volle Offline-Fähigkeit · Erweiterung auf die Pilgerweg-Zonen aus konfi-check (St. Nikolai, Gedächtniskirche, Wittenberg …)
+Karten untereinander zeigen/tauschen („Zeugnis teilen") · weitere Figuren (Tabita, Lydia, Magnificat-Maria als Adventsspezial) · Audio-Stimmen · Kompass-Richtungspfeil zur nächsten Begegnung · Erweiterung auf die Pilgerweg-Zonen aus konfi-check (St. Nikolai, Gedächtniskirche, Wittenberg …) · perspektivisch: begehbare 3D-/Voxel-Welt
 
 ---
 
-*Technik: Pures HTML/CSS/JavaScript ohne Build-Step (wie konfi-check und mitunteruns). Einzige Fremdbibliothek: [qrcode-generator](https://github.com/kazuhikoarase/qrcode-generator) (MIT, nur im Leitungsbereich). Design „Illuminierte Sammelkarten": Nachthimmel, Pergament, Gold.*
+*Technik: Pures HTML/CSS/JavaScript ohne Build-Step (wie konfi-check und mitunteruns). Einzige Fremdbibliothek: [qrcode-generator](https://github.com/kazuhikoarase/qrcode-generator) (MIT, nur im Leitungsbereich). Kartendaten © OpenStreetMap-Mitwirkende, Lizenz ODbL (Hinweis steht auf der Karte). Design „Illuminierte Sammelkarten": Nachthimmel, Pergament, Gold.*

@@ -5,9 +5,17 @@
    wer sie ausliest, betrügt nur sich selbst ums Spiel. */
 (function () {
   let watchId = null;
-  let position = null;      // { lat, lng, accuracy } — nur im Speicher
+  let position = null;      // { lat, lng, accuracy, zeit } — nur im Speicher
   let demoOrtId = null;     // im Demo-Modus "gebeamter" Ort
   let listeners = [];
+
+  /* Letzte Position bleibt kurz gültig: Ein GPS-Aussetzer (drinnen, unter Bäumen)
+     oder der Wechsel ins Gespräch soll einen gerade erreichten Ort nicht wieder sperren. */
+  function aktuell() {
+    if (!position) return null;
+    const maxAlter = watchId !== null ? 90000 : 180000;
+    return Date.now() - position.zeit <= maxAlter ? position : null;
+  }
 
   function haversine(lat1, lng1, lat2, lng2) {
     const R = 6371000;
@@ -29,11 +37,13 @@
         position = {
           lat: pos.coords.latitude,
           lng: pos.coords.longitude,
-          accuracy: pos.coords.accuracy
+          accuracy: pos.coords.accuracy,
+          zeit: Date.now()
         };
         melde();
       },
-      () => { position = null; melde(); },
+      // Fehler/Timeout: letzte Position nicht sofort verwerfen (siehe aktuell())
+      () => { melde(); },
       { enableHighAccuracy: true, maximumAge: 10000, timeout: 20000 }
     );
   }
@@ -43,7 +53,6 @@
       navigator.geolocation.clearWatch(watchId);
     }
     watchId = null;
-    position = null;
   }
 
   function beamZu(ortId) {
@@ -52,7 +61,7 @@
     demoOrtId = ortId;
     if (ort.lat !== null && ort.lng !== null) {
       // Simulierte Position läuft durch dieselbe Geofence-Pipeline wie echtes GPS
-      position = { lat: ort.lat, lng: ort.lng, accuracy: 5 };
+      position = { lat: ort.lat, lng: ort.lng, accuracy: 5, zeit: Date.now() };
     }
     melde();
   }
@@ -60,8 +69,9 @@
   function beamZuruecksetzen() { demoOrtId = null; if (watchId === null) position = null; melde(); }
 
   function distanzZu(ort) {
-    if (!position || ort.lat === null || ort.lng === null) return null;
-    return haversine(position.lat, position.lng, ort.lat, ort.lng);
+    const p = aktuell();
+    if (!p || ort.lat === null || ort.lng === null) return null;
+    return haversine(p.lat, p.lng, ort.lat, ort.lng);
   }
 
   /* Zentrale Freischaltungs-Prüfung: GPS, QR oder Demo. */
@@ -74,7 +84,7 @@
     }
     const d = distanzZu(ort);
     if (d !== null) {
-      const toleranz = Math.min(position.accuracy || 0, 30);
+      const toleranz = Math.min(aktuell().accuracy || 0, 30);
       if (d <= ort.radiusMeter + toleranz) {
         return { frei: true, art: "gps", distanz: d };
       }
@@ -92,9 +102,9 @@
     distanzZu,
     haversine,
     aktiv: () => watchId !== null,
-    hatPosition: () => !!position,
-    genauigkeit: () => (position ? position.accuracy : null),
-    positionXY: () => (position ? { lat: position.lat, lng: position.lng } : null),
+    hatPosition: () => !!aktuell(),
+    genauigkeit: () => (aktuell() ? aktuell().accuracy : null),
+    positionXY: () => (aktuell() ? { lat: aktuell().lat, lng: aktuell().lng } : null),
     demoOrt: () => demoOrtId,
     onUpdate(fn) { listeners.push(fn); }
   };

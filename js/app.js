@@ -3,7 +3,12 @@
   let aktuelleView = "home";
   let aktuellerOrt = null;
   let letzterOrtStatus = "";
+  let hinweisSchluessel = "";
   let meilensteinWarteschlange = [];
+
+  function formatDistanz(d) {
+    return d >= 1000 ? `~${(d / 1000).toFixed(1)} km` : `~${Math.round(d / 10) * 10} m`;
+  }
 
   function esc(s) {
     return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
@@ -11,12 +16,14 @@
 
   /* ---------- Init ---------- */
   async function init() {
-    const [config, orte, figuren] = await Promise.all([
+    const [config, orte, figuren, hintergrund] = await Promise.all([
       fetch("data/config.json").then(r => r.json()),
       fetch("data/orte.json").then(r => r.json()),
-      fetch("data/figuren.json").then(r => r.json())
+      fetch("data/figuren.json").then(r => r.json()),
+      // Kartenhintergrund ist optional — ohne ihn bleibt die Karte einfach schlichter
+      fetch("data/karte-hintergrund.json").then(r => r.json()).catch(() => null)
     ]);
-    window.Daten = { config, orte: orte.orte, figuren: figuren.figuren };
+    window.Daten = { config, orte: orte.orte, figuren: figuren.figuren, hintergrund };
 
     const params = new URLSearchParams(location.search);
     window.Rotation.init(config, params.get("heute"));
@@ -54,17 +61,20 @@
     document.getElementById("app-laedt").hidden = true;
 
     verdrahteNav();
-    // GPS-Ticks aktualisieren nur die Karte bzw. den Ort-Status — kein voller
-    // Re-Render, sonst verliert z. B. das Code-Eingabefeld beim Tippen den Fokus.
+    // GPS-Fixes kommen beim Gehen alle 1–2 Sekunden. Sie dürfen nichts neu aufbauen,
+    // was man gerade antippt oder ausfüllt (Karte, Code-Feld) — deshalb werden nur
+    // Entfernungen und Hinweise an Ort und Stelle aktualisiert. Neu aufgebaut wird
+    // nur, wenn sich ein Ort tatsächlich freischaltet oder wieder sperrt.
     window.Geo.onUpdate(() => {
       if (aktuelleView === "home") {
-        const c = document.getElementById("karte-container");
-        if (c) window.Karte.render(c);
+        window.Karte.aktualisiere(document.getElementById("karte-container"));
+        aktualisiereHinweise();
       }
       if (aktuelleView === "ort" && aktuellerOrt) {
-        const status = window.Geo.freischaltung(window.Daten.orte.find(o => o.id === aktuellerOrt));
-        const signatur = status.frei + ":" + status.art + ":" + (status.distanz === null ? "-" : Math.round(status.distanz / 10));
-        if (signatur !== letzterOrtStatus) renderOrt(aktuellerOrt);
+        const ort = window.Daten.orte.find(o => o.id === aktuellerOrt);
+        const status = window.Geo.freischaltung(ort);
+        if (status.frei + ":" + status.art !== letzterOrtStatus) renderOrt(aktuellerOrt);
+        else aktualisiereOrtDistanz(ort, status);
       }
     });
 
@@ -75,10 +85,17 @@
       zeigeView("home");
     }
     if (qrToast) toast(qrToast);
+
+    // Offline-Fähigkeit: Netz zuerst, bei schlechtem Empfang (z. B. am Waldhaus) aus dem Cache
+    if ("serviceWorker" in navigator && (location.protocol === "https:" || location.hostname === "localhost")) {
+      navigator.serviceWorker.register("sw.js").catch(() => { /* ohne SW läuft alles wie bisher */ });
+    }
   }
 
   /* ---------- View-Router ---------- */
   function zeigeView(name) {
+    // Kamera/Lagesensor nie im Hintergrund weiterlaufen lassen
+    if (name !== "ar" && window.AR) window.AR.stoppe();
     aktuelleView = name;
     document.querySelectorAll(".view").forEach(v => v.classList.remove("aktiv"));
     const view = document.getElementById("view-" + name);
@@ -98,6 +115,7 @@
     }
 
     if (name === "home") renderHome();
+    if (name === "ort" && aktuellerOrt) renderOrt(aktuellerOrt);
     if (name === "wolke") window.Wolke.renderAlbum(document.getElementById("view-wolke"));
     if (name === "einstellungen") renderEinstellungen();
     window.scrollTo(0, 0);
@@ -178,23 +196,20 @@
     const eventAktiv = window.Store.istEventAktiv();
     const aktive = window.Rotation.aktiveFiguren();
 
+    const getroffen = aktive.filter(f => window.Store.istGesammelt(f.id)).length;
+
     const chips = aktive.map(f => {
       const hat = window.Store.istGesammelt(f.id);
       const ort = window.Daten.orte.find(o => o.id === f.ortId);
       return `<button class="woche-chip${hat ? " hat" : ""}" data-figur-chip="${f.id}">
-        <span class="woche-chip-emoji">${hat ? f.emoji : "❔"}</span>
+        <span class="woche-chip-gestalt">${window.Gestalt.svg(f, { praefix: "woche", unbekannt: !hat })}</span>
         <span class="woche-chip-text">
-          <strong>${hat ? esc(f.name) : "???"}</strong>
+          <strong>${hat ? esc(f.name) + " ✓" : "Noch unbekannt"}</strong>
           <small>${esc(f.themaLabel)} · ${ort ? ort.icon : ""} ${esc(window.Karte.KURZNAMEN[f.ortId] || "")}</small>
         </span>
+        <span class="woche-chip-pfeil" aria-hidden="true">›</span>
       </button>`;
     }).join("");
-
-    const geoHinweis = (!s.geoErlaubt && !s.demo)
-      ? `<div class="hinweis-band">Ohne Standort? Kein Problem — scanne die QR-Codes an den Orten. 📷</div>` : "";
-    const genau = window.Geo.genauigkeit();
-    const gpsHinweis = (s.geoErlaubt && genau !== null && genau > 100)
-      ? `<div class="hinweis-band">GPS ist gerade ungenau (±${Math.round(genau)} m) — geh ein paar Schritte oder nutz den QR-Code am Ort.</div>` : "";
 
     view.innerHTML = `
       ${s.demo ? `<div class="demo-band">🧪 Demo-Modus — Begegnungen zählen als Probelauf</div>` : ""}
@@ -206,15 +221,19 @@
         </div>
         <div class="home-logo">☁️</div>
       </header>
-      ${geoHinweis}${gpsHinweis}
+      <div id="naechster-ort" class="naechster-ort"></div>
+      <div id="gps-hinweis"></div>
       <div id="karte-container"></div>
       <section class="woche">
-        <h2>${eventAktiv ? "Heute unterwegs (Rallye!)" : "Diese Woche unterwegs"}</h2>
+        <h2>${eventAktiv ? "Heute unterwegs (Rallye!)" : "Diese Woche unterwegs"}
+          <span class="woche-stand">${getroffen}/${aktive.length} getroffen</span></h2>
         <div class="woche-chips">${chips}</div>
         ${eventAktiv ? "" : `<p class="dezent">Jede Woche (ab Sonntag) sind andere Zeug:innen an den Orten. Dranbleiben lohnt sich!</p>`}
       </section>`;
 
+    hinweisSchluessel = "";
     window.Karte.render(view.querySelector("#karte-container"));
+    aktualisiereHinweise();
     view.querySelectorAll("[data-figur-chip]").forEach(el => {
       el.addEventListener("click", () => {
         const f = figuren.find(x => x.id === el.getAttribute("data-figur-chip"));
@@ -223,11 +242,95 @@
     });
   }
 
+  /* Orte, an denen gerade eine (noch nicht getroffene) Zeug:in wartet */
+  function offeneOrte() {
+    const eventAktiv = window.Store.istEventAktiv();
+    return window.Daten.orte.filter(o => {
+      if (eventAktiv) return window.Rotation.figurenAnOrt(o.id).some(f => !window.Store.istGesammelt(f.id));
+      const f = window.Rotation.aktiveFigur(o.id);
+      return !!f && !window.Store.istGesammelt(f.id);
+    });
+  }
+
+  /* "Kompass" auf der Startseite: Wo geht's als Nächstes hin? Wird bei GPS-Fixes
+     nur dann neu aufgebaut, wenn sich die Aussage ändert — sonst nur die Entfernung. */
+  function aktualisiereHinweise() {
+    const box = document.getElementById("naechster-ort");
+    if (!box) return;
+    const s = window.Store.get();
+    const eventAktiv = window.Store.istEventAktiv();
+    const offen = offeneOrte();
+    let schluessel = "", html = "", dist = "";
+
+    if (!offen.length) {
+      schluessel = "fertig";
+      html = `<div class="hinweis-karte fertig"><span class="hinweis-icon">🎉</span><span>Du hast alle Zeug:innen getroffen, die ${eventAktiv ? "heute" : "diese Woche"} unterwegs sind!${eventAktiv ? "" : " Ab Sonntag warten neue an den Orten."}</span></div>`;
+    } else {
+      const da = offen.find(o => window.Geo.freischaltung(o).frei);
+      if (da) {
+        schluessel = "da:" + da.id;
+        html = `<button class="hinweis-karte da" data-hinweis-ort="${da.id}"><span class="hinweis-icon">✨</span><span><strong>Du bist da!</strong> Hier wartet jemand auf dich: ${esc(da.name)} <span class="hinweis-los">Los →</span></span></button>`;
+      } else if (window.Geo.hatPosition()) {
+        let naechster = null, beste = Infinity;
+        offen.forEach(o => {
+          const d = window.Geo.distanzZu(o);
+          if (d !== null && d < beste) { beste = d; naechster = o; }
+        });
+        if (naechster) {
+          schluessel = "nah:" + naechster.id;
+          dist = formatDistanz(beste);
+          html = `<button class="hinweis-karte" data-hinweis-ort="${naechster.id}"><span class="hinweis-icon">🧭</span><span>Nächste Begegnung: <strong>${esc(naechster.name)}</strong> · <span class="hinweis-dist">${dist}</span></span></button>`;
+        }
+      } else if (s.geoErlaubt) {
+        schluessel = "suche";
+        html = `<div class="hinweis-karte leise"><span class="hinweis-icon">📍</span><span>Suche dein GPS-Signal … Draußen klappt's am besten. Am Ort geht's auch mit dem Code vom Schild.</span></div>`;
+      } else if (!s.demo) {
+        schluessel = "ohne";
+        html = `<div class="hinweis-karte leise"><span class="hinweis-icon">📷</span><span>Ohne Standort? Kein Problem — tipp am Ort auf der Karte den Code vom Schild ein.</span></div>`;
+      }
+    }
+
+    if (schluessel !== hinweisSchluessel) {
+      box.innerHTML = html;
+      hinweisSchluessel = schluessel;
+      const btn = box.querySelector("[data-hinweis-ort]");
+      if (btn) btn.addEventListener("click", () => zeigeOrt(btn.getAttribute("data-hinweis-ort")));
+    } else if (dist) {
+      const d = box.querySelector(".hinweis-dist");
+      if (d && d.textContent !== dist) d.textContent = dist;
+    }
+
+    // Warnung bei ungenauem GPS — ebenfalls ohne Neuaufbau der Seite
+    const gps = document.getElementById("gps-hinweis");
+    if (gps) {
+      const genau = window.Geo.genauigkeit();
+      const text = (s.geoErlaubt && genau !== null && genau > 100)
+        ? `GPS ist gerade ungenau (±${Math.round(genau)} m) — geh ein paar Schritte oder nutz den Code am Ort.` : "";
+      if (gps.textContent !== text) {
+        gps.textContent = text;
+        gps.className = text ? "hinweis-band" : "";
+      }
+    }
+  }
+
   /* ---------- Ort-Detail ---------- */
   function zeigeOrt(ortId) {
     aktuellerOrt = ortId;
-    zeigeView("ort");
-    renderOrt(ortId);
+    zeigeView("ort"); // rendert die Ortsansicht
+  }
+
+  function ortDistanzText(status) {
+    if (status.distanz !== null) return `Du bist noch ${formatDistanz(status.distanz)} entfernt.`;
+    return window.Store.get().geoErlaubt
+      ? "Warte auf GPS-Signal …"
+      : "Standort ist aus — tipp einfach den Code vom Schild am Ort ein.";
+  }
+
+  function aktualisiereOrtDistanz(ort, status) {
+    const el = document.getElementById("ort-distanz-text");
+    if (!el) return;
+    const text = ortDistanzText(status);
+    if (el.textContent !== text) el.textContent = text;
   }
 
   function renderOrt(ortId) {
@@ -236,7 +339,7 @@
     const view = document.getElementById("view-ort");
     const s = window.Store.get();
     const status = window.Geo.freischaltung(ort);
-    letzterOrtStatus = status.frei + ":" + status.art + ":" + (status.distanz === null ? "-" : Math.round(status.distanz / 10));
+    letzterOrtStatus = status.frei + ":" + status.art;
     const eventAktiv = window.Store.istEventAktiv();
     const figurenHier = window.Rotation.figurenAnOrt(ortId);
     const aktiv = window.Rotation.aktiveFigur(ortId);
@@ -248,7 +351,7 @@
     if (status.frei && offen.length) {
       begegnungsBereich = offen.map(f => `
         <div class="ort-begegnung panel-pergament wartet-panel">
-          <div class="ort-begegnung-emoji" style="border-color:${f.farbe}">${f.emoji}</div>
+          <div class="ort-begegnung-nische">${window.Gestalt.svg(f, { praefix: "ort" })}</div>
           <div class="ort-begegnung-text">
             <strong>${esc(f.name)}</strong> wartet hier auf dich.
             <small>${esc(f.kurzvorstellung)}</small>
@@ -257,17 +360,18 @@
           <button class="btn btn-sekundaer" data-ar="${f.id}">📷 In AR sehen</button>
         </div>`).join("");
     } else if (status.frei) {
+      const bekannt = kandidaten.filter(f => window.Store.istGesammelt(f.id));
       begegnungsBereich = `<div class="panel-nacht ort-info">
-        ${aktiv ? `Diese Woche ist <strong>${esc(aktiv.name)}</strong> hier unterwegs — ihr kennt euch schon! 💛 Schau ${eventAktiv ? "" : "nächste Woche"} wieder vorbei.` : "Gerade ist hier niemand unterwegs."}
+        ${aktiv
+          ? `<p>${eventAktiv ? "Allen Zeug:innen hier" : `<strong>${esc(aktiv.name)}</strong>`} ${eventAktiv ? "bist du schon begegnet" : "ist diese Woche hier — ihr kennt euch schon"}! 💛${eventAktiv ? "" : " Ab Sonntag wartet hier jemand anderes."}</p>`
+          : "<p>Gerade ist hier niemand unterwegs.</p>"}
+        ${bekannt.map(f => `<button class="btn btn-sekundaer" data-replay="${f.id}">💬 Nochmal mit ${esc(f.name)} reden</button>`).join("")}
       </div>`;
     } else {
-      const distanzText = status.distanz !== null
-        ? (status.distanz >= 1000 ? `Du bist noch ~${(status.distanz / 1000).toFixed(1)} km entfernt.` : `Du bist noch ~${Math.round(status.distanz / 10) * 10} m entfernt.`)
-        : (s.geoErlaubt ? "Warte auf GPS-Signal …" : "Standort ist aus — nutz den QR-Code am Ort oder tipp den Code ein.");
       begegnungsBereich = `
         <div class="panel-nacht ort-info">
           <p>${aktiv ? `Diese Woche wartet hier: <strong>${window.Store.istGesammelt(aktiv.id) ? esc(aktiv.name) : "??? (" + esc(aktiv.themaLabel) + ")"}</strong>` : ""}</p>
-          <p class="ort-distanz">📍 ${distanzText}</p>
+          <p class="ort-distanz">📍 <span id="ort-distanz-text">${esc(ortDistanzText(status))}</span></p>
           <div class="ort-code">
             <label for="ort-code-eingabe">Code vom Schild am Ort:</label>
             <div class="ort-code-zeile">
@@ -326,12 +430,25 @@
         if (f) window.AR.oeffne(f, { zurueck: "ort" });
       });
     });
+    view.querySelectorAll("[data-replay]").forEach(b => {
+      b.addEventListener("click", () => {
+        const f = window.Daten.figuren.find(x => x.id === b.getAttribute("data-replay"));
+        if (f) window.Encounter.start(f, { replay: true });
+      });
+    });
     const beam = view.querySelector("#ort-beam");
     if (beam) beam.addEventListener("click", () => { window.Geo.beamZu(ortId); renderOrt(ortId); });
     const codeBtn = view.querySelector("#ort-code-btn");
+    const codeFeld = view.querySelector("#ort-code-eingabe");
+    // Enter auf der Handytastatur löst ebenfalls aus
+    if (codeFeld) codeFeld.addEventListener("keydown", e => { if (e.key === "Enter") { e.preventDefault(); codeBtn.click(); } });
     if (codeBtn) codeBtn.addEventListener("click", () => {
-      const eingabe = view.querySelector("#ort-code-eingabe").value.trim().toUpperCase();
-      if (eingabe === ort.qrCode.toUpperCase()) {
+      // Tolerant: Leerzeichen raus, fehlende Bindestriche egal (WDZDKBRUNNEN = WDZ-DK-BRUNNEN),
+      // und kyrillische Doppelgänger-Buchstaben (А, В, Е, К, М, Н, О, Р, С, Т, У, Х) zählen als lateinisch
+      const KYRILLISCH = { "А": "A", "В": "B", "Е": "E", "К": "K", "М": "M", "Н": "H", "О": "O", "Р": "P", "С": "C", "Т": "T", "У": "Y", "Х": "X" };
+      const norm = t => t.toUpperCase().replace(/[\s\-–—_]/g, "").replace(/[АВЕКМНОРСТУХ]/g, z => KYRILLISCH[z]);
+      const eingabe = norm(codeFeld.value);
+      if (eingabe && eingabe === norm(ort.qrCode)) {
         window.Store.qrFreischalten(ort.id);
         toast(`📍 ${ort.name} ist für heute freigeschaltet!`);
         renderOrt(ortId);

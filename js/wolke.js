@@ -67,48 +67,71 @@
 
   const SELTENHEIT_LABEL = { gewoehnlich: "Zeugnis", besonders: "Besonderes Zeugnis", legende: "Legende des Glaubens" };
 
+  // Jede Karte bekommt eigene IDs — dieselbe Figur kann gleichzeitig in
+  // Album, Zeremonie und Detailansicht im Dokument stehen.
+  let zaehler = 0;
+
+  // Spitzbogen-Fenster, in dem die Lichtgestalt steht
+  const FENSTER = `M90 226 L90 92 A60 60 0 0 1 210 92 L210 226 Z`;
+
+  function fensterMitGestalt(figur, uid, unbekannt) {
+    return `
+      <path d="${FENSTER}" fill="url(#${uid}-nacht)"/>
+      <svg x="99" y="40" width="102" height="174" viewBox="0 0 200 340">${window.Gestalt.svg(figur, { praefix: uid, unbekannt }).replace(/^<svg[^>]*>/, "").replace(/<\/svg>\s*$/, "")}</svg>
+      <path d="${FENSTER}" fill="none" stroke="${unbekannt ? "var(--sternennebel)" : "var(--gold-tief)"}" stroke-width="4"/>
+      <path d="${FENSTER}" fill="none" stroke="${unbekannt ? "var(--wolke)" : "var(--gold)"}" stroke-width="1.5" opacity="0.8" transform="translate(150 132) scale(1.07) translate(-150 -132)"/>`;
+  }
+
+  function nachtVerlauf(uid) {
+    return `<radialGradient id="${uid}-nacht" cx="50%" cy="40%" r="70%">
+      <stop offset="0%" stop-color="#2a3a63"/>
+      <stop offset="100%" stop-color="#131a30"/>
+    </radialGradient>`;
+  }
+
   function kartenSVG(figur, opts) {
     opts = opts || {};
     const info = window.Store.get().gesammelt[figur.id];
     const glanz = opts.glanz !== undefined ? opts.glanz : (info && info.glanz);
     const probelauf = info && info.verifikation === "demo";
     const ort = window.Daten.orte.find(o => o.id === figur.ortId);
+    const uid = "k" + (++zaehler);
 
     return `<svg viewBox="0 0 ${KW} ${KH}" class="zeugenkarte s-${figur.seltenheit}${glanz ? " glanz" : ""}" role="img" aria-label="Karte: ${esc(figur.name)}">
       <defs>
-        <radialGradient id="kt-${figur.id}" cx="50%" cy="35%" r="80%">
+        <radialGradient id="${uid}-kt" cx="50%" cy="35%" r="80%">
           <stop offset="0%" stop-color="var(--pergament)"/>
           <stop offset="100%" stop-color="var(--pergament-tief)"/>
         </radialGradient>
-        ${glanz ? `<linearGradient id="foil-${figur.id}" x1="0%" y1="0%" x2="100%" y2="100%">
+        ${nachtVerlauf(uid)}
+        ${glanz ? `<linearGradient id="${uid}-foil" x1="0%" y1="0%" x2="100%" y2="100%">
           <stop offset="0%" stop-color="var(--gold-hell)" stop-opacity="0"/>
           <stop offset="50%" stop-color="var(--gold-hell)" stop-opacity="0.35"/>
           <stop offset="100%" stop-color="var(--gold-hell)" stop-opacity="0"/>
         </linearGradient>` : ""}
       </defs>
-      <rect x="4" y="4" width="${KW - 8}" height="${KH - 8}" rx="16" fill="url(#kt-${figur.id})" stroke="var(--gold-tief)" stroke-width="1"/>
+      <rect x="4" y="4" width="${KW - 8}" height="${KH - 8}" rx="16" fill="url(#${uid}-kt)" stroke="var(--gold-tief)" stroke-width="1"/>
       ${musterSVG(figur.muster, figur.farbe)}
       ${rahmenSVG(figur.seltenheit)}
-      <circle cx="${KW / 2}" cy="140" r="58" fill="var(--pergament)" stroke="${figur.farbe}" stroke-width="4"/>
-      <circle cx="${KW / 2}" cy="140" r="66" fill="none" stroke="var(--gold)" stroke-width="1.5" opacity="0.8"/>
-      <text x="${KW / 2}" y="162" text-anchor="middle" class="karte-emoji">${figur.emoji}</text>
+      ${fensterMitGestalt(figur, uid, false)}
       <text x="${KW / 2}" y="252" text-anchor="middle" class="karte-name">${esc(figur.name)}</text>
       <text x="${KW / 2}" y="278" text-anchor="middle" class="karte-beiname">${esc(figur.beiname)}</text>
       <rect x="${KW / 2 - 80}" y="300" width="160" height="30" rx="15" fill="${figur.farbe}" opacity="0.16"/>
       <text x="${KW / 2}" y="320" text-anchor="middle" class="karte-thema" fill="${figur.farbe}">${esc(figur.themaLabel)}</text>
       <text x="${KW / 2}" y="362" text-anchor="middle" class="karte-ort">${esc(ort ? window.Karte.KURZNAMEN[ort.id] : "")} ${ort ? ort.icon : ""}</text>
       <text x="${KW / 2}" y="392" text-anchor="middle" class="karte-seltenheit">— ${SELTENHEIT_LABEL[figur.seltenheit] || ""} —</text>
-      ${glanz ? `<rect x="6" y="6" width="${KW - 12}" height="${KH - 12}" rx="15" fill="url(#foil-${figur.id})" class="foil"/>` : ""}
+      ${glanz ? `<rect x="6" y="6" width="${KW - 12}" height="${KH - 12}" rx="15" fill="url(#${uid}-foil)" class="foil"/>` : ""}
       ${probelauf ? `<g transform="translate(${KW - 66},44) rotate(12)"><rect x="-38" y="-12" width="76" height="24" rx="4" fill="var(--nacht-hell)" opacity="0.9"/><text text-anchor="middle" y="5" class="karte-probelauf">Probelauf</text></g>` : ""}
     </svg>`;
   }
 
   function silhouetteSVG(figur) {
     const ort = window.Daten.orte.find(o => o.id === figur.ortId);
+    const uid = "s" + (++zaehler);
     return `<svg viewBox="0 0 ${KW} ${KH}" class="zeugenkarte nebel" role="img" aria-label="Noch nicht begegnet — zu finden: ${esc(ort ? ort.name : "")}">
+      <defs>${nachtVerlauf(uid)}</defs>
       <rect x="4" y="4" width="${KW - 8}" height="${KH - 8}" rx="16" fill="var(--nacht-hell)" stroke="var(--sternennebel)" stroke-width="2" stroke-dasharray="6 6"/>
-      <circle cx="${KW / 2}" cy="140" r="58" fill="var(--sternennebel)" opacity="0.5"/>
-      <text x="${KW / 2}" y="165" text-anchor="middle" class="karte-frage">?</text>
+      ${fensterMitGestalt(figur, uid, true)}
       <text x="${KW / 2}" y="262" text-anchor="middle" class="karte-nebel-text">Noch nicht begegnet</text>
       <text x="${KW / 2}" y="330" text-anchor="middle" class="karte-nebel-hinweis">${ort ? ort.icon : ""} ${esc(ort ? window.Karte.KURZNAMEN[ort.id] : "")}</text>
       <text x="${KW / 2}" y="354" text-anchor="middle" class="karte-nebel-hinweis klein">${esc(figur.themaLabel)}</text>

@@ -10,6 +10,23 @@
   let glanz = false;
   let versuch = 0;
   let container = null;
+  let aufgenommen = null;   // nach der Zeremonie: { neuesSiegel }
+  let sperreBis = 0;
+
+  /* Schutz gegen Doppel-Taps: Ein schneller zweiter Tipp würde sonst den gerade
+     neu erschienenen "Weiter"-Button treffen und eine Dialogzeile überspringen. */
+  function zuSchnell() {
+    const jetzt = Date.now();
+    if (jetzt < sperreBis) return true;
+    sperreBis = jetzt + 400;
+    return false;
+  }
+
+  function sperre(ms) { sperreBis = Math.max(sperreBis, Date.now() + ms); }
+
+  function vibriere(muster) {
+    try { if (navigator.vibrate) navigator.vibrate(muster); } catch (e) { /* iOS: egal */ }
+  }
 
   function esc(s) {
     return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
@@ -22,6 +39,8 @@
     dialogIndex = 0;
     glanz = false;
     versuch = 0;
+    aufgenommen = null;
+    sperreBis = 0;
 
     if (!replay) {
       const ort = window.Daten.orte.find(o => o.id === f.ortId);
@@ -50,6 +69,7 @@
       </div>
       <div class="begegnung-inhalt" id="beg-inhalt"></div>`;
     container.querySelector("#beg-abbruch").addEventListener("click", () => {
+      if (aufgenommen) { zurWolke(); return; }
       window.App.zeigeView(replay ? "wolke" : "home");
     });
   }
@@ -86,8 +106,9 @@
       const weiter = document.createElement("button");
       weiter.className = "btn btn-gold";
       weiter.textContent = dialogIndex >= figur.dialog.length ? "Weiter" : "Weiter …";
-      weiter.addEventListener("click", naechsterSchritt);
+      weiter.addEventListener("click", () => { if (!zuSchnell()) naechsterSchritt(); });
       aktionen.appendChild(weiter);
+      sperre(350); // frisch erschienene Buttons kurz gegen den "Nachklapp"-Tipp sperren
     } else {
       // Wahlmoment: Du antwortest, die Figur reagiert
       schritt.optionen.forEach(opt => {
@@ -95,6 +116,8 @@
         b.className = "btn btn-wahl";
         b.textContent = opt.text;
         b.addEventListener("click", () => {
+          if (zuSchnell()) return;
+          aktionen.querySelectorAll("button").forEach(x => { x.disabled = true; });
           bubble(opt.text, "du");
           setTimeout(() => {
             bubble(opt.reaktion, "figur");
@@ -104,6 +127,7 @@
         });
         aktionen.appendChild(b);
       });
+      sperre(350);
     }
   }
 
@@ -112,12 +136,13 @@
     weiter.className = "btn btn-gold";
     if (replay) {
       weiter.textContent = "Fertig";
-      weiter.addEventListener("click", () => window.App.zeigeFigur(figur.id));
+      weiter.addEventListener("click", () => { if (!zuSchnell()) window.App.zeigeFigur(figur.id); });
     } else {
       weiter.textContent = "Weiter zum Impuls →";
-      weiter.addEventListener("click", renderImpuls);
+      weiter.addEventListener("click", () => { if (!zuSchnell()) renderImpuls(); });
     }
     aktionen.appendChild(weiter);
+    sperre(350);
   }
 
   /* ---- Phase 2: Impuls + private Notiz ---- */
@@ -203,6 +228,7 @@
 
   /* ---- Phase 4: Aufnahme in die Wolke ---- */
   function renderZeremonie() {
+    if (aufgenommen) return; // Doppel-Tipp auf "Weiter →"
     window.Store.sammle(figur.id, verifikation, glanz);
 
     // Orts-Siegel prüfen
@@ -210,20 +236,29 @@
     const komplett = amOrt.every(f => window.Store.istGesammelt(f.id));
     const neuesSiegel = komplett && !window.Store.hatSiegel(figur.ortId);
     if (neuesSiegel) window.Store.setzeSiegel(figur.ortId);
+    aufgenommen = { neuesSiegel };
 
     const inhalt = container.querySelector("#beg-inhalt");
     inhalt.innerHTML = `
       <div class="zeremonie">
-        <div class="zeremonie-karte">${window.Wolke.kartenSVG(figur, { glanz })}</div>
+        <div class="zeremonie-karte">
+          ${window.Wolke.kartenSVG(figur, { glanz })}
+          <div class="zeremonie-funken" aria-hidden="true">${Array.from({ length: 18 }, (_, i) => `<span style="--i:${i}"></span>`).join("")}</div>
+        </div>
         <h2 class="zeremonie-titel">${esc(figur.name)} ist jetzt Teil deiner Wolke ☁️</h2>
         <p class="zeremonie-spruch">»${esc(figur.kartenspruch)}«</p>
         <button class="btn btn-gold" id="zeremonie-weiter">Zur Wolke →</button>
       </div>`;
+    vibriere(glanz ? [60, 50, 60, 50, 140] : [60, 60, 120]);
 
-    inhalt.querySelector("#zeremonie-weiter").addEventListener("click", () => {
-      window.App.zeigeView("wolke");
-      window.App.pruefeMeilensteine({ ortKomplett: neuesSiegel ? figur.ortId : null });
-    });
+    inhalt.querySelector("#zeremonie-weiter").addEventListener("click", zurWolke);
+  }
+
+  function zurWolke() {
+    const siegel = aufgenommen && aufgenommen.neuesSiegel;
+    aufgenommen = null;
+    window.App.zeigeView("wolke");
+    window.App.pruefeMeilensteine({ ortKomplett: siegel ? figur.ortId : null });
   }
 
   window.Encounter = { start };

@@ -18,16 +18,19 @@
     gelesen: {}             // meilensteinId -> true
   };
 
+  // JSON-Kopie statt structuredClone: läuft auch auf älteren Handys (iOS < 15.4)
+  function frisch() { return JSON.parse(JSON.stringify(DEFAULT)); }
+
   let state = load();
 
   function load() {
     try {
       const raw = localStorage.getItem(KEY);
-      if (!raw) return structuredClone(DEFAULT);
+      if (!raw) return frisch();
       const parsed = JSON.parse(raw);
-      return Object.assign(structuredClone(DEFAULT), parsed);
+      return Object.assign(frisch(), parsed);
     } catch (e) {
-      return structuredClone(DEFAULT);
+      return frisch();
     }
   }
 
@@ -92,7 +95,7 @@
 
     allesLoeschen() {
       try { localStorage.removeItem(KEY); } catch (e) {}
-      state = structuredClone(DEFAULT);
+      state = frisch();
     }
   };
 })();
