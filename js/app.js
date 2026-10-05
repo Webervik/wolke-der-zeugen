@@ -84,7 +84,8 @@
     } else {
       zeigeView("home");
     }
-    if (qrToast) toast(qrToast);
+    if (qrToast || window.Umzug.meldung) toast(qrToast || window.Umzug.meldung);
+    if (window.Umzug.hinweisImApp) window.Umzug.zeigeHinweis();
 
     // Offline-Fähigkeit: Netz zuerst, bei schlechtem Empfang (z. B. am Waldhaus) aus dem Cache
     if ("serviceWorker" in navigator && (location.protocol === "https:" || location.hostname === "localhost")) {
@@ -537,6 +538,8 @@
       </div>
       <p class="einstellung-fuss">
         Wolke der Zeugen · Ev. Kirchengemeinde Staaken<br>
+        <a class="link-gold" href="https://www.viktor-weber.com/impressum" target="_blank" rel="noopener">Impressum</a> ·
+        <a class="link-gold" href="https://www.viktor-weber.com/datenschutz" target="_blank" rel="noopener">Datenschutzerklärung</a> ·
         <a class="link-gold" href="leiter.html">Leitungsbereich</a>
       </p>`;
 
@@ -652,6 +655,7 @@
   window.App = { zeigeView, zeigeOrt, zeigeFigur, pruefeMeilensteine, toast };
 
   document.addEventListener("DOMContentLoaded", () => {
+    if (window.Umzug.leitetWeiter) return; // alte Adresse: nur weiterleiten (js/umzug.js)
     init().catch(err => {
       document.getElementById("app-laedt").textContent =
         "Die App konnte nicht laden. Bitte über einen Webserver öffnen (nicht als Datei) und neu versuchen.";

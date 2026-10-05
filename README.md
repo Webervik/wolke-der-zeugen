@@ -82,7 +82,9 @@ npx serve -l 3457 .
 
 AR-Tests im Browser: `werkstatt/arsim.js` (nur lokal, nicht im Repo) simuliert Lage- und Bewegungssensor.
 
-**Deployment:** Statisches Hosting genügt (z. B. GitHub Pages wie bei konfi-check). **HTTPS ist Pflicht**, sonst gibt der Browser kein GPS frei. Nach dem Deploy in `data/config.json` die `basisUrl` eintragen.
+**Deployment:** Das Spiel läuft auf dem eigenen Server unter **https://www.viktor-weber.com/wolke-der-zeugen/** (Hostinger-VPS, nginx, eigenes Verzeichnis wie Zwölf Steine). Einrichten und Hochladen: siehe [`deploy/LIESMICH.md`](deploy/LIESMICH.md). **HTTPS ist Pflicht**, sonst gibt der Browser kein GPS frei. Die `basisUrl` in `data/config.json` steht auf der neuen Adresse.
+
+Die frühere Adresse `webervik.github.io/wolke-der-zeugen/` (GitHub Pages aus `main`) leitet per `js/umzug.js` weiter und nimmt den Spielstand im `#`-Teil der Adresse mit. Der `#`-Teil wird nie an einen Server geschickt.
 
 **Leitungsbereich** (`leiter.html`, Zugangscode in `data/config.json` → `leiterCode`):
 - **QR-Bögen drucken** (ein A4-Bogen pro Ort + Rallye-Bogen). Erst nach dem Deploy drucken — die QR-Codes enthalten die Basis-URL! Die Klartext-Codes zum Eintippen funktionieren unabhängig davon.

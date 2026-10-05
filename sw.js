@@ -3,7 +3,7 @@
    kommen sofort an). Nur wenn das Netz fehlt oder länger als 4 Sekunden braucht
    (schlechter Empfang am Waldhaus, im Kirchenraum …), kommt die App aus dem Cache.
    Es werden nur eigene Dateien zwischengespeichert — keine Daten der Nutzer:innen. */
-const CACHE = "wdz-v3";
+const CACHE = "wdz-v4";
 const KERN = [
   "./",
   "index.html",
@@ -19,6 +19,7 @@ const KERN = [
   "js/gesten.js",
   "js/ar.js",
   "js/installieren.js",
+  "js/umzug.js",
   "js/app.js",
   "data/config.json",
   "data/orte.json",
