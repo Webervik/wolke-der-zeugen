@@ -3,7 +3,7 @@
    kommen sofort an). Nur wenn das Netz fehlt oder länger als 4 Sekunden braucht
    (schlechter Empfang am Waldhaus, im Kirchenraum …), kommt die App aus dem Cache.
    Es werden nur eigene Dateien zwischengespeichert — keine Daten der Nutzer:innen. */
-const CACHE = "wdz-v2";
+const CACHE = "wdz-v3";
 const KERN = [
   "./",
   "index.html",
@@ -16,13 +16,19 @@ const KERN = [
   "js/karte.js",
   "js/wolke.js",
   "js/encounter.js",
+  "js/gesten.js",
   "js/ar.js",
+  "js/installieren.js",
   "js/app.js",
   "data/config.json",
   "data/orte.json",
   "data/figuren.json",
   "data/karte-hintergrund.json",
-  "assets/icon.svg"
+  "assets/icon.svg",
+  "assets/icon-180.png",
+  "assets/icon-192.png",
+  "assets/icon-512.png",
+  "assets/icon-maskable-512.png"
 ];
 
 self.addEventListener("install", e => {

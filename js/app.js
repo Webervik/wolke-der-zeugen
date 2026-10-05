@@ -221,6 +221,7 @@
         </div>
         <div class="home-logo">☁️</div>
       </header>
+      ${window.Installieren.karteHTML()}
       <div id="naechster-ort" class="naechster-ort"></div>
       <div id="gps-hinweis"></div>
       <div id="karte-container"></div>
@@ -232,6 +233,7 @@
       </section>`;
 
     hinweisSchluessel = "";
+    window.Installieren.verdrahteKarte(view);
     window.Karte.render(view.querySelector("#karte-container"));
     aktualisiereHinweise();
     view.querySelectorAll("[data-figur-chip]").forEach(el => {
@@ -357,7 +359,7 @@
             <small>${esc(f.kurzvorstellung)}</small>
           </div>
           <button class="btn btn-gold" data-begegnung="${f.id}">✨ Begegnung beginnen</button>
-          <button class="btn btn-sekundaer" data-ar="${f.id}">📷 In AR sehen</button>
+          <p class="ort-begegnung-hinweis">📷 Halte dein Handy hoch — ${esc(f.name)} ist irgendwo hier.</p>
         </div>`).join("");
     } else if (status.frei) {
       const bekannt = kandidaten.filter(f => window.Store.istGesammelt(f.id));
@@ -365,7 +367,8 @@
         ${aktiv
           ? `<p>${eventAktiv ? "Allen Zeug:innen hier" : `<strong>${esc(aktiv.name)}</strong>`} ${eventAktiv ? "bist du schon begegnet" : "ist diese Woche hier — ihr kennt euch schon"}! 💛${eventAktiv ? "" : " Ab Sonntag wartet hier jemand anderes."}</p>`
           : "<p>Gerade ist hier niemand unterwegs.</p>"}
-        ${bekannt.map(f => `<button class="btn btn-sekundaer" data-replay="${f.id}">💬 Nochmal mit ${esc(f.name)} reden</button>`).join("")}
+        ${bekannt.map(f => `<button class="btn btn-sekundaer" data-wieder="${f.id}">✨ ${esc(f.name)} nochmal treffen</button>
+          <button class="btn btn-sekundaer" data-replay="${f.id}">💬 Nur nochmal reden</button>`).join("")}
       </div>`;
     } else {
       begegnungsBereich = `
@@ -418,16 +421,17 @@
       </div>`;
 
     view.querySelector("[data-zurueck]").addEventListener("click", () => zeigeView("home"));
+    // Jede Begegnung beginnt in der AR-Suche (mit Rückfällen ohne Kamera/Sensor)
     view.querySelectorAll("[data-begegnung]").forEach(b => {
       b.addEventListener("click", () => {
         const f = window.Daten.figuren.find(x => x.id === b.getAttribute("data-begegnung"));
-        if (f) window.Encounter.start(f);
+        if (f) window.AR.oeffne(f, { zurueck: "ort" });
       });
     });
-    view.querySelectorAll("[data-ar]").forEach(b => {
+    view.querySelectorAll("[data-wieder]").forEach(b => {
       b.addEventListener("click", () => {
-        const f = window.Daten.figuren.find(x => x.id === b.getAttribute("data-ar"));
-        if (f) window.AR.oeffne(f, { zurueck: "ort" });
+        const f = window.Daten.figuren.find(x => x.id === b.getAttribute("data-wieder"));
+        if (f) window.AR.oeffne(f, { zurueck: "ort", replay: true });
       });
     });
     view.querySelectorAll("[data-replay]").forEach(b => {
@@ -472,12 +476,41 @@
     const s = window.Store.get();
     const c = window.Daten.config;
 
+    const I = window.Installieren;
+    const appBlock = I.imStandalone()
+      ? `<p class="dezent">✅ Du nutzt die Wolke schon als App.</p>`
+      : `<p class="dezent">Mit eigenem Symbol auf dem Home-Bildschirm startet die Wolke schneller und ohne Adressleiste.</p>
+         <button class="btn btn-gold" id="e-install">${I.kannDirekt() ? "📲 Jetzt installieren" : "📲 So geht's"}</button>`;
+
     view.innerHTML = `
       <h1>Einstellungen</h1>
+      <div class="panel-nacht einstellung">
+        <h3>📲 Als App</h3>
+        ${appBlock}
+      </div>
+      <div class="panel-nacht einstellung">
+        <h3>🔁 Spielstand mitnehmen</h3>
+        <p class="dezent">Für ein neues Handy — oder auf dem iPhone in die App auf dem Home-Bildschirm. Der Code enthält nur, wem du begegnet bist: keinen Namen, keine Notizen.</p>
+        <div class="code-anzeige" id="e-code">${esc(window.Spielstand.erzeugeCode())}</div>
+        <div class="code-knoepfe">
+          <button class="btn btn-sekundaer" id="e-code-kopieren">📋 Kopieren</button>
+          ${navigator.share ? `<button class="btn btn-sekundaer" id="e-code-teilen">↗︎ Teilen</button>` : ""}
+        </div>
+        <label class="dezent" for="e-code-eingabe">Code von einem anderen Gerät einfügen:</label>
+        <div class="ort-code-zeile">
+          <input type="text" id="e-code-eingabe" placeholder="W1…" autocomplete="off" autocapitalize="characters" spellcheck="false">
+          <button class="btn btn-sekundaer" id="e-code-uebernehmen">Übernehmen</button>
+        </div>
+      </div>
       <div class="panel-nacht einstellung">
         <h3>📍 Standort</h3>
         <p class="dezent">Wird nur auf deinem Gerät verwendet — nie gespeichert, nie gesendet.</p>
         <label class="schalter"><input type="checkbox" id="e-geo" ${s.geoErlaubt ? "checked" : ""}> Standort für Begegnungen nutzen</label>
+      </div>
+      <div class="panel-nacht einstellung">
+        <h3>📷 Kamera bei Begegnungen</h3>
+        <p class="dezent">Die Zeug:innen erscheinen in deinem Kamerabild. Ohne Kamera stehen sie vor einem Sternenhimmel — das Spiel funktioniert genauso. Das Bild bleibt immer auf deinem Gerät.</p>
+        <label class="schalter"><input type="checkbox" id="e-kamera" ${s.kameraAus ? "" : "checked"}> Kamerabild verwenden</label>
       </div>
       <div class="panel-nacht einstellung">
         <h3>🧪 Demo-Modus</h3>
@@ -506,6 +539,36 @@
         Wolke der Zeugen · Ev. Kirchengemeinde Staaken<br>
         <a class="link-gold" href="leiter.html">Leitungsbereich</a>
       </p>`;
+
+    const install = view.querySelector("#e-install");
+    if (install) install.addEventListener("click", () => window.Installieren.installieren());
+
+    const codeText = () => view.querySelector("#e-code").textContent;
+    view.querySelector("#e-code-kopieren").addEventListener("click", async () => {
+      try {
+        await navigator.clipboard.writeText(codeText());
+        toast("📋 Code kopiert");
+      } catch (e) {
+        // Rückfall: Code markieren, damit man ihn selbst kopieren kann
+        const r = document.createRange(); r.selectNodeContents(view.querySelector("#e-code"));
+        const sel = window.getSelection(); sel.removeAllRanges(); sel.addRange(r);
+        toast("Code markiert — jetzt „Kopieren“ wählen");
+      }
+    });
+    const teilen = view.querySelector("#e-code-teilen");
+    if (teilen) teilen.addEventListener("click", () => {
+      navigator.share({ text: "Mein Spielstand für die Wolke der Zeugen: " + codeText() }).catch(() => {});
+    });
+    view.querySelector("#e-code-uebernehmen").addEventListener("click", () => {
+      const r = window.Spielstand.uebernehmen(view.querySelector("#e-code-eingabe").value);
+      if (!r.ok) { toast("Dieser Code passt nicht. Bitte genau prüfen. 🤔"); return; }
+      toast(r.neu ? `☁️ ${r.neu} Zeug:innen übernommen — jetzt ${r.gesamt} in deiner Wolke!` : "Alles schon da — nichts Neues im Code.");
+      renderEinstellungen();
+    });
+
+    view.querySelector("#e-kamera").addEventListener("change", e => {
+      window.Store.setKameraAus(!e.target.checked);
+    });
 
     view.querySelector("#e-geo").addEventListener("change", e => {
       window.Store.setGeoErlaubt(e.target.checked);

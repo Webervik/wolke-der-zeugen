@@ -15,7 +15,9 @@
     ortsSiegel: {},         // ortId -> true
     qrFreischaltungen: {},  // ortId -> "YYYY-MM-DD" (gültig am Kalendertag)
     eventAktivBis: null,    // ISO-Datum "YYYY-MM-DD" oder null
-    gelesen: {}             // meilensteinId -> true
+    gelesen: {},            // meilensteinId -> true
+    installHinweisAus: false,
+    kameraAus: false        // true: Begegnungen vor Sternenhimmel statt Kamerabild
   };
 
   // JSON-Kopie statt structuredClone: läuft auch auf älteren Handys (iOS < 15.4)
@@ -54,10 +56,12 @@
     setOnboardingDone() { state.onboardingDone = true; save(); },
     setGeoErlaubt(v) { state.geoErlaubt = !!v; save(); },
     setDemo(v) { state.demo = !!v; save(); },
+    setInstallHinweisAus(v) { state.installHinweisAus = !!v; save(); },
+    setKameraAus(v) { state.kameraAus = !!v; save(); },
 
     istGesammelt(figurId) { return !!state.gesammelt[figurId]; },
 
-    sammle(figurId, verifikation, glanz) {
+    sammle(figurId, verifikation, glanz, erlebt) {
       const vorhanden = state.gesammelt[figurId];
       if (vorhanden) {
         // Echter Besuch wertet eine Demo-Begegnung auf; Glanz bleibt erhalten.
@@ -66,10 +70,16 @@
           vorhanden.datum = heuteISO();
         }
         if (glanz) vorhanden.glanz = true;
+        if (erlebt) vorhanden.erlebt = true;
       } else {
         state.gesammelt[figurId] = { datum: heuteISO(), glanz: !!glanz, verifikation };
+        if (erlebt) state.gesammelt[figurId].erlebt = true; // Glaubensgeste in AR gemacht
       }
       save();
+    },
+
+    markiereErlebt(figurId) {
+      if (state.gesammelt[figurId]) { state.gesammelt[figurId].erlebt = true; save(); }
     },
 
     anzahlGesammelt() { return Object.keys(state.gesammelt).length; },

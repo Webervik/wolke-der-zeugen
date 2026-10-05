@@ -12,6 +12,7 @@
   let container = null;
   let aufgenommen = null;   // nach der Zeremonie: { neuesSiegel }
   let sperreBis = 0;
+  let erlebt = false;       // Glaubensgeste in der AR-Begegnung gemacht?
 
   /* Schutz gegen Doppel-Taps: Ein schneller zweiter Tipp würde sonst den gerade
      neu erschienenen "Weiter"-Button treffen und eine Dialogzeile überspringen. */
@@ -25,7 +26,7 @@
   function sperre(ms) { sperreBis = Math.max(sperreBis, Date.now() + ms); }
 
   function vibriere(muster) {
-    try { if (navigator.vibrate) navigator.vibrate(muster); } catch (e) { /* iOS: egal */ }
+    try { if (navigator.vibrate && (!navigator.userActivation || navigator.userActivation.hasBeenActive)) navigator.vibrate(muster); } catch (e) { /* iOS: egal */ }
   }
 
   function esc(s) {
@@ -41,6 +42,9 @@
     versuch = 0;
     aufgenommen = null;
     sperreBis = 0;
+    erlebt = !!opts.erlebt;
+
+    if (replay && erlebt) window.Store.markiereErlebt(f.id); // nur das Merkmal nachtragen
 
     if (!replay) {
       const ort = window.Daten.orte.find(o => o.id === f.ortId);
@@ -229,7 +233,7 @@
   /* ---- Phase 4: Aufnahme in die Wolke ---- */
   function renderZeremonie() {
     if (aufgenommen) return; // Doppel-Tipp auf "Weiter →"
-    window.Store.sammle(figur.id, verifikation, glanz);
+    window.Store.sammle(figur.id, verifikation, glanz, erlebt);
 
     // Orts-Siegel prüfen
     const amOrt = window.Rotation.figurenAnOrt(figur.ortId);

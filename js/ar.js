@@ -1,41 +1,51 @@
-/* Wolke der Zeugen — AR-Ansicht: "Such die Gestalt!"
-   Die Handy-Kamera läuft als Live-Hintergrund. Über den Lagesensor des Handys
-   (deviceorientation) bleibt die Lichtgestalt an einer festen Stelle im Raum
-   stehen: Sie erscheint seitlich versetzt, man muss sich umschauen, sie finden
-   und antippen. Bewusst OHNE WebXR/Raum-Tracking: Das hält es zuverlässig auf
-   allen Handy-Browsern und akkuschonend.
+/* Wolke der Zeugen — AR-Begegnung: suchen, finden, Geste, Bibelwort.
+   Jede Begegnung beginnt hier: Die Handy-Kamera läuft als Live-Hintergrund,
+   die Lichtgestalt steht über den Lagesensor fest an einer Stelle im Raum —
+   seitlich, hinter dir, oben im Baum oder unten am Straßenrand. Hat man sie
+   gefunden und angetippt, lädt sie zu einer Glaubensgeste ein (js/gesten.js).
+   Danach steht ihr Bibelwort da, und das Gespräch beginnt.
 
-   Rückfalle, damit niemand hängen bleibt:
+   Bewusst OHNE WebXR/Raum-Tracking: zuverlässig auf allen Handy-Browsern.
+   Rückfälle, damit niemand hängen bleibt:
    - kein Lagesensor / Erlaubnis verweigert / Querformat → Gestalt steht mittig
-   - keine Kamera / Erlaubnis verweigert → Sternenhimmel statt Live-Bild
-   - der Button "… ansprechen" ist immer da
+   - keine Kamera / abgelehnt / in den Einstellungen aus → Sternenhimmel
+   - jede Geste hat eine Variante ohne Sensor; "Überspringen" nach 20 s
+   - "Ich finde niemanden" holt die Gestalt nach 25 s in die Mitte
 
-   Datenschutz: Kamerabild und Lagedaten bleiben ausschließlich auf dem Gerät.
-   Nichts wird aufgenommen, gespeichert oder übertragen. Kamera und Sensor
-   werden beim Verlassen der Ansicht sofort gestoppt. */
+   Datenschutz: Kamerabild und Bewegungsdaten bleiben ausschließlich auf dem
+   Gerät. Nichts wird aufgenommen, gespeichert oder übertragen. Kamera und
+   Sensoren werden beim Verlassen der Ansicht sofort gestoppt. */
 (function () {
   const SICHTFELD_H = 60;   // angenommenes horizontales Kamera-Sichtfeld (Hochformat), Grad
   const SICHTFELD_V = 75;   // vertikal
+  const HOEHE_ANKER = 0.42; // Bildschirmhöhe, auf der der "Horizont" der Gestalt liegt
+
+  const SUCHTEXTE = {
+    seite: "👀 Irgendwo hier ist jemand … Schau dich langsam um!",
+    hinten: "👀 Jemand steht hinter dir … Dreh dich um!",
+    oben: "👀 Schau mal nach oben …",
+    unten: "👀 Schau mal nach unten …"
+  };
 
   let stream = null;
   let figur = null;
-  let zurueckView = "ort";
+  let optionen = {};
+  let zustand = "aus";       // laedt · suchen · gefunden · gegruesst · geste · erfuellt
   let anker = null;          // Weltrichtung der Gestalt { alpha, beta }
   let glatt = null;          // geglättete Handy-Ausrichtung
   let verankert = false;
-  let gefunden = false;
-  let gegruesst = false;
   let fundSeit = 0;
-  let rueckfallTimer = null;
+  let erlebt = false;        // Geste vollständig gemacht?
+  let laufendeGeste = null;
+  let timer = [];
   let letztesX = null, letztesY = null;
+  const orientierungsHoerer = new Set();
+  const bewegungsHoerer = new Set();
 
   function esc(s) {
     return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
   }
-
-  function unterstuetzt() {
-    return !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia);
-  }
+  const $ = id => document.getElementById(id);
 
   function winkelDiff(a, b) {
     let d = (a - b) % 360;
@@ -45,59 +55,67 @@
   }
 
   function vibriere(muster) {
-    try { if (navigator.vibrate) navigator.vibrate(muster); } catch (e) { /* iOS kann das nicht — egal */ }
+    try { if (navigator.vibrate && (!navigator.userActivation || navigator.userActivation.hasBeenActive)) navigator.vibrate(muster); } catch (e) { /* iOS kann das nicht — egal */ }
   }
 
-  /* iOS verlangt eine ausdrückliche Erlaubnis — muss direkt im Tipp passieren. */
-  async function bewegungErlauben() {
-    const DOE = window.DeviceOrientationEvent;
-    if (!DOE) return false;
-    if (typeof DOE.requestPermission === "function") {
-      try { return (await DOE.requestPermission()) === "granted"; } catch (e) { return false; }
-    }
-    return true;
+  function arDaten() {
+    return figur.ar || { suche: "seite", geste: null, einladung: "Hey {name}! Schön, dass du mich gefunden hast. Ich bin " + figur.name + ".", erfuellt: figur.kartenspruch, bibelstelle: "" };
+  }
+
+  /* iOS verlangt ausdrückliche Erlaubnisse — sie müssen direkt im Tipp angefragt
+     werden. Deshalb beide Anfragen sofort, ohne vorher etwas abzuwarten. */
+  function sensorErlaubnisse() {
+    const DOE = window.DeviceOrientationEvent, DME = window.DeviceMotionEvent;
+    const frage = (K) => (K && typeof K.requestPermission === "function")
+      ? K.requestPermission().then(r => r === "granted").catch(() => false)
+      : Promise.resolve(!!K);
+    return Promise.all([frage(DOE), frage(DME)]);
   }
 
   function aufraeumen() {
     if (stream) { stream.getTracks().forEach(t => t.stop()); stream = null; }
     window.removeEventListener("deviceorientation", onOrientierung);
-    clearTimeout(rueckfallTimer);
+    window.removeEventListener("devicemotion", onBewegung);
+    timer.forEach(t => { clearTimeout(t); clearInterval(t); });
+    timer = [];
+    if (laufendeGeste) { laufendeGeste.stop(); laufendeGeste = null; }
+    orientierungsHoerer.clear();
+    bewegungsHoerer.clear();
+    zustand = "aus";
   }
 
   async function oeffne(f, opts) {
-    opts = opts || {};
     aufraeumen();
     figur = f;
-    zurueckView = opts.zurueck || "ort";
+    optionen = opts || {};
     anker = null; glatt = null; verankert = false;
-    gefunden = false; gegruesst = false; fundSeit = 0;
+    fundSeit = 0; erlebt = false;
     letztesX = null; letztesY = null;
 
-    const view = document.getElementById("view-ar");
+    const view = $("view-ar");
     window.App.zeigeView("ar");
+    zustand = "laedt";
     render(view, "laedt");
 
-    // Reihenfolge wichtig: Bewegungs-Erlaubnis zuerst (braucht den Tipp), dann Kamera
-    const bewegungOk = await bewegungErlauben();
+    const erlaubnis = sensorErlaubnisse(); // noch im Tipp anfragen
+    const [orientierungOk, bewegungOk] = await erlaubnis;
 
-    let modus = "fallback";
-    if (unterstuetzt()) {
-      try {
-        stream = await navigator.mediaDevices.getUserMedia({
-          video: { facingMode: { ideal: "environment" } },
-          audio: false
-        });
-        modus = "kamera";
-      } catch (e) {
-        modus = "fallback"; // abgelehnt, keine Kamera, kein Secure Context → Sternenhimmel
+    let modus = "sterne";
+    if (!window.Store.get().kameraAus) {
+      modus = "fallback";
+      if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+        try {
+          stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: "environment" } }, audio: false });
+          modus = "kamera";
+        } catch (e) { modus = "fallback"; } // abgelehnt, keine Kamera, kein Secure Context
       }
     }
     // Wurde die Ansicht inzwischen verlassen? Dann Kamera gleich wieder aus.
-    if (!document.getElementById("view-ar").classList.contains("aktiv")) { aufraeumen(); return; }
+    if (!$("view-ar").classList.contains("aktiv") || zustand !== "laedt") { if (stream) { stream.getTracks().forEach(t => t.stop()); stream = null; } return; }
 
     render(view, modus);
     if (modus === "kamera") {
-      const v = view.querySelector("#ar-video");
+      const v = $("ar-video");
       if (v) {
         v.srcObject = stream;
         v.setAttribute("playsinline", "");
@@ -105,16 +123,25 @@
       }
     }
 
-    if (bewegungOk) window.addEventListener("deviceorientation", onOrientierung);
+    setzeZustand("suchen");
+    setzeStatus(arDaten().suchText || SUCHTEXTE[arDaten().suche] || SUCHTEXTE.seite);
+    if (orientierungOk) window.addEventListener("deviceorientation", onOrientierung);
+    if (bewegungOk) window.addEventListener("devicemotion", onBewegung);
+
     // Kommen keine Lagedaten (Desktop, Sensor fehlt, verweigert): Gestalt steht mittig
-    rueckfallTimer = setTimeout(() => {
-      if (!verankert) {
-        setzeStatus("mittig");
-        setTimeout(finde, 700);
+    timer.push(setTimeout(() => {
+      if (!verankert && zustand === "suchen") {
+        setzeStatus("✨ Da erscheint jemand …");
+        timer.push(setTimeout(finde, 700));
       }
-    }, 1500);
+    }, 1500));
+    // Wer nach 25 s noch sucht, bekommt Hilfe
+    timer.push(setTimeout(() => {
+      if (zustand === "suchen") zeigeHilfe("Ich finde niemanden — hilf mir", () => { verankert = false; setzePosition(0, 0); finde(); });
+    }, 25000));
   }
 
+  /* ---------- Sensoren ---------- */
   function onOrientierung(e) {
     if (e.alpha === null || e.beta === null || e.alpha === undefined) return;
     if (window.innerWidth > window.innerHeight) return; // Querformat: nicht verankern
@@ -124,28 +151,50 @@
       glatt.alpha = (glatt.alpha + winkelDiff(e.alpha, glatt.alpha) * 0.25 + 360) % 360;
       glatt.beta = glatt.beta + (e.beta - glatt.beta) * 0.25;
     }
-    if (!anker) {
-      // Die Gestalt steht 35–65° seitlich — man muss sich erst umschauen
+    if (!anker && zustand === "suchen") {
       const seite = Math.random() < 0.5 ? -1 : 1;
-      anker = {
-        alpha: (glatt.alpha + seite * (35 + Math.random() * 30) + 360) % 360,
-        beta: Math.min(100, Math.max(65, glatt.beta))
-      };
+      const horizont = Math.min(100, Math.max(65, glatt.beta));
+      const art = arDaten().suche;
+      // Wo steht die Gestalt? Seitlich, hinter dir, oben im Baum oder unten am Rand
+      if (art === "hinten") anker = { alpha: glatt.alpha + 180 + seite * (5 + Math.random() * 15), beta: horizont };
+      else if (art === "oben") anker = { alpha: glatt.alpha + seite * (10 + Math.random() * 20), beta: 125 };
+      else if (art === "unten") anker = { alpha: glatt.alpha + seite * (10 + Math.random() * 20), beta: 52 };
+      else anker = { alpha: glatt.alpha + seite * (35 + Math.random() * 30), beta: horizont };
+      anker.alpha = (anker.alpha + 360) % 360;
       verankert = true;
-      clearTimeout(rueckfallTimer);
-      if (!gefunden) setzeStatus("suchen");
     }
-    // Richtungspfeil und Fund-Erkennung hängen am Sensor, nicht an der Bildrate
-    // (die im Stromsparmodus gedrosselt sein kann)
     const p = bildPosition();
     setzePosition(p.x, p.y);
-    aktualisiereRichtung(p.x);
-    pruefeFund(p.x, p.y);
+    if (zustand === "suchen" || zustand === "gefunden") aktualisiereRichtung(p.x, p.y);
+    if (zustand === "suchen") pruefeFund(p.x, p.y);
+    orientierungsHoerer.forEach(fn => { try { fn(); } catch (x) {} });
+  }
+
+  function onBewegung(e) {
+    bewegungsHoerer.forEach(fn => { try { fn(e); } catch (x) {} });
+  }
+
+  /* Bildschirm-Versatz (px) eines Punkts in Weltrichtung (alpha, beta) gegenüber der Mitte:
+     Dreht man das Handy nach links, wandert er nach rechts; kippt man es hoch, wandert er nach unten. */
+  function zuBild(alpha, beta) {
+    if (!glatt) return { x: 0, y: 0 };
+    const w = window.innerWidth, h = window.innerHeight;
+    return {
+      x: winkelDiff(glatt.alpha, alpha) * (w / SICHTFELD_H),
+      y: (glatt.beta - beta) * (h / SICHTFELD_V)
+    };
+  }
+
+  function bildPosition() {
+    if (!(verankert && anker && glatt)) return { x: 0, y: 0 };
+    const p = zuBild(anker.alpha, anker.beta);
+    const h = window.innerHeight;
+    return { x: p.x, y: Math.max(-h, Math.min(h, p.y)) };
   }
 
   /* Nur transform ändern (läuft auf der Grafikkarte, kein Layout) */
   function setzePosition(x, y) {
-    const el = document.getElementById("ar-gestalt-pos");
+    const el = $("ar-gestalt-pos");
     if (!el) return;
     if (letztesX === null || Math.abs(x - letztesX) > 0.5 || Math.abs(y - letztesY) > 0.5) {
       el.style.transform = `translate(${x.toFixed(1)}px, ${y.toFixed(1)}px)`;
@@ -153,22 +202,14 @@
     }
   }
 
-  /* Weltfeste Position der Gestalt auf dem Bildschirm (px relativ zur Mitte):
-     Dreht man das Handy nach links, wandert die Gestalt nach rechts. */
-  function bildPosition() {
-    if (!(verankert && anker && glatt)) return { x: 0, y: 0 };
-    const w = window.innerWidth, h = window.innerHeight;
-    return {
-      x: winkelDiff(glatt.alpha, anker.alpha) * (w / SICHTFELD_H),
-      y: Math.max(-h * 0.35, Math.min(h * 0.35, (glatt.beta - anker.beta) * (h / SICHTFELD_V)))
-    };
-  }
-
-  function aktualisiereRichtung(x) {
-    const pfeil = document.getElementById("ar-richtung");
+  function aktualisiereRichtung(x, y) {
+    const pfeil = $("ar-richtung");
     if (!pfeil) return;
-    const aussen = Math.abs(x) > window.innerWidth * 0.42;
-    const text = !aussen ? "" : (x < 0 ? "← Dreh dich nach links" : "Dreh dich nach rechts →");
+    const w = window.innerWidth, h = window.innerHeight;
+    let text = "";
+    if (Math.abs(x) > w * 0.42) text = x < 0 ? "← Dreh dich nach links" : "Dreh dich nach rechts →";
+    else if (y < -h * 0.38) text = "↑ Schau nach oben";
+    else if (y > h * 0.3) text = "↓ Schau nach unten";
     if (pfeil.textContent !== text) {
       pfeil.textContent = text;
       pfeil.classList.toggle("sichtbar", !!text);
@@ -176,8 +217,9 @@
   }
 
   function pruefeFund(x, y) {
-    if (gefunden || !verankert) return;
-    const mittig = Math.abs(x) < window.innerWidth * 0.2 && Math.abs(y) < window.innerHeight * 0.25;
+    if (!verankert) return;
+    const w = window.innerWidth, h = window.innerHeight;
+    const mittig = Math.abs(x) < w * 0.2 && y > -h * 0.28 && y < h * 0.2;
     const jetzt = performance.now();
     if (mittig) {
       if (!fundSeit) fundSeit = jetzt;
@@ -187,65 +229,193 @@
     }
   }
 
-  function setzeStatus(art) {
-    const el = document.getElementById("ar-status");
+  /* ---------- Ablauf ---------- */
+  function setzeZustand(z) {
+    zustand = z;
+    const b = document.querySelector("#view-ar .ar-buehne");
+    if (b) b.dataset.zustand = z;
+    // Der Richtungspfeil gehört nur zur Suche
+    if (z !== "suchen" && z !== "gefunden") {
+      const pfeil = $("ar-richtung");
+      if (pfeil) { pfeil.textContent = ""; pfeil.classList.remove("sichtbar"); }
+    }
+  }
+
+  function setzeStatus(text) {
+    const el = $("ar-status");
+    if (el && el.textContent !== text) el.textContent = text;
+  }
+
+  function zeigeHilfe(text, aktion) {
+    const el = $("ar-hilfe");
     if (!el) return;
-    const name = esc(figur.name);
-    const texte = {
-      laedt: "Kamera wird geöffnet …",
-      suchen: "👀 Irgendwo hier ist jemand … Schau dich langsam um!",
-      mittig: "✨ Da erscheint jemand …",
-      gefunden: `✨ Du hast ${name} gefunden! Tipp die Gestalt an.`,
-      gegruesst: "" // jetzt spricht die Sprechblase
-    };
-    el.innerHTML = texte[art] || "";
+    el.textContent = text;
+    el.hidden = false;
+    el.onclick = () => { el.hidden = true; aktion(); };
+  }
+  function versteckeHilfe() { const el = $("ar-hilfe"); if (el) el.hidden = true; }
+
+  function hauptknopf(text, gold, aktion) {
+    const b = $("ar-haupt");
+    if (!b) return;
+    if (!text) { b.hidden = true; return; }
+    b.hidden = false;
+    b.textContent = text;
+    b.classList.toggle("btn-gold", !!gold);
+    b.classList.toggle("btn-sekundaer", !gold);
+    b.onclick = aktion;
+  }
+
+  function fortschritt(wert, beschriftung) {
+    const box = $("ar-fortschritt");
+    if (!box) return;
+    box.hidden = false;
+    box.querySelector(".ar-fortschritt-wert").style.width = Math.round(Math.max(0, Math.min(1, wert)) * 100) + "%";
+    box.querySelector(".ar-fortschritt-text").textContent = beschriftung || "";
+  }
+
+  function blase(text) {
+    const el = $("ar-blase");
+    if (!el) return;
+    if (!text) { el.classList.remove("sichtbar"); return; }
+    el.textContent = text;
+    el.classList.add("sichtbar");
   }
 
   function finde() {
-    if (gefunden) return;
-    gefunden = true;
+    if (zustand !== "suchen") return;
+    setzeZustand("gefunden");
+    versteckeHilfe();
+    const pfeil = $("ar-richtung");
+    if (pfeil) { pfeil.textContent = ""; pfeil.classList.remove("sichtbar"); }
     const buehne = document.querySelector("#view-ar .ar-buehne");
     if (buehne) buehne.classList.add("gefunden");
-    const btn = document.getElementById("ar-ansprechen");
-    if (btn) { btn.classList.remove("btn-sekundaer"); btn.classList.add("btn-gold"); }
-    setzeStatus("gefunden");
+    setzeStatus(`✨ Du hast ${figur.name} gefunden! Tipp die Gestalt an.`);
+    hauptknopf("👋 Hallo sagen", false, gruesse);
     vibriere([40, 60, 90]);
   }
 
   function gruesse() {
-    gegruesst = true;
-    const blase = document.getElementById("ar-blase");
-    const name = window.Store.get().name;
-    if (blase) {
-      blase.textContent = `${name ? "Hey " + name + "! " : "Hey! "}Schön, dass du mich gefunden hast. Ich bin ${figur.name} — ${figur.beiname}. Magst du kurz mit mir reden?`;
-      blase.classList.add("sichtbar");
-    }
-    const gestalt = document.getElementById("ar-gestalt");
-    if (gestalt) {
-      gestalt.classList.remove("huepft");
-      void gestalt.offsetWidth; // Animation neu starten
-      gestalt.classList.add("huepft");
-    }
-    setzeStatus("gegruesst");
+    if (zustand !== "gefunden") return;
+    setzeZustand("gegruesst");
+    const d = arDaten();
+    const name = window.Store.get().name || "du";
+    blase(d.einladung.replace("{name}", name));
+    huepfen();
     vibriere(30);
+    setzeStatus("");
+    // Zachäus steigt vom Baum herunter
+    if (d.suche === "oben" && verankert && glatt) senkeAnkerAb();
+    if (d.geste) hauptknopf("✨ Los geht's", true, starteGeste);
+    else hauptknopf("📖 Weiter", true, erfuellt);
+  }
+
+  function senkeAnkerAb() {
+    const ziel = Math.min(100, Math.max(65, glatt.beta));
+    const startBeta = anker.beta, dauer = 1400, t0 = performance.now();
+    const t = setInterval(() => {
+      const k = Math.min(1, (performance.now() - t0) / dauer);
+      anker.beta = startBeta + (ziel - startBeta) * (1 - Math.pow(1 - k, 3));
+      const p = bildPosition();
+      setzePosition(p.x, p.y);
+      if (k >= 1) clearInterval(t);
+    }, 30);
+    timer.push(t);
+  }
+
+  /* Nach der Geste (oft schaut man dabei nach oben, unten oder zur Seite)
+     kommt die Gestalt sanft dorthin, wohin man gerade blickt — zum Bibelwort ist sie bei dir. */
+  function holeHeran() {
+    if (!(verankert && anker && glatt)) return;
+    const start = { alpha: anker.alpha, beta: anker.beta }, dauer = 1100, t0 = performance.now();
+    const t = setInterval(() => {
+      if (!glatt) { clearInterval(t); return; }
+      const k = 1 - Math.pow(1 - Math.min(1, (performance.now() - t0) / dauer), 3);
+      anker.alpha = (start.alpha + winkelDiff(glatt.alpha, start.alpha) * k + 360) % 360;
+      anker.beta = start.beta + (glatt.beta - start.beta) * k;
+      const p = bildPosition();
+      setzePosition(p.x, p.y);
+      if (k >= 1) clearInterval(t);
+    }, 30);
+    timer.push(t);
+  }
+
+  function huepfen() {
+    const g = $("ar-gestalt");
+    if (!g) return;
+    g.classList.remove("huepft"); void g.offsetWidth; g.classList.add("huepft");
+  }
+
+  function starteGeste() {
+    if (zustand !== "gegruesst") return;
+    setzeZustand("geste");
+    const d = arDaten();
+    blase("");
+    hauptknopf(null);
+    setzeStatus(d.auftrag || "");
+    const buehne = document.querySelector("#view-ar .ar-buehne");
+    const ctx = {
+      ebene: $("ar-geste-ebene"),
+      figurPos: $("ar-gestalt-pos"),
+      buehne,
+      verankert: () => verankert,
+      richtung: () => (glatt ? { alpha: glatt.alpha, beta: glatt.beta } : null),
+      zuBild,
+      aufOrientierung(fn) { orientierungsHoerer.add(fn); return () => orientierungsHoerer.delete(fn); },
+      aufBewegung(fn) { bewegungsHoerer.add(fn); return () => bewegungsHoerer.delete(fn); },
+      status: setzeStatus,
+      fortschritt,
+      vibriere,
+      fertig: () => { erlebt = true; timer.push(setTimeout(erfuellt, 700)); }
+    };
+    laufendeGeste = window.Gesten.starte(d.geste, ctx);
+    // Geht gerade nicht (Bewegungseinschränkung, im Bus …)? Nach 20 s darf man überspringen.
+    timer.push(setTimeout(() => {
+      if (zustand === "geste") zeigeHilfe("Geht gerade nicht? Überspringen", () => erfuellt());
+    }, 20000));
+  }
+
+  function erfuellt() {
+    if (zustand === "erfuellt" || zustand === "aus") return;
+    if (laufendeGeste) laufendeGeste.stop(); // Bedienelemente der Geste weg, Enthülltes bleibt
+    laufendeGeste = null;
+    setzeZustand("erfuellt");
+    versteckeHilfe();
+    blase("");
+    const fort = $("ar-fortschritt");
+    if (fort) fort.hidden = true;
+    const d = arDaten();
+    const vers = $("ar-vers");
+    if (vers) {
+      vers.innerHTML = `<p>${esc(d.erfuellt)}</p>${d.bibelstelle ? `<span class="ar-vers-stelle">${esc(d.bibelstelle)}</span>` : ""}`;
+      vers.hidden = false;
+    }
+    holeHeran();
+    huepfen();
+    setzeStatus(erlebt ? "✨ Geschafft!" : "");
+    hauptknopf(optionen.replay ? `💬 Nochmal mit ${figur.name} reden` : `💬 ${figur.name} ansprechen`, true, ansprechen);
+    if (erlebt) vibriere([30, 50, 120]);
   }
 
   function tippeGestalt() {
-    if (!gefunden) { finde(); return; }
-    if (!gegruesst) { gruesse(); return; }
-    ansprechen();
+    if (zustand === "suchen") { finde(); return; }
+    if (zustand === "gefunden") { gruesse(); return; }
+    if (zustand === "gegruesst") { huepfen(); return; }
+    if (zustand === "erfuellt") { ansprechen(); }
   }
 
   function verlasse(ziel) {
     aufraeumen();
-    window.App.zeigeView(ziel || zurueckView);
+    window.App.zeigeView(ziel || optionen.zurueck || "ort");
   }
 
   function ansprechen() {
+    const warErlebt = erlebt;
     aufraeumen();
-    window.Encounter.start(figur);
+    window.Encounter.start(figur, { replay: !!optionen.replay, erlebt: warErlebt });
   }
 
+  /* ---------- Darstellung ---------- */
   function render(view, modus) {
     const laden = modus === "laedt";
     const hintergrund = modus === "kamera"
@@ -270,6 +440,7 @@
               </div>
             </div>`}
         </div>
+        <div id="ar-geste-ebene" class="ar-geste-ebene"></div>
         <div class="ar-overlay">
           <button class="ar-schliessen" id="ar-close" aria-label="Schließen">✕</button>
           <div class="ar-kopf">
@@ -283,23 +454,27 @@
                 <div class="ar-name">${esc(figur.name)}</div>
                 <div class="ar-beiname">${esc(figur.beiname)}</div>
               </div>
+              <div id="ar-vers" class="ar-vers" hidden></div>
+              <div id="ar-fortschritt" class="ar-fortschritt" hidden>
+                <div class="ar-fortschritt-balken"><div class="ar-fortschritt-wert"></div></div>
+                <span class="ar-fortschritt-text"></span>
+              </div>
               ${fallbackHinweis}
-              <button class="btn btn-sekundaer" id="ar-ansprechen">💬 ${esc(figur.name)} ansprechen</button>
-              <button class="ar-textlink" id="ar-zurueck">Zurück ohne AR</button>
-              <p class="ar-datenschutz">🔒 Kamerabild und Bewegung bleiben auf deinem Gerät — nichts wird aufgenommen oder verschickt. 📸 Tipp: Screenshot als Erinnerung!</p>
+              <button class="btn btn-gold" id="ar-haupt" hidden></button>
+              <button class="ar-textlink" id="ar-hilfe" hidden></button>
+              <button class="ar-textlink" id="ar-zurueck">Zurück</button>
+              <p class="ar-datenschutz">🔒 Kamerabild und Bewegung bleiben auf deinem Gerät — nichts wird aufgenommen oder verschickt.</p>
             </div>`}
         </div>
       </div>`;
 
-    const close = view.querySelector("#ar-close");
+    const close = $("ar-close");
     if (close) close.addEventListener("click", () => verlasse());
-    const zurueck = view.querySelector("#ar-zurueck");
+    const zurueck = $("ar-zurueck");
     if (zurueck) zurueck.addEventListener("click", () => verlasse());
-    const ansprechenBtn = view.querySelector("#ar-ansprechen");
-    if (ansprechenBtn) ansprechenBtn.addEventListener("click", ansprechen);
-    const gestalt = view.querySelector("#ar-gestalt");
+    const gestalt = $("ar-gestalt");
     if (gestalt) gestalt.addEventListener("click", tippeGestalt);
   }
 
-  window.AR = { oeffne, verlasse, unterstuetzt, stoppe: aufraeumen };
+  window.AR = { oeffne, verlasse, stoppe: aufraeumen };
 })();
