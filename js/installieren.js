@@ -154,8 +154,10 @@
   window.Installieren = { plattform, imStandalone, hinweisSinnvoll, installieren, zeigeAnleitung, karteHTML, verdrahteKarte, kannDirekt: () => !!installEreignis };
 
   /* ---------- Spielstand mitnehmen: kurzer Code ----------
-     Pro Figur 3 Bit (gesammelt, Goldglanz, echter Besuch) → 18 Figuren = 54 Bit →
-     11 Zeichen Crockford-Base32 + 1 Prüfzeichen, vorne "W1" (Version).
+     Pro Figur 3 Bit (gesammelt, Goldglanz, echter Besuch), in der Reihenfolge von
+     figuren.json → Crockford-Base32 + 1 Prüfzeichen, vorne "W1" (Version).
+     18 Figuren = 11 Zeichen, 26 Figuren = 16 Zeichen. Neue Figuren werden in
+     figuren.json immer HINTEN angehängt — dann bleiben ältere, kürzere Codes gültig.
      Bewusst NICHT enthalten: Name und private Notizen. */
   const ZEICHEN = "0123456789ABCDEFGHJKMNPQRSTVWXYZ";
 
@@ -186,15 +188,16 @@
     const s = String(text || "").toUpperCase().replace(/[^0-9A-Z]/g, "").replace(/O/g, "0").replace(/[IL]/g, "1");
     if (!s.startsWith("W1")) return null;
     const daten = s.slice(2, -1), pruef = s.slice(-1);
-    const anzahl = window.Daten.figuren.length;
-    if (daten.length !== Math.ceil(anzahl * 3 / 5) || pruefzeichen(daten) !== pruef) return null;
+    // Wie viele Figuren stecken im Code? Ältere Codes kennen nur die ersten Figuren.
+    const anzahl = Math.min(window.Daten.figuren.length, Math.floor(daten.length * 5 / 3));
+    if (!daten.length || daten.length !== Math.ceil(anzahl * 3 / 5) || pruefzeichen(daten) !== pruef) return null;
     const bits = [];
     for (const z of daten) {
       const v = ZEICHEN.indexOf(z);
       if (v < 0) return null;
       for (let b = 4; b >= 0; b--) bits.push((v >> b) & 1);
     }
-    return window.Daten.figuren.map((f, i) => ({ id: f.id, gesammelt: !!bits[i * 3], glanz: !!bits[i * 3 + 1], echt: !!bits[i * 3 + 2] }));
+    return window.Daten.figuren.slice(0, anzahl).map((f, i) => ({ id: f.id, gesammelt: !!bits[i * 3], glanz: !!bits[i * 3 + 1], echt: !!bits[i * 3 + 2] }));
   }
 
   function uebernehmen(text) {

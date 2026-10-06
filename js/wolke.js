@@ -114,11 +114,11 @@
       ${musterSVG(figur.muster, figur.farbe)}
       ${rahmenSVG(figur.seltenheit)}
       ${fensterMitGestalt(figur, uid, false)}
-      <text x="${KW / 2}" y="252" text-anchor="middle" class="karte-name">${esc(figur.name)}</text>
-      <text x="${KW / 2}" y="278" text-anchor="middle" class="karte-beiname">${esc(figur.beiname)}</text>
+      <text x="${KW / 2}" y="252" text-anchor="middle" class="karte-name"${figur.name.length > 19 ? ` style="font-size:${Math.floor(540 / figur.name.length)}px"` : ""}>${esc(figur.name)}</text>
+      <text x="${KW / 2}" y="278" text-anchor="middle" class="karte-beiname"${figur.beiname.length > 34 ? ` style="font-size:${Math.floor(510 / figur.beiname.length)}px"` : ""}>${esc(figur.beiname)}</text>
       <rect x="${KW / 2 - 80}" y="300" width="160" height="30" rx="15" fill="${figur.farbe}" opacity="0.16"/>
       <text x="${KW / 2}" y="320" text-anchor="middle" class="karte-thema" fill="${figur.farbe}">${esc(figur.themaLabel)}</text>
-      <text x="${KW / 2}" y="362" text-anchor="middle" class="karte-ort">${esc(ort ? window.Karte.KURZNAMEN[ort.id] : "")} ${ort ? ort.icon : ""}</text>
+      <text x="${KW / 2}" y="362" text-anchor="middle" class="karte-ort">${esc(ort ? ort.kurzname || ort.name : "")} ${ort ? ort.icon : ""}</text>
       <text x="${KW / 2}" y="392" text-anchor="middle" class="karte-seltenheit">— ${SELTENHEIT_LABEL[figur.seltenheit] || ""} —</text>
       ${glanz ? `<rect x="6" y="6" width="${KW - 12}" height="${KH - 12}" rx="15" fill="url(#${uid}-foil)" class="foil"/>` : ""}
       ${probelauf ? `<g transform="translate(${KW - 66},44) rotate(12)"><rect x="-38" y="-12" width="76" height="24" rx="4" fill="var(--nacht-hell)" opacity="0.9"/><text text-anchor="middle" y="5" class="karte-probelauf">Probelauf</text></g>` : ""}
@@ -133,7 +133,7 @@
       <rect x="4" y="4" width="${KW - 8}" height="${KH - 8}" rx="16" fill="var(--nacht-hell)" stroke="var(--sternennebel)" stroke-width="2" stroke-dasharray="6 6"/>
       ${fensterMitGestalt(figur, uid, true)}
       <text x="${KW / 2}" y="262" text-anchor="middle" class="karte-nebel-text">Noch nicht begegnet</text>
-      <text x="${KW / 2}" y="330" text-anchor="middle" class="karte-nebel-hinweis">${ort ? ort.icon : ""} ${esc(ort ? window.Karte.KURZNAMEN[ort.id] : "")}</text>
+      <text x="${KW / 2}" y="330" text-anchor="middle" class="karte-nebel-hinweis">${ort ? ort.icon : ""} ${esc(ort ? ort.kurzname || ort.name : "")}</text>
       <text x="${KW / 2}" y="354" text-anchor="middle" class="karte-nebel-hinweis klein">${esc(figur.themaLabel)}</text>
     </svg>`;
   }
@@ -149,7 +149,7 @@
       finale = `<div class="finale panel-pergament">
         <div class="finale-titel">☁️ Deine Wolke ist voll!</div>
         <p>»Wir sind von einer großen Wolke von Zeugen umgeben. So lasst uns laufen in dem Lauf, der uns bestimmt ist — und dabei auf Jesus sehen, den Anfänger und Vollender des Glaubens.«</p>
-        <p class="finale-quelle">Hebräer 12,1-2 · <strong>${esc(window.Store.get().name || "Du")}</strong>, achtzehn Zeug:innen feuern dich an.</p>
+        <p class="finale-quelle">Hebräer 12,1-2 · <strong>${esc(window.Store.get().name || "Du")}</strong>, ${zahlwort(figuren.length)} Zeug:innen feuern dich an.</p>
       </div>`;
     }
 
@@ -187,13 +187,28 @@
     });
   }
 
-  /* ---- Kirchenfenster: 18 Scheiben füllen sich ---- */
+  /* Zahl als Wort (für Texte wie »sechsundzwanzig Zeug:innen«) */
+  function zahlwort(n, gross) {
+    const einer = ["", "ein", "zwei", "drei", "vier", "fünf", "sechs", "sieben", "acht", "neun"];
+    const zehner = ["", "zehn", "zwanzig", "dreißig", "vierzig", "fünfzig", "sechzig", "siebzig", "achtzig", "neunzig"];
+    const besondere = { 1: "eins", 10: "zehn", 11: "elf", 12: "zwölf", 16: "sechzehn", 17: "siebzehn" };
+    let w;
+    if (n < 1 || n > 99) w = String(n);
+    else if (besondere[n]) w = besondere[n];
+    else if (n < 10) w = einer[n];
+    else if (n < 20) w = einer[n - 10] + "zehn";
+    else w = (n % 10 ? einer[n % 10] + "und" : "") + zehner[Math.floor(n / 10)];
+    return gross ? w.charAt(0).toUpperCase() + w.slice(1) : w;
+  }
+
+  /* ---- Kirchenfenster: Mit jeder Begegnung leuchtet eine Scheibe ---- */
   function renderFenster(container) {
     const figuren = window.Daten.figuren;
     const FW = 320, FH = 480;
     const arch = `M 36 ${FH - 20} L 36 190 Q 36 44 ${FW / 2} 36 Q ${FW - 36} 44 ${FW - 36} 190 L ${FW - 36} ${FH - 20} Z`;
 
-    const cols = 3, rows = 6;
+    // Bis 18 Figuren 3 Spalten, darüber 4 — freie Felder oben werden zu Zierscheiben
+    const cols = figuren.length > 18 ? 4 : 3, rows = Math.ceil(figuren.length / cols);
     const x0 = 36, x1 = FW - 36, yTop = 40, yBot = FH - 20;
     const cw = (x1 - x0) / cols, rh = (yBot - yTop) / rows;
 
@@ -209,6 +224,11 @@
         <rect x="${x + 2}" y="${y + 2}" width="${cw - 4}" height="${rh - 4}" fill="${fill}" opacity="${op}"/>
         ${hat ? `<text x="${x + cw / 2}" y="${y + rh / 2 + 9}" text-anchor="middle" class="fenster-emoji">${f.emoji}</text>` : ""}
       </g>`;
+    }).join("") + Array.from({ length: cols * rows - figuren.length }, (_, k) => {
+      const i = figuren.length + k;
+      const x = x0 + (i % cols) * cw, y = yBot - (Math.floor(i / cols) + 1) * rh;
+      return `<rect x="${x + 2}" y="${y + 2}" width="${cw - 4}" height="${rh - 4}" fill="var(--gold)" opacity="0.28"/>
+        <text x="${x + cw / 2}" y="${y + rh / 2 + 6}" text-anchor="middle" class="fenster-zier">✦</text>`;
     }).join("");
 
     // Steinrahmen (Maßwerk) über den Scheiben
@@ -291,5 +311,5 @@
     if (replay) replay.addEventListener("click", () => window.Encounter.start(figur, { replay: true }));
   }
 
-  window.Wolke = { kartenSVG, silhouetteSVG, renderAlbum, renderFenster, renderFigurDetail };
+  window.Wolke = { kartenSVG, silhouetteSVG, renderAlbum, renderFenster, renderFigurDetail, zahlwort };
 })();

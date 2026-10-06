@@ -1,12 +1,13 @@
 /* Wolke der Zeugen — Standortlogik.
    Datenschutz: Die Position existiert nur im Speicher dieser Funktionen.
    Sie wird nie persistiert, nie in URLs geschrieben und nie übertragen.
-   Die QR-/Leiter-Codes im JSON sind eine Fairness-Hürde, keine Security —
-   wer sie ausliest, betrügt nur sich selbst ums Spiel. */
+   Wie bei Pokémon Go schaltet allein der echte Standort einen Ort frei
+   (oder im Demo-Modus das "Beamen" zum Ausprobieren). */
 (function () {
   let watchId = null;
   let position = null;      // { lat, lng, accuracy, zeit } — nur im Speicher
   let demoOrtId = null;     // im Demo-Modus "gebeamter" Ort
+  let verweigert = false;   // Browser/Handy blockiert den Standort
   let listeners = [];
 
   /* Letzte Position bleibt kurz gültig: Ein GPS-Aussetzer (drinnen, unter Bäumen)
@@ -34,6 +35,7 @@
     if (!("geolocation" in navigator)) return;
     watchId = navigator.geolocation.watchPosition(
       pos => {
+        verweigert = false;
         position = {
           lat: pos.coords.latitude,
           lng: pos.coords.longitude,
@@ -43,7 +45,10 @@
         melde();
       },
       // Fehler/Timeout: letzte Position nicht sofort verwerfen (siehe aktuell())
-      () => { melde(); },
+      err => {
+        if (err && err.code === 1) { verweigert = true; stop(); } // PERMISSION_DENIED
+        melde();
+      },
       { enableHighAccuracy: true, maximumAge: 10000, timeout: 20000 }
     );
   }
@@ -74,13 +79,10 @@
     return haversine(p.lat, p.lng, ort.lat, ort.lng);
   }
 
-  /* Zentrale Freischaltungs-Prüfung: GPS, QR oder Demo. */
+  /* Zentrale Freischaltungs-Prüfung: GPS oder Demo. */
   function freischaltung(ort) {
     if (window.Store.get().demo && demoOrtId === ort.id) {
       return { frei: true, art: "demo", distanz: 0 };
-    }
-    if (window.Store.istQrFrei(ort.id)) {
-      return { frei: true, art: "qr", distanz: distanzZu(ort) };
     }
     const d = distanzZu(ort);
     if (d !== null) {
@@ -102,6 +104,7 @@
     distanzZu,
     haversine,
     aktiv: () => watchId !== null,
+    verweigert: () => verweigert,
     hatPosition: () => !!aktuell(),
     genauigkeit: () => (aktuell() ? aktuell().accuracy : null),
     positionXY: () => (aktuell() ? { lat: aktuell().lat, lng: aktuell().lng } : null),

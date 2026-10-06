@@ -1171,6 +1171,584 @@
         "erfuellt": "»Nennt mich nicht Noomi, nennt mich Mara.« Aber am Ende hatte ich meinen Namen wieder. Bitterkeit darf sein — sie muss nicht bleiben.",
         "bibelstelle": "Rut 1,20; 4,14-15"
       }
+    },
+    {
+      "id": "tabita",
+      "name": "Tabita",
+      "beiname": "Die Jüngerin mit Nadel und Faden",
+      "ortId": "staakentreff",
+      "thema": "fuereinander",
+      "themaLabel": "Füreinander da sein",
+      "seltenheit": "besonders",
+      "emoji": "🧵",
+      "farbe": "#b0574f",
+      "muster": "ranken",
+      "kurzvorstellung": "Die einzige Frau, die im Neuen Testament ausdrücklich »Jüngerin« heißt — sie nähte Kleider für die Witwen ihrer Stadt.",
+      "dialog": [
+        {
+          "sprecher": "figur",
+          "text": "Ich bin Tabita aus Joppe. Auf Griechisch heiße ich Dorkas — Gazelle. Predigen wie Petrus konnte ich nicht. Aber nähen konnte ich. Also habe ich für die Witwen in unserer Stadt Kleider genäht. Die hatten sonst niemanden."
+        },
+        {
+          "sprecher": "du",
+          "optionen": [
+            {
+              "text": "Ist Nähen nicht ein bisschen … klein?",
+              "reaktion": "Sag das mal einer Witwe im Winter! Zu meiner Zeit hatte eine Frau ohne Mann oft gar nichts — kein Geld, keine Rechte. Ein warmes Kleid war kein Geschenk, sondern Überleben. Glaube, der niemanden wärmt, ist nur Gerede."
+            },
+            {
+              "text": "Was ist mit dir passiert?",
+              "reaktion": "Ich wurde krank und bin gestorben. Die Witwen standen weinend um mich herum und haben Petrus meine Kleider gezeigt: »Schau, das hat sie für uns gemacht.« Dann hat Petrus gebetet und gesagt: »Tabita, steh auf!« Und ich bin aufgestanden."
+            }
+          ]
+        },
+        {
+          "sprecher": "figur",
+          "text": "Weißt du, warum ich hier am Staakentreff warte? Hier reparieren Leute Fahrräder und Kleider, kochen zusammen, helfen bei Formularen, lernen Deutsch. Kein großes Tamtam. Genau so fängt Gottes Reich an: mit Nachbar:innen, die füreinander da sind."
+        }
+      ],
+      "impuls": "Tabita konnte nähen — und hat daraus etwas für andere gemacht. Was kannst du gut? Kochen, zuhören, Mathe erklären, Fahrräder flicken, Leute zum Lachen bringen? Für wen in deiner Nachbarschaft könnte das etwas bedeuten?",
+      "frage": {
+        "typ": "multiple-choice",
+        "schwierigkeit": 2,
+        "frage": "Was zeigten die Witwen Petrus, als er zu der toten Tabita kam?",
+        "antworten": [
+          "Die Kleider, die Tabita für sie genäht hatte",
+          "Ihre Ersparnisse für das Begräbnis",
+          "Briefe, die Tabita geschrieben hatte",
+          "Den Schlüssel zu Tabitas Haus"
+        ],
+        "richtig": 0,
+        "erklaerung": "Die Witwen weinten und zeigten Petrus die Kleider, die Tabita für sie gemacht hatte. Ihr Glaube war ganz praktisch — und genau das hat alle berührt. Tabita ist übrigens die einzige Frau, die im Neuen Testament ausdrücklich »Jüngerin« genannt wird.",
+        "bibelstelle": "Apostelgeschichte 9,36-42",
+        "bibellink": "https://www.die-bibel.de/bibel/BB/ACT.9.36-ACT.9.42"
+      },
+      "kartenspruch": "Sie war reich an guten Werken.",
+      "ar": {
+        "suche": "seite",
+        "geste": {
+          "typ": "sammeln",
+          "symbol": "🧵",
+          "symbole": [
+            "👗",
+            "🧥",
+            "🧣",
+            "👕",
+            "🧤",
+            "🧦"
+          ],
+          "anzahl": 6,
+          "bereich": "rundum"
+        },
+        "einladung": "Hey {name}! Ich bin Tabita. Die Witwen haben Petrus die Kleider gezeigt, die ich genäht habe. Jetzt liegen sie hier überall verstreut — sammelst du sie ein?",
+        "auftrag": "🧵 Dreh dich um und sammle 6 Kleidungsstücke ein.",
+        "erfuellt": "»Alle Witwen standen um ihn herum, weinten und zeigten ihm die Kleider, die Tabita gemacht hatte.« Kleine Dinge, mit Liebe gemacht, bleiben.",
+        "bibelstelle": "Apostelgeschichte 9,39"
+      }
+    },
+    {
+      "id": "noah",
+      "name": "Noah",
+      "beiname": "Der Kapitän der Arche",
+      "ortId": "kita-arche-noah",
+      "thema": "schutz",
+      "themaLabel": "Schutz & Geborgenheit",
+      "seltenheit": "legende",
+      "emoji": "🚢",
+      "farbe": "#3d6d8f",
+      "muster": "wellen",
+      "kurzvorstellung": "Baute einen riesigen Kasten aus Holz, als alle anderen lachten — und rettete darin Menschen und Tiere.",
+      "dialog": [
+        {
+          "sprecher": "figur",
+          "text": "Ich bin Noah. Gott hat zu mir gesagt: Bau eine Arche — einen riesigen Kasten aus Holz. Mitten im Trockenen! Die Nachbarn haben sich totgelacht. Aber ich habe gebaut. Und als die Flut kam, war Platz für meine Familie und für die Tiere: große, kleine, laute, stachelige."
+        },
+        {
+          "sprecher": "du",
+          "optionen": [
+            {
+              "text": "War es nicht eng da drin?",
+              "reaktion": "Eng, laut, und gerochen hat es — glaub mir! Aber alle waren drin, und alle waren sicher. Eine Arche ist kein Palast. Sie ist ein Ort, an dem niemand draußen bleiben muss."
+            },
+            {
+              "text": "Warum war dir das so wichtig?",
+              "reaktion": "Weil Gott das Leben liebt — jedes. Nicht nur die Starken und die Nützlichen. Auch die Schnecke, auch den Elefanten, auch die Kleinsten. Ich hab nur getan, was Gott wollte: Leben schützen."
+            }
+          ]
+        },
+        {
+          "sprecher": "figur",
+          "text": "Und dann kam der Regenbogen. Gott hat versprochen: Nie wieder will ich alles Leben vernichten. Die Kinder hier in der Kita Arche Noah erleben jeden Tag, was das heißt: Du bist geschützt. Du gehörst dazu. Wer hat dich eigentlich beschützt, als du klein warst?"
+        }
+      ],
+      "impuls": "Eine Arche ist ein Ort, an dem niemand draußen bleiben muss. Wo ist deine »Arche« — ein Ort oder Menschen, bei denen du sicher bist? Und für wen könntest du ein Stück Arche sein?",
+      "frage": {
+        "typ": "multiple-choice",
+        "schwierigkeit": 1,
+        "frage": "Was gibt Gott nach der Flut als Zeichen für sein Versprechen?",
+        "antworten": [
+          "Einen Regenbogen in den Wolken",
+          "Einen Olivenbaum auf dem Berg",
+          "Einen Stern über der Arche",
+          "Eine weiße Taube auf dem Dach"
+        ],
+        "richtig": 0,
+        "erklaerung": "Gott setzt seinen Bogen in die Wolken: »Das ist das Zeichen des Bundes zwischen mir und der Erde.« Ein Versprechen an alles, was lebt — an Menschen und Tiere. Die Taube mit dem Ölzweig gibt es in der Geschichte auch: Sie zeigt Noah, dass das Wasser zurückgeht.",
+        "bibelstelle": "1. Mose 9,12-17",
+        "bibellink": "https://www.die-bibel.de/bibel/BB/GEN.9.12-GEN.9.17"
+      },
+      "kartenspruch": "Meinen Bogen setze ich in die Wolken.",
+      "ar": {
+        "suche": "seite",
+        "geste": {
+          "typ": "sammeln",
+          "symbol": "🐾",
+          "symbole": [
+            "🐘",
+            "🦒",
+            "🐢",
+            "🐑",
+            "🦔",
+            "🐌",
+            "🦁"
+          ],
+          "anzahl": 7,
+          "bereich": "rundum"
+        },
+        "einladung": "Hey {name}! Ich bin Noah. Gleich kommt der Regen — und die Tiere sind überall verstreut. Hilfst du mir, sie in die Arche zu holen?",
+        "auftrag": "🐾 Schau dich um und hol 7 Tiere in die Arche.",
+        "erfuellt": "»Von allem, was lebt, sollst du ein Paar in die Arche bringen, damit es mit dir am Leben bleibt.« Alle drin. Alle sicher.",
+        "bibelstelle": "1. Mose 6,19"
+      }
+    },
+    {
+      "id": "weisheit",
+      "name": "Frau Weisheit",
+      "beiname": "Die vor Gott spielte",
+      "ortId": "waldarche",
+      "thema": "staunen",
+      "themaLabel": "Staunen & Spielen",
+      "seltenheit": "besonders",
+      "emoji": "🍂",
+      "farbe": "#5f7f3a",
+      "muster": "ranken",
+      "kurzvorstellung": "Die Bibel erzählt von ihr wie von einer Frau: Sie war dabei, als Gott die Welt erschuf — und hat dabei gespielt.",
+      "dialog": [
+        {
+          "sprecher": "figur",
+          "text": "Psst, hier im Wald! Ich bin die Weisheit. Die Bibel erzählt von mir wie von einer Frau. Ich war schon da, bevor es Berge gab und Quellen und Bäume. Als Gott die Welt gemacht hat, war ich dabei. Und weißt du, was ich da gemacht habe? Ich habe gespielt."
+        },
+        {
+          "sprecher": "du",
+          "optionen": [
+            {
+              "text": "Gespielt? Ist Weisheit nicht was für alte, ernste Leute?",
+              "reaktion": "Das denken viele. Aber Weisheit fängt mit Staunen an: Wie kann so ein winziger Käfer so glänzen? Warum riecht der Waldboden nach Regen? Wer aufhört zu staunen, wird nicht weise, sondern nur müde."
+            },
+            {
+              "text": "Was hat Spielen mit Gott zu tun?",
+              "reaktion": "Alles! Gott hat die Welt nicht gemacht, weil er musste, sondern aus Freude. »Ich spielte vor ihm allezeit und hatte meine Freude an den Menschen« — so steht es über mich in der Bibel. Spielen heißt auch: Wie schön, dass es dich gibt."
+            }
+          ]
+        },
+        {
+          "sprecher": "figur",
+          "text": "Die Kinder der Waldarche sind jeden Tag hier draußen. Sie bauen Höhlen, finden Käfer, matschen im Regen. Für mich ist das ein Gottesdienst ohne Worte. Und du — wann hast du das letzte Mal draußen einfach nur gestaunt?"
+        }
+      ],
+      "impuls": "Die Weisheit sagt: Staunen ist der Anfang. Bleib nach dem Gespräch eine Minute hier stehen, ohne aufs Handy zu schauen. Was hörst, riechst, siehst du? Was davon würdest du Gott gern einmal zeigen?",
+      "frage": {
+        "typ": "multiple-choice",
+        "schwierigkeit": 3,
+        "frage": "Was tat die Weisheit nach dem Buch der Sprüche, als Gott die Welt erschuf?",
+        "antworten": [
+          "Sie spielte vor Gott und freute sich",
+          "Sie schrieb alles in ein Buch",
+          "Sie zählte die Sterne",
+          "Sie schlief bis zum siebten Tag"
+        ],
+        "richtig": 0,
+        "erklaerung": "In Sprüche 8 erzählt die Weisheit: »Ich war bei ihm als sein Liebling, ich spielte vor ihm allezeit und hatte meine Freude an den Menschen.« Gottes Schöpfung ist voller Freude — und Spielen gehört dazu.",
+        "bibelstelle": "Sprüche 8,22-31",
+        "bibellink": "https://www.die-bibel.de/bibel/BB/PRO.8.22-PRO.8.31"
+      },
+      "kartenspruch": "Ich spielte vor ihm allezeit.",
+      "ar": {
+        "suche": "seite",
+        "geste": {
+          "typ": "sammeln",
+          "symbol": "🍂",
+          "symbole": [
+            "🍂",
+            "🌰",
+            "🍄",
+            "🪨",
+            "🐞",
+            "🪶",
+            "🐌"
+          ],
+          "anzahl": 7,
+          "bereich": "boden"
+        },
+        "einladung": "Hey {name}! Ich bin die Weisheit. Weißt du, was die Kinder hier jeden Tag machen? Schätze suchen. Komm, such mit — auf dem Waldboden!",
+        "auftrag": "🍂 Schau nach unten und sammle 7 Waldschätze.",
+        "erfuellt": "»Ich war bei ihm als sein Liebling, ich spielte vor ihm allezeit und hatte meine Freude an den Menschen.« Staunen ist der Anfang aller Weisheit.",
+        "bibelstelle": "Sprüche 8,30-31"
+      }
+    },
+    {
+      "id": "schifra",
+      "name": "Schifra",
+      "beiname": "Die Hebamme, die Nein sagte",
+      "ortId": "kita-regenbogen",
+      "thema": "leben-schuetzen",
+      "themaLabel": "Kinder schützen",
+      "seltenheit": "besonders",
+      "emoji": "🤲",
+      "farbe": "#c4626f",
+      "muster": "strahlen",
+      "kurzvorstellung": "Hebamme in Ägypten. Der Pharao befahl ihr, neugeborene Jungen zu töten — sie hat sich geweigert.",
+      "dialog": [
+        {
+          "sprecher": "figur",
+          "text": "Ich bin Schifra. Zusammen mit Pua war ich Hebamme in Ägypten. Wir haben den hebräischen Frauen geholfen, ihre Babys zu bekommen. Eines Tages hat uns der Pharao zu sich gerufen, der mächtigste Mann der Welt. Sein Befehl: Jeden neugeborenen Jungen sollt ihr töten."
+        },
+        {
+          "sprecher": "du",
+          "optionen": [
+            {
+              "text": "Und was habt ihr gemacht?",
+              "reaktion": "Nichts davon. Wir haben einfach weiter Babys auf die Welt geholfen. Als der Pharao uns zur Rede stellte, haben wir gesagt: »Die hebräischen Frauen sind so kräftig, die haben schon geboren, bevor wir da sind.« Ein bisschen frech, oder? Aber Kinder zu schützen war uns wichtiger als Gehorsam."
+            },
+            {
+              "text": "Hattet ihr keine Angst?",
+              "reaktion": "Natürlich! Aber in der Bibel steht: Wir fürchteten Gott mehr als den König. Das heißt: Uns war wichtiger, was Gott vom Leben hält, als was ein mächtiger Mann befiehlt. Mut heißt nicht, keine Angst zu haben. Mut heißt, trotzdem das Richtige zu tun."
+            }
+          ]
+        },
+        {
+          "sprecher": "figur",
+          "text": "Ich warte hier bei der Kita Regenbogen, weil hier jeden Tag Erwachsene sind, die Kinder schützen. Das ist keine Kleinigkeit — das ist heilige Arbeit. Und der Name eurer Kita erinnert an Gottes Regenbogen: Gott steht auf der Seite des Lebens. Auf der Seite der Kleinsten."
+        }
+      ],
+      "impuls": "Schifra und Pua haben bei etwas Falschem nicht mitgemacht — obwohl der Befehl von ganz oben kam. Gab es bei dir schon mal so eine Situation, in der du Nein sagen musstest? Und: Wen kennst du, der Schwächere schützt?",
+      "frage": {
+        "typ": "multiple-choice",
+        "schwierigkeit": 2,
+        "frage": "Was taten die Hebammen Schifra und Pua, als der Pharao ihnen einen grausamen Befehl gab?",
+        "antworten": [
+          "Sie weigerten sich und ließen die Kinder leben",
+          "Sie flohen aus Ägypten",
+          "Sie versteckten sich im Palast",
+          "Sie baten Mose um Hilfe"
+        ],
+        "richtig": 0,
+        "erklaerung": "»Die Hebammen fürchteten Gott und taten nicht, was der König von Ägypten befohlen hatte, sondern ließen die Kinder leben.« Zwei Frauen ohne Macht — und doch der erste mutige Widerstand der Bibel. Mose war da übrigens noch gar nicht geboren.",
+        "bibelstelle": "2. Mose 1,15-21",
+        "bibellink": "https://www.die-bibel.de/bibel/BB/EXO.1.15-EXO.1.21"
+      },
+      "kartenspruch": "Sie ließen die Kinder leben.",
+      "ar": {
+        "suche": "seite",
+        "geste": {
+          "typ": "festhalten",
+          "sekunden": 5,
+          "effekt": "licht",
+          "symbol": "👶"
+        },
+        "einladung": "Hey {name}! Ich bin Schifra. Der Pharao wollte, dass wir die Kinder nicht schützen. Wir haben es trotzdem getan. Leg du deine Hand schützend auf das Kind und lass sie da.",
+        "auftrag": "🤲 Leg deinen Finger auf das Kind und halt ihn ruhig dort.",
+        "erfuellt": "»Die Hebammen fürchteten Gott und ließen die Kinder leben.« Mut heißt: trotzdem das Richtige tun.",
+        "bibelstelle": "2. Mose 1,17"
+      }
+    },
+    {
+      "id": "samuel",
+      "name": "Samuel",
+      "beiname": "Der Junge, der hinhören lernte",
+      "ortId": "kita-gartenstadt",
+      "thema": "hinhoeren",
+      "themaLabel": "Hinhören",
+      "seltenheit": "gewoehnlich",
+      "emoji": "👂",
+      "farbe": "#5d7fb8",
+      "muster": "sterne",
+      "kurzvorstellung": "Wuchs als Kind im Tempel auf — und hörte eines Nachts eine Stimme, die seinen Namen rief.",
+      "dialog": [
+        {
+          "sprecher": "figur",
+          "text": "Ich bin Samuel. Als ich klein war, hat meine Mutter mich in den Tempel gebracht, zum alten Priester Eli. Eines Nachts lag ich da und hörte jemanden rufen: »Samuel!« Ich bin zu Eli gerannt: »Hier bin ich!« Aber Eli sagte: »Ich hab nicht gerufen. Leg dich wieder schlafen.«"
+        },
+        {
+          "sprecher": "du",
+          "optionen": [
+            {
+              "text": "Wer war es dann?",
+              "reaktion": "Das ist dreimal passiert. Beim dritten Mal hat Eli verstanden: Das ist Gott, der da ruft. Er hat mir gesagt: Wenn du es wieder hörst, dann sag: »Rede, Gott, ich höre.« Und genau das hab ich gemacht."
+            },
+            {
+              "text": "Warum ruft Gott ausgerechnet ein Kind?",
+              "reaktion": "Genau das ist der Punkt! Damals hörte man Gottes Stimme selten — selbst die Erwachsenen im Tempel hörten nichts mehr. Und dann redet Gott mit einem Kind. Kinder sind nicht erst später wichtig. Sie sind es jetzt."
+            }
+          ]
+        },
+        {
+          "sprecher": "figur",
+          "text": "Ich bin langsam gewachsen. In der Bibel steht: Samuel wuchs heran, und Gott und die Menschen hatten ihn gern. Hier in der Kita in der Gartenstadt wachsen auch Kinder, jeden Tag ein bisschen. Und vielleicht hören sie manchmal mehr als wir Großen."
+        }
+      ],
+      "impuls": "»Rede, Gott, ich höre.« Wann hast du zuletzt richtig zugehört — einem Menschen, der Stille, deinem Bauchgefühl? Und wer hat dir als Kind zugehört, so wie Eli dem kleinen Samuel?",
+      "frage": {
+        "typ": "multiple-choice",
+        "schwierigkeit": 2,
+        "frage": "Was antwortete Samuel, als Gott ihn zum vierten Mal rief?",
+        "antworten": [
+          "»Rede, denn dein Diener hört.«",
+          "»Lass mich bitte schlafen.«",
+          "»Wer bist du?«",
+          "»Ich habe Angst.«"
+        ],
+        "richtig": 0,
+        "erklaerung": "Dreimal lief Samuel zu Eli. Dann verstand der alte Priester, dass Gott das Kind ruft, und gab ihm den Satz mit: »Rede, Herr, denn dein Diener hört.« Gottes Stimme kommt zu einem Kind — und ein alter Mann hilft ihm, sie zu verstehen.",
+        "bibelstelle": "1. Samuel 3,1-10",
+        "bibellink": "https://www.die-bibel.de/bibel/BB/1SA.3.1-1SA.3.10"
+      },
+      "kartenspruch": "Rede, Gott, ich höre.",
+      "ar": {
+        "suche": "seite",
+        "geste": {
+          "typ": "stille",
+          "sekunden": 6,
+          "vorspiel": [
+            {
+              "klasse": "nacht",
+              "text": "🌙 Nacht im Tempel. Alles schläft …",
+              "nach": "»Samuel!«"
+            },
+            {
+              "klasse": "nacht",
+              "text": "🏃 Samuel läuft zu Eli: »Hier bin ich!«",
+              "nach": "»Ich hab nicht gerufen.«"
+            },
+            {
+              "klasse": "nacht",
+              "text": "»Samuel!« … schon wieder.",
+              "nach": "Eli versteht: Das ist Gott."
+            }
+          ],
+          "ende": "»Rede, Gott — ich höre.«"
+        },
+        "einladung": "Hey {name}! Ich bin Samuel. Nachts im Tempel hab ich eine Stimme gehört. Man muss ganz still sein, um so etwas zu hören. Probierst du's mit mir?",
+        "auftrag": "🤫 Hör zu — und dann halt dein Handy ganz still.",
+        "erfuellt": "»Rede, Herr, denn dein Diener hört.« Wer still wird, hört mehr.",
+        "bibelstelle": "1. Samuel 3,10"
+      }
+    },
+    {
+      "id": "junge-mit-den-broten",
+      "name": "Der Junge mit den Broten",
+      "beiname": "Der seine Brotdose hergab",
+      "ortId": "hort-gartenstadt",
+      "thema": "teilen",
+      "themaLabel": "Teilen",
+      "seltenheit": "gewoehnlich",
+      "emoji": "🐟",
+      "farbe": "#d08a3a",
+      "muster": "weg",
+      "kurzvorstellung": "Hatte nur fünf Gerstenbrote und zwei Fische dabei — und gab sie her, als Tausende Hunger hatten.",
+      "dialog": [
+        {
+          "sprecher": "figur",
+          "text": "Hi! Meinen Namen kennt keiner. In der Bibel heiße ich nur »ein Junge«. Ich war mit Tausenden Leuten unterwegs, um Jesus zu hören. Abends hatten alle Hunger, und die Jünger waren ratlos. Ich hatte meine Brotdose dabei: fünf Gerstenbrote und zwei kleine Fische."
+        },
+        {
+          "sprecher": "du",
+          "optionen": [
+            {
+              "text": "Und das hast du einfach hergegeben?",
+              "reaktion": "Andreas hat mich entdeckt und zu Jesus gebracht. Ehrlich: Ich hab kurz überlegt. Das war MEIN Abendessen. Und Andreas hat auch gleich gesagt: »Aber was ist das schon für so viele?« Trotzdem hab ich's hergegeben."
+            },
+            {
+              "text": "Was ist dann passiert?",
+              "reaktion": "Jesus hat das Brot genommen, Gott gedankt und es austeilen lassen. Und es hat gereicht! Alle wurden satt, und am Ende waren noch zwölf Körbe übrig. Ich weiß bis heute nicht genau, wie. Aber ich weiß: Es fing mit meiner Brotdose an."
+            }
+          ]
+        },
+        {
+          "sprecher": "figur",
+          "text": "Hier im Hort sind jeden Tag ganz viele Kinder. Die hören oft: »Dafür bist du noch zu klein.« Ich sag dir was: Das Wunder fing nicht bei den Erwachsenen an. Es fing bei einem Kind an, das geteilt hat."
+        }
+      ],
+      "impuls": "»Was ist das schon für so viele?« — das denken wir oft, wenn wir nur etwas Kleines haben. Was ist deine »Brotdose«: Zeit, ein Talent, ein Lächeln, ein Pausenbrot? Wo könnte etwas Kleines von dir für jemanden viel sein?",
+      "frage": {
+        "typ": "multiple-choice",
+        "schwierigkeit": 1,
+        "frage": "Was hatte der Junge dabei, als Tausende Menschen hungrig waren?",
+        "antworten": [
+          "Fünf Brote und zwei Fische",
+          "Zwei Brote und fünf Fische",
+          "Sieben Brote und ein paar Fische",
+          "Zwölf Körbe voller Brot"
+        ],
+        "richtig": 0,
+        "erklaerung": "Nur das Johannesevangelium erzählt von dem Jungen: Er hat fünf Gerstenbrote und zwei Fische. Gerstenbrot war das Brot der armen Leute. Daraus wird ein Essen für 5000 — und zwölf Körbe bleiben übrig. (Sieben Brote gibt es auch, in einer anderen Speisungsgeschichte bei Markus.)",
+        "bibelstelle": "Johannes 6,5-13",
+        "bibellink": "https://www.die-bibel.de/bibel/BB/JHN.6.5-JHN.6.13"
+      },
+      "kartenspruch": "Hier ist ein Junge, der hat fünf Brote und zwei Fische.",
+      "ar": {
+        "suche": "seite",
+        "geste": {
+          "typ": "sammeln",
+          "symbol": "🧺",
+          "symbole": [
+            "🍞",
+            "🍞",
+            "🐟",
+            "🍞",
+            "🍞",
+            "🐟",
+            "🍞"
+          ],
+          "anzahl": 7,
+          "bereich": "rundum"
+        },
+        "einladung": "Hey {name}! Ich bin der Junge mit den Broten. Hilf mir mal: Fünf Brote und zwei Fische — sammelst du sie ein? Dann teilen wir.",
+        "auftrag": "🧺 Sammle 5 Brote und 2 Fische ein.",
+        "erfuellt": "»Als alle satt waren, sammelten sie die Reste: zwölf Körbe voll.« Es fing mit einer Brotdose an.",
+        "bibelstelle": "Johannes 6,12-13"
+      }
+    },
+    {
+      "id": "hanna",
+      "name": "Hanna",
+      "beiname": "Die Prophetin mit 84",
+      "ortId": "hohenlohe",
+      "thema": "wuerde",
+      "themaLabel": "Würde im Alter",
+      "seltenheit": "besonders",
+      "emoji": "🕯️",
+      "farbe": "#8c6a9e",
+      "muster": "strahlen",
+      "kurzvorstellung": "Eine alte Witwe, die Tag und Nacht im Tempel betete — und als eine der Ersten in einem Baby den Retter erkannte.",
+      "dialog": [
+        {
+          "sprecher": "figur",
+          "text": "Ich bin Hanna. Nur sieben Jahre war ich verheiratet, dann starb mein Mann. Seitdem habe ich im Tempel gelebt: gebetet, gefastet, gewartet. Jahrzehntelang. Mit 84 war ich die Alte, die immer da ist. Die meisten sind an mir vorbeigelaufen."
+        },
+        {
+          "sprecher": "du",
+          "optionen": [
+            {
+              "text": "Worauf hast du gewartet?",
+              "reaktion": "Auf Gottes Rettung für mein Volk. Und eines Tages kamen Maria und Josef mit einem Baby in den Tempel. Ich habe es angeschaut — und gewusst: Das ist er. Ich habe Gott gelobt und allen davon erzählt, die mit mir gewartet hatten."
+            },
+            {
+              "text": "Ist das nicht langweilig, so alt zu sein?",
+              "reaktion": "Frag mal hier im Haus nach! Die Menschen hier haben Krieg erlebt, die Mauer kommen und gehen sehen, Kinder großgezogen, Liebe verloren. Langweilig ist das nicht. Es fragt nur selten jemand nach. Wer lange gelebt hat, sieht manchmal, was andere übersehen."
+            }
+          ]
+        },
+        {
+          "sprecher": "figur",
+          "text": "Einmal im Monat kommt eure Gemeinde hierher: Andacht, alte Lieder, die alle noch auswendig können, Zeit für ein Gespräch. Für manche hier ist das der einzige Besuch im Monat. Seelsorge heißt nicht, schlaue Sachen zu sagen. Seelsorge heißt: Ich komme. Ich sehe dich. Du gehörst dazu."
+        }
+      ],
+      "impuls": "Hanna hat ihr Leben lang gewartet — und wurde fast übersehen. Wen aus der Generation deiner Großeltern kennst du? Was weißt du über ihr Leben? Vielleicht wäre diese Woche ein Anruf oder ein Besuch dran.",
+      "frage": {
+        "typ": "multiple-choice",
+        "schwierigkeit": 3,
+        "frage": "Wie alt war die Prophetin Hanna, als sie das Kind Jesus im Tempel sah?",
+        "antworten": [
+          "84 Jahre",
+          "40 Jahre",
+          "120 Jahre",
+          "Das erzählt die Bibel nicht"
+        ],
+        "richtig": 0,
+        "erklaerung": "Lukas erzählt: Hanna war eine Witwe von 84 Jahren. (Man kann den Satz auch so lesen, dass sie 84 Jahre lang Witwe war — dann war sie noch älter.) Sie erkennt in dem Baby den Retter und erzählt allen davon.",
+        "bibelstelle": "Lukas 2,36-38",
+        "bibellink": "https://www.die-bibel.de/bibel/BB/LUK.2.36-LUK.2.38"
+      },
+      "kartenspruch": "Sie lobte Gott und erzählte allen von dem Kind.",
+      "ar": {
+        "suche": "seite",
+        "geste": {
+          "typ": "wischen",
+          "schleier": "nebel",
+          "enthuellt": "👶"
+        },
+        "einladung": "Hey {name}! Ich bin Hanna, 84 Jahre alt. Viele sind an mir vorbeigelaufen. Aber das Wichtigste habe ich gesehen, als andere es übersehen haben. Wisch den Nebel weg — was habe ich gesehen?",
+        "auftrag": "👆 Wisch den Nebel weg.",
+        "erfuellt": "»Sie kam dazu, lobte Gott und erzählte von dem Kind allen, die auf die Rettung warteten.« Niemand ist zu alt, um Gott zu entdecken.",
+        "bibelstelle": "Lukas 2,38"
+      }
+    },
+    {
+      "id": "mose",
+      "name": "Mose",
+      "beiname": "Der nicht alles allein tragen musste",
+      "ortId": "hohenlohe",
+      "thema": "mittragen",
+      "themaLabel": "Gemeinsam tragen",
+      "seltenheit": "legende",
+      "emoji": "🙌",
+      "farbe": "#8b5e34",
+      "muster": "weg",
+      "kurzvorstellung": "Führte ein ganzes Volk durch die Wüste — und musste lernen, dass er das nicht allein schafft.",
+      "dialog": [
+        {
+          "sprecher": "figur",
+          "text": "Ich bin Mose. Ich habe ein ganzes Volk aus Ägypten geführt — Tausende Menschen. Und ich dachte: Ich muss mich um alles selbst kümmern. Jeden Streit schlichten, jede Frage beantworten, von morgens bis abends. Irgendwann war ich am Ende."
+        },
+        {
+          "sprecher": "du",
+          "optionen": [
+            {
+              "text": "Und dann?",
+              "reaktion": "Dann kam mein Schwiegervater Jitro zu Besuch. Er hat einen Tag lang zugeschaut und gesagt: »Das ist nicht gut, was du da machst. Du machst dich kaputt — und die Leute gleich mit. Das ist zu schwer für dich allein.« Er hatte recht. Wir haben die Arbeit auf viele Schultern verteilt."
+            },
+            {
+              "text": "Warum hast du nicht einfach um Hilfe gebeten?",
+              "reaktion": "Gute Frage. Weil ich dachte, ich bin der, der das können muss. Einmal sollte ich während eines Kampfes die Arme zum Gebet hochhalten. Die wurden schwer, so schwer. Da haben Aaron und Hur mir einen Stein zum Sitzen gebracht und meine Arme gestützt, links und rechts. Erst so hat es gereicht."
+            }
+          ]
+        },
+        {
+          "sprecher": "figur",
+          "text": "Eure Gemeinde ist riesig: Kirchen, Kitas, ein Erinnerungsort, dieses Seniorenzentrum ganz am Rand. Und es gibt weniger Mitglieder, weniger Geld und weniger Hauptamtliche als früher. Die können nicht überall gleichzeitig sein. Darum müssen sie Schwerpunkte setzen — und darum braucht es viele, die mittragen. Gemeinde ist kein Service. Gemeinde sind wir alle."
+        }
+      ],
+      "impuls": "Mose musste lernen: Ich schaffe das nicht allein — und ich muss es auch nicht. Was ist für dich gerade zu schwer? Wer könnte deine Arme stützen? Und wo könntest du mittragen — in deiner Familie, deiner Klasse, deiner Gemeinde?",
+      "frage": {
+        "typ": "multiple-choice",
+        "schwierigkeit": 2,
+        "frage": "Was riet Jitro seinem Schwiegersohn Mose?",
+        "antworten": [
+          "Die Arbeit auf viele Schultern zu verteilen",
+          "Mehr zu beten und weniger zu schlafen",
+          "Mit dem Volk nach Ägypten zurückzukehren",
+          "Einen König über das Volk zu setzen"
+        ],
+        "richtig": 0,
+        "erklaerung": "Jitro sah, wie Mose von morgens bis abends allein Recht sprach, und sagte: »Die Aufgabe ist zu schwer für dich. Du kannst sie nicht allein bewältigen.« Mose suchte sich zuverlässige Leute, die mittrugen.",
+        "bibelstelle": "2. Mose 18,13-26",
+        "bibellink": "https://www.die-bibel.de/bibel/BB/EXO.18.13-EXO.18.26"
+      },
+      "kartenspruch": "Du kannst es nicht allein tragen.",
+      "ar": {
+        "suche": "seite",
+        "geste": {
+          "typ": "festhalten",
+          "sekunden": 6,
+          "effekt": "morgenrot",
+          "symbol": "🙌"
+        },
+        "einladung": "Hey {name}! Ich bin Mose. Meine Arme sind so schwer … Aaron und Hur haben sie mir damals gestützt. Hältst du sie mit hoch?",
+        "auftrag": "🙌 Leg deinen Finger auf den Kreis und halt fest — bis die Sonne untergeht.",
+        "erfuellt": "»Aaron und Hur stützten seine Arme, einer links, einer rechts. So blieben sie oben, bis die Sonne unterging.« Niemand muss alles allein tragen.",
+        "bibelstelle": "2. Mose 17,12"
+      }
     }
   ]
 }

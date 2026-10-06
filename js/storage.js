@@ -13,8 +13,6 @@
     gesammelt: {},          // figurId -> { datum, glanz, verifikation: "gps"|"qr"|"demo" }
     notizen: {},            // figurId -> string (privat, nur lokal)
     ortsSiegel: {},         // ortId -> true
-    qrFreischaltungen: {},  // ortId -> "YYYY-MM-DD" (gültig am Kalendertag)
-    eventAktivBis: null,    // ISO-Datum "YYYY-MM-DD" oder null
     gelesen: {},            // meilensteinId -> true
     installHinweisAus: false,
     kameraAus: false        // true: Begegnungen vor Sternenhimmel statt Kamerabild
@@ -94,11 +92,13 @@
     setzeSiegel(ortId) { state.ortsSiegel[ortId] = true; save(); },
     hatSiegel(ortId) { return !!state.ortsSiegel[ortId]; },
 
-    qrFreischalten(ortId) { state.qrFreischaltungen[ortId] = heuteISO(); save(); },
-    istQrFrei(ortId) { return state.qrFreischaltungen[ortId] === heuteISO(); },
-
-    aktiviereEvent() { state.eventAktivBis = heuteISO(); save(); },
-    istEventAktiv() { return state.eventAktivBis === heuteISO(); },
+    /* Aktionstag (z. B. Konfi-Tag-Rallye): steht als Datum in data/config.json →
+       aktionstage. An diesem Tag sind alle Zeug:innen gleichzeitig unterwegs. */
+    aktionstag() {
+      const tage = (window.Daten && window.Daten.config && window.Daten.config.aktionstage) || [];
+      return tage.find(t => t.datum === heuteISO()) || null;
+    },
+    istEventAktiv() { return !!window.Store.aktionstag(); },
 
     markiereGelesen(id) { state.gelesen[id] = true; save(); },
     istGelesen(id) { return !!state.gelesen[id]; },

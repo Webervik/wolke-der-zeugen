@@ -36,6 +36,7 @@
   let verankert = false;
   let fundSeit = 0;
   let erlebt = false;        // Geste vollständig gemacht?
+  let kameraHierAus = false; // Kita, Hort, Seniorenzentrum: Sternenhimmel statt Kamerabild
   let laufendeGeste = null;
   let timer = [];
   let letztesX = null, letztesY = null;
@@ -100,8 +101,11 @@
     const erlaubnis = sensorErlaubnisse(); // noch im Tipp anfragen
     const [orientierungOk, bewegungOk] = await erlaubnis;
 
+    // An Kitas, Hort und Seniorenzentrum bleibt die Kamera aus (orte.json → kameraAus)
+    const ort = window.Daten.orte.find(o => o.id === f.ortId);
+    kameraHierAus = !!(ort && ort.kameraAus);
     let modus = "sterne";
-    if (!window.Store.get().kameraAus) {
+    if (!window.Store.get().kameraAus && !kameraHierAus) {
       modus = "fallback";
       if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
         try {
@@ -423,7 +427,9 @@
       : `<div class="ar-sternenhimmel"></div>`;
     const fallbackHinweis = modus === "fallback"
       ? `<div class="ar-hinweis">📷 Ohne Kamerabild — ${esc(figur.name)} ist trotzdem da.</div>`
-      : "";
+      : (modus === "sterne" && kameraHierAus)
+        ? `<div class="ar-hinweis">🌙 An diesem Ort bleibt die Kamera aus. ${esc(figur.name)} ist trotzdem da.</div>`
+        : "";
 
     view.innerHTML = `
       <div class="ar-buehne ${modus}">

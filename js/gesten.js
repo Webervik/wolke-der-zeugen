@@ -68,6 +68,9 @@
   /* ---------- Sammeln: Dinge rund um dich im Raum antippen ---------- */
   function sammeln(g, ctx) {
     const n = g.anzahl || 5;
+    // Ein Symbol für alle (Sterne) oder eine Liste, die reihum verteilt wird (Tiere, Brote und Fische)
+    const symbole = g.symbole && g.symbole.length ? g.symbole : [g.symbol || "✨"];
+    const zeichen = g.symbol || symbole[0];
     const dinge = [];
     let gesammelt = 0;
     const welt = ctx.verankert() && ctx.richtung();
@@ -86,7 +89,7 @@
     }
 
     dinge.forEach((d, i) => {
-      const b = element("button", "geste-ding", g.symbol);
+      const b = element("button", "geste-ding", symbole[i % symbole.length]);
       b.setAttribute("aria-label", "Einsammeln");
       b.style.animationDelay = (i * 0.37) + "s";
       b.addEventListener("click", () => sammle(d));
@@ -126,7 +129,7 @@
         if (Math.abs(naechster.x) > w * 0.45) hinweis = naechster.x < 0 ? "dreh dich nach links ←" : "dreh dich nach rechts →";
         else hinweis = naechster.y < 0 ? "schau nach oben ↑" : "schau nach unten ↓";
       }
-      ctx.status(`${g.symbol} ${gesammelt}/${n} — ${hinweis}`);
+      ctx.status(`${zeichen} ${gesammelt}/${n} — ${hinweis}`);
     }
 
     function sammle(d) {
@@ -144,7 +147,7 @@
     const abmelden = welt ? ctx.aufOrientierung(platziere) : () => {};
     ctx.fortschritt(0, `0 / ${n}`);
     platziere();
-    if (!welt) ctx.status(`${g.symbol} Tipp alle ${n} an!`);
+    if (!welt) ctx.status(`${zeichen} Tipp alle ${n} an!`);
 
     function aufraeumen() { abmelden(); }
     return { stop() { aufraeumen(); dinge.forEach(d => d.el && d.el.remove()); } };
@@ -214,18 +217,16 @@
           beendet = true;
           aufraeumen();
           box.classList.add("erfuellt");
-          if (g.vorspiel) {
-            // Elia: das leise Säuseln
-            const leise = element("div", "geste-gross leise", "… ein leises Säuseln …");
-            ctx.ebene.appendChild(leise);
-          }
+          const ende = g.ende || (g.vorspiel === true ? "… ein leises Säuseln …" : "");
+          if (ende) ctx.ebene.appendChild(element("div", "geste-gross leise", ende));
           ctx.fertig();
         }
       }, 100));
     }
 
     if (g.vorspiel) {
-      const phasen = [
+      // vorspiel: true = Elia (Sturm, Beben, Feuer); oder eine eigene Liste { text, nach, klasse? }
+      const phasen = Array.isArray(g.vorspiel) ? g.vorspiel : [
         { klasse: "sturm", text: "🌪️ Ein gewaltiger Sturm …", nach: "Aber Gott war nicht im Sturm." },
         { klasse: "beben", text: "🌍 Ein Erdbeben …", nach: "Aber Gott war nicht im Erdbeben." },
         { klasse: "feuer", text: "🔥 Ein Feuer …", nach: "Aber Gott war nicht im Feuer." }
@@ -234,13 +235,13 @@
       let zeit = 0;
       phasen.forEach(p => {
         timer.push(setTimeout(() => {
-          ctx.buehne.classList.add(p.klasse);
+          if (p.klasse) ctx.buehne.classList.add(p.klasse);
           titel.textContent = p.text;
           ctx.status(p.text);
           if (p.klasse === "beben") ctx.vibriere([200, 80, 200, 80, 300]);
         }, zeit));
         timer.push(setTimeout(() => { titel.textContent = p.nach; ctx.status(p.nach); }, zeit + 1700));
-        timer.push(setTimeout(() => ctx.buehne.classList.remove(p.klasse), zeit + 2600));
+        if (p.klasse) timer.push(setTimeout(() => ctx.buehne.classList.remove(p.klasse), zeit + 2600));
         zeit += 2700;
       });
       timer.push(setTimeout(stillePhase, zeit));
@@ -251,7 +252,7 @@
     function aufraeumen() {
       abmelden();
       timer.forEach(t => { clearTimeout(t); clearInterval(t); });
-      ["sturm", "beben", "feuer"].forEach(k => ctx.buehne.classList.remove(k));
+      ["sturm", "beben", "feuer", "nacht"].forEach(k => ctx.buehne.classList.remove(k));
     }
     return { stop() { beendet = true; aufraeumen(); box.remove(); titel.remove(); } };
   }

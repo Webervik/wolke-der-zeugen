@@ -10,19 +10,17 @@
    und aktualisieren Entfernungen an Ort und Stelle — sonst gingen Taps
    verloren, die zufällig in einen Neuaufbau fallen. */
 (function () {
-  const W = 800, H = 600, PAD = 90;
+  const W = 800, H = 800, PAD = 80; // quadratisch: das Gemeindegebiet ist mit Hohenlohe höher als breit
+  const PAD_OBEN = 125;              // Platz für die Titel-Kartusche
 
-  const KURZNAMEN = {
-    "dorfkirche": "Dorfkirche",
-    "gartenstadt": "Gartenstadt",
-    "heerstrasse-nord": "Heerstr. Nord",
-    "ernst-lange-haus": "Ernst-Lange-Haus",
-    "waldhaus": "Waldhaus",
-    "zuversichtskirche": "Zuversicht"
-  };
+  // Reihenfolge des gestrichelten Pilgerwegs auf der Karte (geografischer Bogen West → Nord → Südost).
+  // Kitas und Hort liegen direkt neben einer Kirche ("nebenAn" in orte.json) und hängen dort als kleine Medaillons.
+  const WEG_REIHENFOLGE = ["waldhaus", "dorfkirche", "hohenlohe", "gartenstadt", "zuversichtskirche", "staakentreff", "ernst-lange-haus", "heerstrasse-nord"];
+  const NACHBAR_ABSTAND = 54;   // px vom Medaillon der Kirche
+  const NACHBAR_SKALA = 0.62;
 
-  // Reihenfolge des gestrichelten Pilgerwegs auf der Karte (geografischer Bogen West → Nord → Südost)
-  const WEG_REIHENFOLGE = ["waldhaus", "dorfkirche", "gartenstadt", "zuversichtskirche", "ernst-lange-haus", "heerstrasse-nord"];
+  function kurzname(o) { return o.kurzname || o.name; }
+  function istNachbar(o) { return !!o.nebenAn; }
 
   const STRASSE_BREITE = { trunk: [8, 5], primary: [7, 4.4], secondary: [5, 3], tertiary: [3.4, 1.8] };
 
@@ -47,9 +45,9 @@
       const mProLng = 111320 * Math.cos(latMitte * Math.PI / 180);
       const spannX = Math.max((lngMax - lngMin) * mProLng, 1);
       const spannY = Math.max((latMax - latMin) * mProLat, 1);
-      const skala = Math.min((W - 2 * PAD) / spannX, (H - 2 * PAD) / spannY);
+      const skala = Math.min((W - 2 * PAD) / spannX, (H - PAD - PAD_OBEN) / spannY);
       const offX = (W - spannX * skala) / 2;
-      const offY = (H - spannY * skala) / 2;
+      const offY = PAD_OBEN + (H - PAD - PAD_OBEN - spannY * skala) / 2;
       projektion = (lat, lng) => ({
         x: offX + (lng - lngMin) * mProLng * skala,
         y: offY + (latMax - lat) * mProLat * skala
@@ -59,6 +57,41 @@
       orte.forEach(o => { map[o.id] = { x: o.layoutX * W, y: o.layoutY * H }; });
     }
     return map;
+  }
+
+  /* Nachbarorte liegen oft nur 30–140 m neben der Kirche — auf der Karte wären sie
+     deckungsgleich. Sie wandern deshalb seitlich neben das Kirchen-Medaillon,
+     in ihrer echten Himmelsrichtung, aber nie unter den Namen (unten) oder darüber. */
+  function nachbarnAnlegen(map, seiten) {
+    const orte = window.Daten.orte;
+    const proHaupt = {};
+    orte.filter(istNachbar).forEach(o => {
+      const h = map[o.nebenAn], p = map[o.id];
+      if (!h || !p) return;
+      const rechts = p.x >= h.x;
+      let winkel = Math.atan2(p.y - h.y, p.x - h.x) * 180 / Math.PI; // 0° = rechts, 90° = unten
+      // erlaubte Bereiche weg vom Namen: Name unten → rechts −60°…20°, links 160°…240°;
+      // Name oben → rechts −20°…60°, links 120°…200°
+      const oben = seiten && seiten[o.nebenAn] === "oben";
+      const [r1, r2] = oben ? [-20, 60] : [-60, 20];
+      const [l1, l2] = oben ? [120, 200] : [160, 240];
+      if (rechts) winkel = Math.max(r1, Math.min(r2, winkel));
+      else { if (winkel < 0) winkel += 360; winkel = Math.max(l1, Math.min(l2, winkel)); }
+      (proHaupt[o.nebenAn] = proHaupt[o.nebenAn] || []).push({ o, winkel, rechts });
+    });
+    Object.keys(proHaupt).forEach(hid => {
+      const h = map[hid];
+      const liste = proHaupt[hid];
+      // Zwei Nachbarn auf derselben Seite: den zweiten weiter nach oben schieben
+      [true, false].forEach(seite => {
+        const teil = liste.filter(n => n.rechts === seite).sort((a, b) => seite ? b.winkel - a.winkel : a.winkel - b.winkel);
+        teil.forEach((n, i) => { if (i > 0) n.winkel += seite ? -50 * i : 50 * i; });
+      });
+      liste.forEach(n => {
+        const r = n.winkel * Math.PI / 180;
+        map[n.o.id] = { x: h.x + Math.cos(r) * NACHBAR_ABSTAND, y: h.y + Math.sin(r) * NACHBAR_ABSTAND, haupt: h };
+      });
+    });
   }
 
   function esc(s) {
@@ -175,10 +208,10 @@
 
   /* Beschriftungen, die sich überlappen würden: die obere wandert über das Medaillon. */
   function labelSeiten(pos) {
-    const orte = window.Daten.orte;
+    const orte = window.Daten.orte.filter(o => !istNachbar(o));
     const seite = {};
     const box = o => {
-      const w = (KURZNAMEN[o.id] || o.name).length * 8.6 + 12;
+      const w = kurzname(o).length * 8.6 + 12;
       return { x1: pos[o.id].x - w / 2, x2: pos[o.id].x + w / 2, y1: pos[o.id].y + 38, y2: pos[o.id].y + 82 };
     };
     orte.forEach(o => { seite[o.id] = "unten"; });
@@ -198,22 +231,23 @@
   function medaillon(ort, p, seite) {
     const siegel = window.Store.hatSiegel(ort.id);
     const wartetBegegnung = wartet(ort);
+    const klein = istNachbar(ort);
     const oben = seite === "oben";
     const yName = oben ? -42 : 50;
     const yJahre = oben ? -56 : 64;
     const yDist = oben ? (ort.denkmal ? -70 : -56) : (ort.denkmal ? 78 : 64);
 
     const ringKlasse = ort.denkmal ? "medaillon-ring denkmal" : "medaillon-ring";
-    return `<g class="medaillon${wartetBegegnung ? " wartet" : ""}" data-ort="${ort.id}" transform="translate(${p.x},${p.y})" role="button" tabindex="0" aria-label="${esc(ort.name)}${wartetBegegnung ? " — hier wartet jemand auf dich" : ""}">
+    return `<g class="medaillon${klein ? " nachbar" : ""}${wartetBegegnung ? " wartet" : ""}" data-ort="${ort.id}" transform="translate(${p.x.toFixed(1)},${p.y.toFixed(1)})${klein ? ` scale(${NACHBAR_SKALA})` : ""}" role="button" tabindex="0" aria-label="${esc(ort.name)}${wartetBegegnung ? " — hier wartet jemand auf dich" : ""}">
       <circle r="44" fill="transparent"/>
       ${wartetBegegnung ? `<circle class="medaillon-puls" r="34" fill="var(--gold)"/>` : ""}
       <circle r="30" fill="var(--pergament)" stroke="${ort.farbe}" stroke-width="3" class="${ringKlasse}"/>
       <text y="9" text-anchor="middle" class="medaillon-icon">${ort.icon}</text>
       ${wartetBegegnung ? `<g transform="translate(-22,-22)"><circle r="11" fill="var(--gold)" stroke="var(--gold-tief)"/><text y="4.5" text-anchor="middle" class="medaillon-siegel">!</text></g>` : ""}
       ${siegel ? `<g transform="translate(22,-22)"><circle r="11" fill="var(--gold)" stroke="var(--gold-tief)"/><text y="4.5" text-anchor="middle" class="medaillon-siegel">✦</text></g>` : ""}
-      <text y="${yName}" text-anchor="middle" class="medaillon-name">${esc(KURZNAMEN[ort.id] || ort.name)}</text>
+      ${klein ? "" : `<text y="${yName}" text-anchor="middle" class="medaillon-name">${esc(kurzname(ort))}</text>
       ${ort.denkmal ? `<text y="${yJahre}" text-anchor="middle" class="medaillon-jahre">${esc(ort.jahre || "")}</text>` : ""}
-      <text y="${yDist}" text-anchor="middle" class="medaillon-distanz" data-dist="${ort.id}">${distanzText(ort)}</text>
+      <text y="${yDist}" text-anchor="middle" class="medaillon-distanz" data-dist="${ort.id}">${distanzText(ort)}</text>`}
     </g>`;
   }
 
@@ -229,6 +263,7 @@
     const pos = positionen();
     const orte = window.Daten.orte;
     const seiten = labelSeiten(pos);
+    nachbarnAnlegen(pos, seiten);
     const hg = hintergrund();
     const spieler = spielerTransform();
 
@@ -253,7 +288,9 @@
         </g>
         ${kompass(W - 70, 100)}
         <path d="${wegPfad(pos)}" fill="none" stroke="var(--gold-tief)" stroke-width="3" stroke-dasharray="2 9" stroke-linecap="round" opacity="0.9"/>
-        ${orte.map(o => medaillon(o, pos[o.id], seiten[o.id])).join("")}
+        ${orte.filter(istNachbar).map(o => pos[o.id].haupt ? `<line class="nachbar-linie" x1="${pos[o.id].haupt.x.toFixed(1)}" y1="${pos[o.id].haupt.y.toFixed(1)}" x2="${pos[o.id].x.toFixed(1)}" y2="${pos[o.id].y.toFixed(1)}"/>` : "").join("")}
+        ${orte.filter(o => !istNachbar(o)).map(o => medaillon(o, pos[o.id], seiten[o.id])).join("")}
+        ${orte.filter(istNachbar).map(o => medaillon(o, pos[o.id], "unten")).join("")}
         <g id="spieler" class="spieler" transform="${spieler || "translate(-100,-100)"}" style="${spieler ? "" : "display:none"}" aria-label="Deine Position">
           <circle class="spieler-puls" r="14" fill="var(--gold)"/>
           <circle r="7" fill="var(--gold)" stroke="var(--pergament)" stroke-width="2.5"/>
@@ -291,5 +328,5 @@
     });
   }
 
-  window.Karte = { render, aktualisiere, KURZNAMEN };
+  window.Karte = { render, aktualisiere, kurzname };
 })();

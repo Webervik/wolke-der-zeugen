@@ -294,6 +294,24 @@ textarea { resize: vertical; margin: 8px 0; }
 .hinweis-band { background: var(--nacht-hell); border: 1px solid var(--sternennebel); color: var(--wolke); font-weight: 500; }
 .denkmal-band { background: rgba(74, 111, 165, 0.2); border: 1px solid #4a6fa5; }
 
+/* Kitas, Hort, Seniorenzentrum: freundlicher Hinweis zu Rücksicht und Kamera */
+.ort-respekt {
+  margin: 0 0 12px;
+  padding: 10px 14px;
+  border-radius: var(--radius);
+  background: rgba(212, 167, 58, 0.12);
+  border: 1px dashed var(--gold-tief);
+  color: var(--wolke);
+  font-size: 14px;
+  line-height: 1.45;
+}
+.ort-nachbarn { margin: -4px 0 14px; display: flex; flex-wrap: wrap; align-items: center; gap: 2px 6px; }
+.chip-knopf { cursor: pointer; font: inherit; font-size: 13.5px; }
+.chip-knopf:hover, .chip-knopf:focus-visible { border-color: var(--gold-tief); color: var(--gold-hell); }
+.aktionstage { margin: 4px 0 0; padding-left: 18px; color: var(--wolke); font-size: 14.5px; }
+.aktionstage li { margin-bottom: 4px; }
+.koord-position { font-size: 17px; margin: 10px 0 6px; font-variant-numeric: tabular-nums; }
+
 /* ---------- Pilgerkarte (SVG) ---------- */
 #karte-container { margin: 4px 0 6px; }
 .pilgerkarte {
@@ -313,6 +331,7 @@ textarea { resize: vertical; margin: 8px 0; }
 .medaillon { cursor: pointer; }
 .medaillon:focus { outline: none; }
 .medaillon:focus circle:not(.medaillon-puls) { stroke-width: 5; }
+.nachbar-linie { stroke: var(--gold-tief); stroke-width: 2; stroke-dasharray: 2 4; stroke-linecap: round; opacity: 0.75; }
 .medaillon-icon { font-size: 26px; }
 .medaillon-name { font-size: 15px; font-weight: 700; fill: var(--tinte); font-family: var(--font-text); }
 .medaillon-jahre, .medaillon-distanz { font-size: 12px; fill: var(--gold-tief); font-family: var(--font-text); font-weight: 600; }
@@ -722,6 +741,7 @@ button.hinweis-karte { cursor: pointer; }
 .fenster-wrap { text-align: center; padding: 10px 0; }
 .kirchenfenster { max-width: 300px; width: 90%; height: auto; }
 .fenster-emoji { font-size: 24px; }
+.fenster-zier { font-size: 16px; fill: var(--gold); opacity: 0.6; }
 .fenster-text { color: var(--wolke); margin-top: 10px; }
 
 .finale { text-align: center; margin-bottom: 16px; border-width: 2.5px; }
@@ -1119,6 +1139,8 @@ button.hinweis-karte { cursor: pointer; }
 .ar-buehne.beben { animation: beben 0.18s linear infinite; }
 .ar-buehne.feuer::after { opacity: 1; background: radial-gradient(ellipse at 50% 100%, rgba(255,120,40,.65), rgba(255,170,60,.25) 45%, transparent 75%); animation: flackern 0.4s ease-in-out infinite alternate; }
 .ar-buehne.zittern { animation: beben 0.25s linear infinite; }
+/* Samuel: Nacht im Tempel */
+.ar-buehne.nacht::after { opacity: 1; background: radial-gradient(ellipse at 50% 40%, rgba(10, 14, 32, 0.35), rgba(6, 8, 20, 0.82) 75%); }
 @keyframes sturm { 0%, 100% { transform: translateX(0); } 50% { transform: translateX(-4px); } }
 @keyframes beben { 0% { transform: translate(0, 0); } 25% { transform: translate(-5px, 3px); } 50% { transform: translate(4px, -3px); } 75% { transform: translate(-3px, -4px); } 100% { transform: translate(0, 0); } }
 @keyframes wind { from { background-position: 0 0; } to { background-position: -200px 0; } }

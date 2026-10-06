@@ -3,10 +3,8 @@
   "jahresStart": "2026-09-06",
   "wochenAnker": "sonntag",
   "leiterCode": "ZEUGEN-LEITUNG",
-  "eventCodes": [
-    { "code": "RALLYE-2026", "name": "Konfi-Tag Rallye" }
-  ],
-  "qrGueltigkeit": "kalendertag",
+  "aktionstage": [],
+  "aktionstageHinweis": "Format: { \"datum\": \"2026-11-14\", \"name\": \"Konfi-Tag Rallye\" }. An diesen Tagen sind alle Zeug:innen gleichzeitig unterwegs – eintragen, hochladen, fertig.",
   "basisUrl": "https://www.viktor-weber.com/wolke-der-zeugen/",
   "rahmen": {
     "sendung": [
@@ -25,7 +23,7 @@
       },
       {
         "id": "meilenstein-9",
-        "bei": 9,
+        "bei": 13,
         "text": "Die Hälfte deiner Wolke ist versammelt. Fällt dir was auf? Keine:r von ihnen war perfekt. Genau deshalb sind sie Zeug:innen — nicht trotz ihrer Geschichten, sondern wegen ihnen. — Jesus"
       },
       {
@@ -36,12 +34,12 @@
       {
         "id": "meilenstein-alle",
         "beiAllen": true,
-        "text": "Deine Wolke ist voll. Achtzehn Zeug:innen, die dich anfeuern. Und jetzt sieh auf: Lauf deinen Lauf. Ich bin der Anfang und das Ziel. (Hebräer 12,1-2) — Jesus"
+        "text": "Deine Wolke ist voll. {anzahl} Zeug:innen, die dich anfeuern. Und jetzt sieh auf: Lauf deinen Lauf. Ich bin der Anfang und das Ziel. (Hebräer 12,1-2) — Jesus"
       }
     ]
   },
   "datenschutz": {
     "kurz": "📍 Dein Standort bleibt auf deinem Handy. Er wird nie gespeichert und nie verschickt — die App rechnet nur aus, wie weit du von den Orten weg bist. Kein Konto, keine Cloud, alles bleibt bei dir.",
-    "lang": "Diese App speichert alles nur auf deinem eigenen Gerät (im sogenannten localStorage deines Browsers): deinen Vornamen, deine gesammelten Begegnungen und deine privaten Notizen. Nichts davon wird ins Internet geschickt. Wenn du der App erlaubst, deinen Standort zu nutzen, passiert das nur direkt auf deinem Handy: Die App rechnet aus, wie weit du von den Gemeindeorten entfernt bist — dein Standort wird nie gespeichert, nie an einen Server übertragen und nie mit anderen geteilt. Kamera und Bewegungssensor nutzt die App nur während einer Begegnung: Das Kamerabild bleibt auf deinem Handy, es wird weder gespeichert noch verschickt. Die App liegt auf dem Webserver von www.viktor-weber.com. Beim Laden schickt dein Browser wie bei jeder Webseite technische Angaben wie deine IP-Adresse an den Server; für diese App werden die Aufrufe dort nicht protokolliert. Es gibt kein Konto, keine Anmeldung und keine Werbung. Links zu externen Seiten (z. B. die-bibel.de oder staaken-evangelisch.de) öffnen sich nur, wenn du sie selbst antippst. Unter Einstellungen → »Alles löschen« kannst du jederzeit alle Daten der App von deinem Gerät entfernen."
+    "lang": "Diese App speichert alles nur auf deinem eigenen Gerät (im sogenannten localStorage deines Browsers): deinen Vornamen, deine gesammelten Begegnungen und deine privaten Notizen. Nichts davon wird ins Internet geschickt. Wenn du der App erlaubst, deinen Standort zu nutzen, passiert das nur direkt auf deinem Handy: Die App rechnet aus, wie weit du von den Gemeindeorten entfernt bist — dein Standort wird nie gespeichert, nie an einen Server übertragen und nie mit anderen geteilt. Kamera und Bewegungssensor nutzt die App nur während einer Begegnung: Das Kamerabild bleibt auf deinem Handy, es wird weder gespeichert noch verschickt. Die App liegt auf dem Webserver von www.viktor-weber.com. Beim Laden schickt dein Browser wie bei jeder Webseite technische Angaben wie deine IP-Adresse an den Server; für diese App werden die Aufrufe dort nicht protokolliert. Es gibt kein Konto, keine Anmeldung und keine Werbung. Links zu externen Seiten (z. B. die-bibel.de oder die Seiten der Orte) öffnen sich nur, wenn du sie selbst antippst. Unter Einstellungen → »Alles löschen« kannst du jederzeit alle Daten der App von deinem Gerät entfernen."
   }
 }

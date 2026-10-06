@@ -54,7 +54,7 @@ Zum Sichern zusätzlich `git push`. Die Kopie auf GitHub leitet nur noch weiter,
 ## Die alte Adresse (GitHub Pages)
 
 `js/umzug.js` erkennt die alte Adresse `webervik.github.io`:
-- **Im Browser** leitet sie sofort auf die neue Adresse weiter. Der ganze Spielstand (mit Name und Notizen) reist im `#`-Teil der Adresse mit. Dieser Teil wird nie an einen Server geschickt. Die neue Seite liest ihn ein, legt ihn mit einem vorhandenen Stand zusammen und löscht ihn sofort aus der Adresszeile. QR-Parameter (`?ort=…&k=…`, `?event=…`) und der Leitungsbereich werden mit umgeleitet.
+- **Im Browser** leitet sie sofort auf die neue Adresse weiter. Der ganze Spielstand (mit Name und Notizen) reist im `#`-Teil der Adresse mit. Dieser Teil wird nie an einen Server geschickt. Die neue Seite liest ihn ein, legt ihn mit einem vorhandenen Stand zusammen und löscht ihn sofort aus der Adresszeile. Parameter in der Adresse und der Leitungsbereich werden mit umgeleitet.
 - **Als App auf dem Home-Bildschirm** startet die alte App normal und zeigt einen Hinweis mit dem Spielstand-Code. Auf dem iPhone hat die App einen eigenen Speicher, eine Weiterleitung käme dort nicht an.
 - Den alten Offline-Speicher räumt sie dabei ab, und zwar nur den dieser App.
 
@@ -73,14 +73,14 @@ Auf dem Handy:
 3. Im Flugmodus starten: Das Spiel muss auch offline laufen.
 4. Kamera, Standort und Bewegung fragen auf der neuen Adresse **neu** um Erlaubnis. Das ist normal.
 
-## QR-Bögen
+## Neue Stationen einmessen
 
-Erst **nach** dem Umzug drucken. Im Leitungsbereich (`…/wolke-der-zeugen/leiter.html`) steht die neue Adresse schon als Basis-URL (`data/config.json` → `basisUrl`).
+Im Leitungsbereich (`…/wolke-der-zeugen/leiter.html`) unter **Position messen** an die Stelle stellen, warten bis ±10 m, **Koordinaten kopieren** und in `data/orte.json` (`lat`, `lng`) eintragen — oder an Claude schicken. Geschätzt sind bisher: Waldarche (Bauwagen), Staakentreff, die Kitas, der Hort und Hohenlohe.
 
 ## Textbaustein für die Datenschutzerklärung der Homepage
 
 > **Spiel „Wolke der Zeugen“ (www.viktor-weber.com/wolke-der-zeugen/)**
-> Das ortsbasierte Spiel der Ev. Kirchengemeinde Staaken läuft vollständig in Ihrem Browser. Vorname, gesammelte Begegnungen, private Notizen und Einstellungen werden ausschließlich lokal auf Ihrem Gerät gespeichert (Web Storage des Browsers) und nicht an uns oder Dritte übertragen. Es gibt kein Konto, keine Cookies, keine Analyse- oder Tracking-Dienste und keine Inhalte von fremden Servern. Wenn Sie es erlauben, nutzt das Spiel den Standort, die Kamera sowie den Lage- und Bewegungssensor Ihres Geräts. Diese Daten werden ausschließlich auf dem Gerät verarbeitet: Der Standort dient nur dazu, die Entfernung zu den Gemeindeorten zu berechnen. Das Kamerabild wird nur während einer Begegnung als Hintergrund angezeigt. Nichts davon wird gespeichert oder übertragen. Für die Seiten des Spiels führt unser Webserver kein Zugriffsprotokoll. Die beim Aufruf technisch notwendigen Verbindungsdaten (z. B. IP-Adresse) werden nur für die Dauer der Verbindung verarbeitet. Links zu www.die-bibel.de und www.staaken-evangelisch.de öffnen sich nur auf Ihren Klick; dann gelten die Datenschutzbestimmungen dieser Seiten. Alle Spieldaten lassen sich im Spiel unter *Mehr → Alles löschen* oder über die Browser-Einstellungen („Websitedaten löschen“) entfernen.
+> Das ortsbasierte Spiel der Ev. Kirchengemeinde Staaken läuft vollständig in Ihrem Browser. Vorname, gesammelte Begegnungen, private Notizen und Einstellungen werden ausschließlich lokal auf Ihrem Gerät gespeichert (Web Storage des Browsers) und nicht an uns oder Dritte übertragen. Es gibt kein Konto, keine Cookies, keine Analyse- oder Tracking-Dienste und keine Inhalte von fremden Servern. Wenn Sie es erlauben, nutzt das Spiel den Standort, die Kamera sowie den Lage- und Bewegungssensor Ihres Geräts. Diese Daten werden ausschließlich auf dem Gerät verarbeitet: Der Standort dient nur dazu, die Entfernung zu den Gemeindeorten zu berechnen. Das Kamerabild wird nur während einer Begegnung als Hintergrund angezeigt. Nichts davon wird gespeichert oder übertragen. Für die Seiten des Spiels führt unser Webserver kein Zugriffsprotokoll. Die beim Aufruf technisch notwendigen Verbindungsdaten (z. B. IP-Adresse) werden nur für die Dauer der Verbindung verarbeitet. Links zu www.die-bibel.de und zu den Seiten der Orte (z. B. Kitas, Gemeinwesenverein, Seniorenzentrum) öffnen sich nur auf Ihren Klick; dann gelten die Datenschutzbestimmungen dieser Seiten. Alle Spieldaten lassen sich im Spiel unter *Mehr → Alles löschen* oder über die Browser-Einstellungen („Websitedaten löschen“) entfernen.
 
 ## Rückgängig machen
 

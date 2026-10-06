@@ -30,30 +30,10 @@
 
     if (params.get("demo") === "1") window.Store.setDemo(true);
 
-    // QR-Freischaltung: ?ort=<id>&k=<code> — gescannt mit der normalen Kamera-App
-    const ortParam = params.get("ort"), code = params.get("k");
-    let qrToast = null;
-    if (ortParam && code) {
-      const ort = window.Daten.orte.find(o => o.id === ortParam);
-      if (ort && ort.qrCode === code) {
-        window.Store.qrFreischalten(ort.id);
-        qrToast = `📍 ${ort.name} ist für heute freigeschaltet!`;
-      } else {
-        qrToast = "Dieser Code passt zu keinem Ort. 🤔";
-      }
-    }
+    // Wie bei Pokémon Go: Orte schalten sich nur über den echten Standort frei.
+    // Alte Links mit ?ort=…&k=… oder ?event=… (Codes gibt es nicht mehr) öffnen einfach die App.
 
-    // Event-/Rallye-Modus: ?event=<code>
-    const eventCode = params.get("event");
-    if (eventCode) {
-      const ev = (config.eventCodes || []).find(e => e.code === eventCode);
-      if (ev) {
-        window.Store.aktiviereEvent();
-        qrToast = qrToast || `🎉 ${ev.name} ist gestartet — heute sind alle Zeug:innen unterwegs!`;
-      }
-    }
-
-    // URL aufräumen: keine Codes/Parameter in der Adresszeile stehen lassen
+    // URL aufräumen: keine Parameter in der Adresszeile stehen lassen
     if ([...params.keys()].length) {
       history.replaceState(null, "", location.pathname);
     }
@@ -84,7 +64,7 @@
     } else {
       zeigeView("home");
     }
-    if (qrToast || window.Umzug.meldung) toast(qrToast || window.Umzug.meldung);
+    if (window.Umzug.meldung) toast(window.Umzug.meldung);
     if (window.Umzug.hinweisImApp) window.Umzug.zeigeHinweis();
 
     // Offline-Fähigkeit: Netz zuerst, bei schlechtem Empfang (z. B. am Waldhaus) aus dem Cache
@@ -168,10 +148,10 @@
           <div class="onboarding">
             <h2>Kurz zum Datenschutz</h2>
             <div class="panel-nacht datenschutz-panel"><p>${esc(c.datenschutz.kurz)}</p></div>
-            <p>Darf die App deinen Standort nutzen, damit Begegnungen automatisch starten, wenn du an einem Ort ankommst?</p>
+            <p>Wie bei Pokémon Go erscheinen die Zeug:innen, wenn du wirklich an einem Ort bist. Darf die App dafür deinen Standort nutzen?</p>
             <button class="btn btn-gold" id="ob-geo-ja">📍 Ja, Standort nutzen</button>
-            <button class="btn btn-sekundaer" id="ob-geo-nein">Lieber ohne — ich nutze die QR-Codes vor Ort</button>
-            <p class="dezent">Beides ist völlig okay. Du kannst es jederzeit in den Einstellungen ändern.</p>
+            <button class="btn btn-sekundaer" id="ob-geo-nein">Erst mal nur reinschnuppern (Demo)</button>
+            <p class="dezent">Im Demo-Modus kannst du alles zu Hause ausprobieren. Begegnungen zählen dann als Probelauf. Den Standort kannst du jederzeit unter <em>Mehr</em> einschalten.</p>
           </div>`;
         view.querySelector("#ob-geo-ja").addEventListener("click", () => fertig(true));
         view.querySelector("#ob-geo-nein").addEventListener("click", () => fertig(false));
@@ -180,6 +160,7 @@
 
     function fertig(geo) {
       window.Store.setGeoErlaubt(geo);
+      if (!geo) window.Store.setDemo(true);
       window.Store.setOnboardingDone();
       zeigeView("home");
       toast(`Willkommen, ${window.Store.get().name}! ☁️`);
@@ -206,7 +187,7 @@
         <span class="woche-chip-gestalt">${window.Gestalt.svg(f, { praefix: "woche", unbekannt: !hat })}</span>
         <span class="woche-chip-text">
           <strong>${hat ? esc(f.name) + " ✓" : "Noch unbekannt"}</strong>
-          <small>${esc(f.themaLabel)} · ${ort ? ort.icon : ""} ${esc(window.Karte.KURZNAMEN[f.ortId] || "")}</small>
+          <small>${esc(f.themaLabel)} · ${ort ? ort.icon + " " + esc(ort.kurzname || ort.name) : ""}</small>
         </span>
         <span class="woche-chip-pfeil" aria-hidden="true">›</span>
       </button>`;
@@ -214,7 +195,7 @@
 
     view.innerHTML = `
       ${s.demo ? `<div class="demo-band">🧪 Demo-Modus — Begegnungen zählen als Probelauf</div>` : ""}
-      ${eventAktiv ? `<div class="event-band">🎉 Rallye läuft — heute sind alle Zeug:innen unterwegs!</div>` : ""}
+      ${eventAktiv ? `<div class="event-band">🎉 ${esc(window.Store.aktionstag().name || "Aktionstag")} — heute sind alle Zeug:innen unterwegs!</div>` : ""}
       <header class="home-kopf">
         <div>
           <div class="home-gruss">Hey ${esc(s.name || "du")} 👋</div>
@@ -227,7 +208,7 @@
       <div id="gps-hinweis"></div>
       <div id="karte-container"></div>
       <section class="woche">
-        <h2>${eventAktiv ? "Heute unterwegs (Rallye!)" : "Diese Woche unterwegs"}
+        <h2>${eventAktiv ? "Heute unterwegs (Aktionstag!)" : "Diese Woche unterwegs"}
           <span class="woche-stand">${getroffen}/${aktive.length} getroffen</span></h2>
         <div class="woche-chips">${chips}</div>
         ${eventAktiv ? "" : `<p class="dezent">Jede Woche (ab Sonntag) sind andere Zeug:innen an den Orten. Dranbleiben lohnt sich!</p>`}
@@ -286,10 +267,16 @@
         }
       } else if (s.geoErlaubt) {
         schluessel = "suche";
-        html = `<div class="hinweis-karte leise"><span class="hinweis-icon">📍</span><span>Suche dein GPS-Signal … Draußen klappt's am besten. Am Ort geht's auch mit dem Code vom Schild.</span></div>`;
+        if (window.Geo.verweigert()) {
+          schluessel = "verweigert";
+          html = `<div class="hinweis-karte leise"><span class="hinweis-icon">🔒</span><span>Dein Handy blockiert den Standort für diese Seite. ${standortHilfe()}</span></div>`;
+        } else {
+          schluessel = "suche";
+          html = `<div class="hinweis-karte leise"><span class="hinweis-icon">📍</span><span>Suche dein GPS-Signal … Draußen unter freiem Himmel klappt's am besten.</span></div>`;
+        }
       } else if (!s.demo) {
         schluessel = "ohne";
-        html = `<div class="hinweis-karte leise"><span class="hinweis-icon">📷</span><span>Ohne Standort? Kein Problem — tipp am Ort auf der Karte den Code vom Schild ein.</span></div>`;
+        html = `<button class="hinweis-karte" data-geo-an><span class="hinweis-icon">📍</span><span>Die Zeug:innen erscheinen nur, wenn du wirklich da bist. <strong>Standort einschalten</strong></span></button>`;
       }
     }
 
@@ -298,6 +285,8 @@
       hinweisSchluessel = schluessel;
       const btn = box.querySelector("[data-hinweis-ort]");
       if (btn) btn.addEventListener("click", () => zeigeOrt(btn.getAttribute("data-hinweis-ort")));
+      const geoAn = box.querySelector("[data-geo-an]");
+      if (geoAn) geoAn.addEventListener("click", standortEinschalten);
     } else if (dist) {
       const d = box.querySelector(".hinweis-dist");
       if (d && d.textContent !== dist) d.textContent = dist;
@@ -307,8 +296,13 @@
     const gps = document.getElementById("gps-hinweis");
     if (gps) {
       const genau = window.Geo.genauigkeit();
-      const text = (s.geoErlaubt && genau !== null && genau > 100)
-        ? `GPS ist gerade ungenau (±${Math.round(genau)} m) — geh ein paar Schritte oder nutz den Code am Ort.` : "";
+      let text = "";
+      if (s.geoErlaubt && genau !== null && genau > 500) {
+        // iPhone/Android mit "ungefährem Standort": auf ein paar Kilometer ungenau
+        text = `Dein Handy meldet nur einen ungefähren Standort (±${formatDistanz(genau).replace("~", "")}). Schalte „Genauer Standort“ ein: ${standortHilfe()}`;
+      } else if (s.geoErlaubt && genau !== null && genau > 100) {
+        text = `GPS ist gerade ungenau (±${Math.round(genau)} m) — geh ein paar Schritte ins Freie.`;
+      }
       if (gps.textContent !== text) {
         gps.textContent = text;
         gps.className = text ? "hinweis-band" : "";
@@ -324,9 +318,21 @@
 
   function ortDistanzText(status) {
     if (status.distanz !== null) return `Du bist noch ${formatDistanz(status.distanz)} entfernt.`;
-    return window.Store.get().geoErlaubt
-      ? "Warte auf GPS-Signal …"
-      : "Standort ist aus — tipp einfach den Code vom Schild am Ort ein.";
+    if (!window.Store.get().geoErlaubt) return "Standort ist aus — schalt ihn ein, dann erscheinen die Zeug:innen, sobald du hier bist.";
+    if (window.Geo.verweigert()) return "Dein Handy blockiert den Standort für diese Seite. " + standortHilfe();
+    return "Warte auf GPS-Signal …";
+  }
+
+  function standortHilfe() {
+    return window.Installieren.plattform() === "android"
+      ? "Tipp in der Adresszeile auf das Schloss-Symbol → Berechtigungen → Standort erlauben."
+      : "iPhone: Einstellungen → Datenschutz & Sicherheit → Ortungsdienste → Safari-Websites → „Beim Verwenden“ und „Genauer Standort“ an.";
+  }
+
+  function standortEinschalten() {
+    window.Store.setGeoErlaubt(true);
+    window.Geo.start();
+    if (aktuelleView === "ort" && aktuellerOrt) renderOrt(aktuellerOrt); else zeigeView(aktuelleView);
   }
 
   function aktualisiereOrtDistanz(ort, status) {
@@ -376,13 +382,7 @@
         <div class="panel-nacht ort-info">
           <p>${aktiv ? `Diese Woche wartet hier: <strong>${window.Store.istGesammelt(aktiv.id) ? esc(aktiv.name) : "??? (" + esc(aktiv.themaLabel) + ")"}</strong>` : ""}</p>
           <p class="ort-distanz">📍 <span id="ort-distanz-text">${esc(ortDistanzText(status))}</span></p>
-          <div class="ort-code">
-            <label for="ort-code-eingabe">Code vom Schild am Ort:</label>
-            <div class="ort-code-zeile">
-              <input type="text" id="ort-code-eingabe" placeholder="WDZ-…" autocomplete="off" autocapitalize="characters">
-              <button class="btn btn-sekundaer" id="ort-code-btn">Freischalten</button>
-            </div>
-          </div>
+          ${s.geoErlaubt ? "" : `<button class="btn btn-gold" id="ort-geo-an">📍 Standort einschalten</button>`}
         </div>`;
     }
 
@@ -409,7 +409,9 @@
         ${window.Store.hatSiegel(ort.id) ? `<div class="ort-siegel" title="Orts-Siegel">✦</div>` : ""}
       </header>
       ${ort.denkmal ? `<div class="denkmal-band">🕯️ Erinnerungsort — die Kirche stand hier ${esc(ort.jahre)}</div>` : ""}
+      ${ort.hinweis ? `<div class="ort-respekt">${esc(ort.hinweis)}</div>` : ""}
       <p class="ort-beschreibung">${esc(ort.beschreibung)}</p>
+      ${nachbarnHTML(ort)}
       ${s.demo ? `<button class="btn btn-sekundaer" id="ort-beam">🧪 Demo: Beam mich hierhin</button>` : ""}
       ${begegnungsBereich}
       <section class="ort-figuren">
@@ -443,24 +445,23 @@
     });
     const beam = view.querySelector("#ort-beam");
     if (beam) beam.addEventListener("click", () => { window.Geo.beamZu(ortId); renderOrt(ortId); });
-    const codeBtn = view.querySelector("#ort-code-btn");
-    const codeFeld = view.querySelector("#ort-code-eingabe");
-    // Enter auf der Handytastatur löst ebenfalls aus
-    if (codeFeld) codeFeld.addEventListener("keydown", e => { if (e.key === "Enter") { e.preventDefault(); codeBtn.click(); } });
-    if (codeBtn) codeBtn.addEventListener("click", () => {
-      // Tolerant: Leerzeichen raus, fehlende Bindestriche egal (WDZDKBRUNNEN = WDZ-DK-BRUNNEN),
-      // und kyrillische Doppelgänger-Buchstaben (А, В, Е, К, М, Н, О, Р, С, Т, У, Х) zählen als lateinisch
-      const KYRILLISCH = { "А": "A", "В": "B", "Е": "E", "К": "K", "М": "M", "Н": "H", "О": "O", "Р": "P", "С": "C", "Т": "T", "У": "Y", "Х": "X" };
-      const norm = t => t.toUpperCase().replace(/[\s\-–—_]/g, "").replace(/[АВЕКМНОРСТУХ]/g, z => KYRILLISCH[z]);
-      const eingabe = norm(codeFeld.value);
-      if (eingabe && eingabe === norm(ort.qrCode)) {
-        window.Store.qrFreischalten(ort.id);
-        toast(`📍 ${ort.name} ist für heute freigeschaltet!`);
-        renderOrt(ortId);
-      } else {
-        toast("Dieser Code passt hier nicht. 🤔");
-      }
+    const geoAn = view.querySelector("#ort-geo-an");
+    if (geoAn) geoAn.addEventListener("click", standortEinschalten);
+    view.querySelectorAll("[data-nachbar]").forEach(b => {
+      b.addEventListener("click", () => zeigeOrt(b.getAttribute("data-nachbar")));
     });
+  }
+
+  /* Kitas & Hort liegen direkt neben einer Kirche: gegenseitig verlinken */
+  function nachbarnHTML(ort) {
+    const orte = window.Daten.orte;
+    const nachbarn = ort.nebenAn
+      ? orte.filter(o => o.id === ort.nebenAn || (o.nebenAn === ort.nebenAn && o.id !== ort.id))
+      : orte.filter(o => o.nebenAn === ort.id);
+    if (!nachbarn.length) return "";
+    return `<div class="ort-nachbarn"><span class="dezent">Gleich nebenan:</span>
+      ${nachbarn.map(o => `<button class="chip chip-knopf" data-nachbar="${o.id}">${o.icon} ${esc(o.kurzname || o.name)}</button>`).join("")}
+    </div>`;
   }
 
   /* ---------- Figuren-Detail ---------- */
@@ -472,6 +473,17 @@
   }
 
   /* ---------- Einstellungen ---------- */
+  function aktionstageHTML() {
+    const heute = window.Store.aktionstag();
+    if (heute) return `<p class="chip chip-gold">Heute ist ${esc(heute.name || "Aktionstag")}! 🎉</p>`;
+    const jetzt = window.Rotation.heute();
+    const iso = jetzt.getFullYear() + "-" + String(jetzt.getMonth() + 1).padStart(2, "0") + "-" + String(jetzt.getDate()).padStart(2, "0");
+    const kommende = (window.Daten.config.aktionstage || []).filter(t => t.datum > iso).sort((a, b) => a.datum.localeCompare(b.datum));
+    if (!kommende.length) return `<p class="dezent">Gerade ist kein Aktionstag geplant.</p>`;
+    const datum = t => new Date(t.datum + "T12:00:00").toLocaleDateString("de-DE", { weekday: "short", day: "numeric", month: "long" });
+    return `<ul class="aktionstage">${kommende.slice(0, 3).map(t => `<li><strong>${esc(datum(t))}</strong> · ${esc(t.name || "Aktionstag")}</li>`).join("")}</ul>`;
+  }
+
   function renderEinstellungen() {
     const view = document.getElementById("view-einstellungen");
     const s = window.Store.get();
@@ -519,13 +531,9 @@
         <label class="schalter"><input type="checkbox" id="e-demo" ${s.demo ? "checked" : ""}> Demo-Modus aktivieren</label>
       </div>
       <div class="panel-nacht einstellung">
-        <h3>🎉 Aktionstag</h3>
-        <p class="dezent">Bei einer Konfi-Rallye bekommst du von der Leitung einen Code.</p>
-        <div class="ort-code-zeile">
-          <input type="text" id="e-event" placeholder="Event-Code" autocomplete="off" autocapitalize="characters">
-          <button class="btn btn-sekundaer" id="e-event-btn">Aktivieren</button>
-        </div>
-        ${window.Store.istEventAktiv() ? `<p class="chip chip-gold">Rallye ist heute aktiv! 🎉</p>` : ""}
+        <h3>🎉 Aktionstage</h3>
+        <p class="dezent">An Aktionstagen (z. B. beim Konfi-Tag) sind alle Zeug:innen gleichzeitig unterwegs — hingehen musst du trotzdem.</p>
+        ${aktionstageHTML()}
       </div>
       <div class="panel-nacht einstellung">
         <h3>🔒 Datenschutz</h3>
@@ -582,17 +590,6 @@
       if (!e.target.checked) window.Geo.beamZuruecksetzen();
       toast(e.target.checked ? "Demo-Modus an 🧪" : "Demo-Modus aus");
     });
-    view.querySelector("#e-event-btn").addEventListener("click", () => {
-      const code = view.querySelector("#e-event").value.trim().toUpperCase();
-      const ev = (c.eventCodes || []).find(x => x.code.toUpperCase() === code);
-      if (ev) {
-        window.Store.aktiviereEvent();
-        toast(`🎉 ${ev.name} gestartet — alle Zeug:innen sind heute unterwegs!`);
-        renderEinstellungen();
-      } else {
-        toast("Diesen Event-Code kenne ich nicht. 🤔");
-      }
-    });
     view.querySelector("#e-loeschen").addEventListener("click", () => {
       if (confirm("Wirklich alles löschen? Deine Wolke, Notizen und dein Name werden von diesem Gerät entfernt.")) {
         window.Store.allesLoeschen();
@@ -636,7 +633,7 @@
     overlay.innerHTML = `
       <div class="meilenstein panel-pergament">
         <div class="meilenstein-zeichen">☁️ ✦ ☁️</div>
-        <p>${esc(m.text)}</p>
+        <p>${esc(m.text.replace("{anzahl}", window.Wolke.zahlwort(window.Daten.figuren.length, true)))}</p>
         <button class="btn btn-gold" id="meilenstein-weiter">Amen. Weiter! →</button>
       </div>`;
     overlay.querySelector("#meilenstein-weiter").addEventListener("click", zeigeNaechstenMeilenstein);

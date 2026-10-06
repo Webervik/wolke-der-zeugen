@@ -1,2 +1,3 @@
+werkstatt/*
+!werkstatt/karte-backen.py
 .DS_Store
-werkstatt/
