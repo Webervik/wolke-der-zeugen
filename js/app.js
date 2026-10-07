@@ -230,9 +230,11 @@
   function offeneOrte() {
     const eventAktiv = window.Store.istEventAktiv();
     return window.Daten.orte.filter(o => {
-      if (eventAktiv) return window.Rotation.figurenAnOrt(o.id).some(f => !window.Store.istGesammelt(f.id));
+      // Noch nicht frei: so tun, als käme man echt hin (Probelauf-Karten locken zum echten Besuch)
+      const art = window.Geo.freischaltung(o).art || "gps";
+      if (eventAktiv) return window.Rotation.figurenAnOrt(o.id).some(f => window.Store.brauchtBegegnung(f.id, art));
       const f = window.Rotation.aktiveFigur(o.id);
-      return !!f && !window.Store.istGesammelt(f.id);
+      return !!f && window.Store.brauchtBegegnung(f.id, art);
     });
   }
 
@@ -274,9 +276,11 @@
           schluessel = "suche";
           html = `<div class="hinweis-karte leise"><span class="hinweis-icon">📍</span><span>Suche dein GPS-Signal … Draußen unter freiem Himmel klappt's am besten.</span></div>`;
         }
-      } else if (!s.demo) {
-        schluessel = "ohne";
-        html = `<button class="hinweis-karte" data-geo-an><span class="hinweis-icon">📍</span><span>Die Zeug:innen erscheinen nur, wenn du wirklich da bist. <strong>Standort einschalten</strong></span></button>`;
+      } else {
+        schluessel = s.demo ? "ohne-demo" : "ohne";
+        html = s.demo
+          ? `<button class="hinweis-karte" data-geo-an><span class="hinweis-icon">🧪</span><span>Du spielst im Demo-Modus (Probelauf). <strong>Standort einschalten</strong> — dann zählen echte Besuche.</span></button>`
+          : `<button class="hinweis-karte" data-geo-an><span class="hinweis-icon">📍</span><span>Die Zeug:innen erscheinen nur, wenn du wirklich da bist. <strong>Standort einschalten</strong></span></button>`;
       }
     }
 
@@ -329,8 +333,18 @@
       : "iPhone: Einstellungen → Datenschutz & Sicherheit → Ortungsdienste → Safari-Websites → „Beim Verwenden“ und „Genauer Standort“ an.";
   }
 
-  function standortEinschalten() {
+  /* Standort an = ab jetzt echt: der Demo-Modus (z. B. aus dem Onboarding) geht aus */
+  function standortAn() {
     window.Store.setGeoErlaubt(true);
+    if (window.Store.get().demo) {
+      window.Store.setDemo(false);
+      window.Geo.beamZuruecksetzen();
+      toast("📍 Standort an — ab jetzt zählen echte Besuche.");
+    }
+  }
+
+  function standortEinschalten() {
+    standortAn();
     window.Geo.start();
     if (aktuelleView === "ort" && aktuellerOrt) renderOrt(aktuellerOrt); else zeigeView(aktuelleView);
   }
@@ -355,21 +369,21 @@
 
     let begegnungsBereich = "";
     const kandidaten = eventAktiv ? figurenHier : (aktiv ? [aktiv] : []);
-    const offen = kandidaten.filter(f => !window.Store.istGesammelt(f.id));
+    const offen = kandidaten.filter(f => window.Store.brauchtBegegnung(f.id, status.art));
 
     if (status.frei && offen.length) {
       begegnungsBereich = offen.map(f => `
         <div class="ort-begegnung panel-pergament wartet-panel">
           <div class="ort-begegnung-nische">${window.Gestalt.svg(f, { praefix: "ort" })}</div>
           <div class="ort-begegnung-text">
-            <strong>${esc(f.name)}</strong> wartet hier auf dich.
-            <small>${esc(f.kurzvorstellung)}</small>
+            <strong>${esc(f.name)}</strong> wartet hier auf dich${window.Store.istProbelauf(f.id) ? " — diesmal in echt!" : "."}
+            <small>${window.Store.istProbelauf(f.id) ? "Aus eurem Probelauf wird jetzt eine richtige Begegnung." : esc(f.kurzvorstellung)}</small>
           </div>
           <button class="btn btn-gold" data-begegnung="${f.id}">✨ Begegnung beginnen</button>
           <p class="ort-begegnung-hinweis">📷 Halte dein Handy hoch — ${esc(f.name)} ist irgendwo hier.</p>
         </div>`).join("");
     } else if (status.frei) {
-      const bekannt = kandidaten.filter(f => window.Store.istGesammelt(f.id));
+      const bekannt = kandidaten.filter(f => window.Store.istGesammelt(f.id) && !offen.includes(f));
       begegnungsBereich = `<div class="panel-nacht ort-info">
         ${aktiv
           ? `<p>${eventAktiv ? "Allen Zeug:innen hier" : `<strong>${esc(aktiv.name)}</strong>`} ${eventAktiv ? "bist du schon begegnet" : "ist diese Woche hier — ihr kennt euch schon"}! 💛${eventAktiv ? "" : " Ab Sonntag wartet hier jemand anderes."}</p>`
@@ -412,7 +426,7 @@
       ${ort.hinweis ? `<div class="ort-respekt">${esc(ort.hinweis)}</div>` : ""}
       <p class="ort-beschreibung">${esc(ort.beschreibung)}</p>
       ${nachbarnHTML(ort)}
-      ${s.demo ? `<button class="btn btn-sekundaer" id="ort-beam">🧪 Demo: Beam mich hierhin</button>` : ""}
+      ${s.demo && status.art !== "gps" ? `<button class="btn btn-sekundaer" id="ort-beam">🧪 Demo: Beam mich hierhin</button>` : ""}
       ${begegnungsBereich}
       <section class="ort-figuren">
         <h3>Zeug:innen an diesem Ort</h3>
@@ -582,8 +596,14 @@
     });
 
     view.querySelector("#e-geo").addEventListener("change", e => {
-      window.Store.setGeoErlaubt(e.target.checked);
-      if (!e.target.checked) window.Geo.stop();
+      if (e.target.checked) {
+        const warDemo = window.Store.get().demo;
+        standortAn();
+        if (warDemo) view.querySelector("#e-demo").checked = false;
+        return;
+      }
+      window.Store.setGeoErlaubt(false);
+      window.Geo.stop();
     });
     view.querySelector("#e-demo").addEventListener("change", e => {
       window.Store.setDemo(e.target.checked);

@@ -5,8 +5,10 @@
    (oder im Demo-Modus das "Beamen" zum Ausprobieren). */
 (function () {
   let watchId = null;
-  let position = null;      // { lat, lng, accuracy, zeit } — nur im Speicher
+  let position = null;      // echtes GPS: { lat, lng, accuracy, zeit } — nur im Speicher
   let demoOrtId = null;     // im Demo-Modus "gebeamter" Ort
+  let beam = null;          // simulierte Position im Demo-Modus — getrennt vom echten GPS,
+                            // damit ein echter Besuch nie als Probelauf zählt (und umgekehrt)
   let verweigert = false;   // Browser/Handy blockiert den Standort
   let listeners = [];
 
@@ -64,35 +66,39 @@
     const ort = window.Daten.orte.find(o => o.id === ortId);
     if (!ort) return;
     demoOrtId = ortId;
-    if (ort.lat !== null && ort.lng !== null) {
-      // Simulierte Position läuft durch dieselbe Geofence-Pipeline wie echtes GPS
-      position = { lat: ort.lat, lng: ort.lng, accuracy: 5, zeit: Date.now() };
-    }
+    beam = (ort.lat !== null && ort.lng !== null) ? { lat: ort.lat, lng: ort.lng } : null;
     melde();
   }
 
-  function beamZuruecksetzen() { demoOrtId = null; if (watchId === null) position = null; melde(); }
+  function beamZuruecksetzen() { demoOrtId = null; beam = null; melde(); }
+
+  /* Für Anzeigen (Entfernung, Punkt auf der Karte): echtes GPS, sonst im Demo-Modus der Beam-Punkt */
+  function anzeigePosition() {
+    return aktuell() || (window.Store.get().demo ? beam : null);
+  }
 
   function distanzZu(ort) {
-    const p = aktuell();
+    const p = anzeigePosition();
     if (!p || ort.lat === null || ort.lng === null) return null;
     return haversine(p.lat, p.lng, ort.lat, ort.lng);
   }
 
-  /* Zentrale Freischaltungs-Prüfung: GPS oder Demo. */
+  /* Zentrale Freischaltungs-Prüfung: Echtes GPS geht immer vor — wer wirklich da ist,
+     bekommt eine echte Begegnung, auch wenn der Demo-Modus noch an ist. */
   function freischaltung(ort) {
-    if (window.Store.get().demo && demoOrtId === ort.id) {
+    const p = aktuell();
+    const hatOrt = ort.lat !== null && ort.lng !== null;
+    if (p && hatOrt) {
+      const d = haversine(p.lat, p.lng, ort.lat, ort.lng);
+      const toleranz = Math.min(p.accuracy || 0, 30);
+      if (d <= ort.radiusMeter + toleranz) return { frei: true, art: "gps", distanz: d };
+    }
+    // Demo: der gebeamte Ort und seine direkten Nachbarn (z. B. die Kita neben der Kirche)
+    if (window.Store.get().demo && (demoOrtId === ort.id ||
+        (beam && hatOrt && haversine(beam.lat, beam.lng, ort.lat, ort.lng) <= ort.radiusMeter))) {
       return { frei: true, art: "demo", distanz: 0 };
     }
-    const d = distanzZu(ort);
-    if (d !== null) {
-      const toleranz = Math.min(aktuell().accuracy || 0, 30);
-      if (d <= ort.radiusMeter + toleranz) {
-        return { frei: true, art: "gps", distanz: d };
-      }
-      return { frei: false, art: null, distanz: d };
-    }
-    return { frei: false, art: null, distanz: null };
+    return { frei: false, art: null, distanz: distanzZu(ort) };
   }
 
   window.Geo = {
@@ -105,9 +111,9 @@
     haversine,
     aktiv: () => watchId !== null,
     verweigert: () => verweigert,
-    hatPosition: () => !!aktuell(),
+    hatPosition: () => !!anzeigePosition(),
     genauigkeit: () => (aktuell() ? aktuell().accuracy : null),
-    positionXY: () => (aktuell() ? { lat: aktuell().lat, lng: aktuell().lng } : null),
+    positionXY: () => { const p = anzeigePosition(); return p ? { lat: p.lat, lng: p.lng } : null; },
     demoOrt: () => demoOrtId,
     onUpdate(fn) { listeners.push(fn); }
   };

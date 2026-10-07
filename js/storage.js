@@ -59,6 +59,15 @@
 
     istGesammelt(figurId) { return !!state.gesammelt[figurId]; },
 
+    /* Steht hier noch eine Begegnung an? Ja, wenn die Figur nie getroffen wurde —
+       oder nur im Probelauf (Demo) und man jetzt wirklich vor Ort ist. Dann wird
+       aus dem Probelauf eine echte Begegnung (sammle() wertet die Karte auf). */
+    brauchtBegegnung(figurId, art) {
+      const g = state.gesammelt[figurId];
+      return !g || (g.verifikation === "demo" && !!art && art !== "demo");
+    },
+    istProbelauf(figurId) { const g = state.gesammelt[figurId]; return !!g && g.verifikation === "demo"; },
+
     sammle(figurId, verifikation, glanz, erlebt) {
       const vorhanden = state.gesammelt[figurId];
       if (vorhanden) {

@@ -186,10 +186,10 @@
     const status = window.Geo.freischaltung(ort);
     if (!status.frei) return false;
     if (window.Store.istEventAktiv()) {
-      return window.Rotation.figurenAnOrt(ort.id).some(f => !window.Store.istGesammelt(f.id));
+      return window.Rotation.figurenAnOrt(ort.id).some(f => window.Store.brauchtBegegnung(f.id, status.art));
     }
     const figur = window.Rotation.aktiveFigur(ort.id);
-    return !!figur && !window.Store.istGesammelt(figur.id);
+    return !!figur && window.Store.brauchtBegegnung(figur.id, status.art);
   }
 
   function distanzText(ort) {
