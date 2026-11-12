@@ -150,7 +150,7 @@
 
     return {
       defs: labelDefs,
-      ebenen: `<g class="gruen">${gruen}</g><g class="wasser">${wasser}</g>
+      ebenen: `<g class="gruen">${gruen}</g><g class="gruen-muster">${gruen}</g><g class="wasser">${wasser}</g>
                <g class="strassen">${strassen}</g><g class="bahn">${bahn}</g>
                <g class="strassen-namen">${labels}</g>`,
       quelle: hg.quelle || ""
@@ -172,12 +172,19 @@
   }
 
   function kompass(x, y) {
+    let zacken = "";
+    for (let i = 0; i < 8; i++) {
+      const lang = i % 2 === 0, r = lang ? 24 : 13;
+      zacken += `<path transform="rotate(${i * 45})" d="M0 ${-r} L${lang ? 4.5 : 3} 0 L0 0 Z" fill="var(--gold-tief)" opacity="${lang ? 0.9 : 0.6}"/>
+                 <path transform="rotate(${i * 45})" d="M0 ${-r} L${lang ? -4.5 : -3} 0 L0 0 Z" fill="#f0d284" opacity="${lang ? 0.95 : 0.7}"/>`;
+    }
     return `<g class="kompass" transform="translate(${x},${y})" aria-hidden="true">
-      <circle r="27" fill="var(--pergament)" opacity="0.85"/>
-      <circle r="26" fill="none" stroke="var(--gold-tief)" stroke-width="1.5" opacity="0.7"/>
-      <path d="M0,-22 L5,0 L0,22 L-5,0 Z" fill="var(--gold-tief)" opacity="0.8"/>
-      <path d="M-22,0 L0,-5 L22,0 L0,5 Z" fill="var(--gold-tief)" opacity="0.45"/>
-      <text y="-30" text-anchor="middle" class="karte-kompass-n">N</text>
+      <circle r="31" fill="#f6ecd7" opacity="0.88"/>
+      <circle r="30" fill="none" stroke="var(--gold-tief)" stroke-width="1.6" opacity="0.8"/>
+      <circle r="26" fill="none" stroke="var(--gold-tief)" stroke-width="0.6" stroke-dasharray="1.5 3.6" opacity="0.8"/>
+      ${zacken}
+      <circle r="3" fill="#f6ecd7" stroke="var(--gold-tief)" stroke-width="1.2"/>
+      <text y="-35" text-anchor="middle" class="karte-kompass-n">N</text>
     </g>`;
   }
 
@@ -228,7 +235,7 @@
     return seite;
   }
 
-  function medaillon(ort, p, seite) {
+  function medaillon(ort, p, seite, i) {
     const siegel = window.Store.hatSiegel(ort.id);
     const wartetBegegnung = wartet(ort);
     const klein = istNachbar(ort);
@@ -238,16 +245,28 @@
     const yDist = oben ? (ort.denkmal ? -70 : -56) : (ort.denkmal ? 78 : 64);
 
     const ringKlasse = ort.denkmal ? "medaillon-ring denkmal" : "medaillon-ring";
-    return `<g class="medaillon${klein ? " nachbar" : ""}${wartetBegegnung ? " wartet" : ""}" data-ort="${ort.id}" transform="translate(${p.x.toFixed(1)},${p.y.toFixed(1)})${klein ? ` scale(${NACHBAR_SKALA})` : ""}" role="button" tabindex="0" aria-label="${esc(ort.name)}${wartetBegegnung ? " — hier wartet jemand auf dich" : ""}">
+    // Strahlen um einen Ort, an dem jemand wartet
+    let strahlen = "";
+    if (wartetBegegnung) {
+      for (let k = 0; k < 12; k++) strahlen += `<path transform="rotate(${k * 30})" d="M-2.6 -35 L0 ${k % 2 ? -47 : -54} L2.6 -35 Z"/>`;
+      strahlen = `<g class="medaillon-strahlen" fill="var(--gold)">${strahlen}</g>`;
+    }
+    return `<g class="medaillon${klein ? " nachbar" : ""}${wartetBegegnung ? " wartet" : ""}${siegel ? " besiegelt" : ""}" data-ort="${ort.id}" transform="translate(${p.x.toFixed(1)},${p.y.toFixed(1)})${klein ? ` scale(${NACHBAR_SKALA})` : ""}" role="button" tabindex="0" aria-label="${esc(ort.name)}${wartetBegegnung ? " — hier wartet jemand auf dich" : ""}">
+      <g class="med-in" style="--i:${i}">
       <circle r="44" fill="transparent"/>
+      ${strahlen}
       ${wartetBegegnung ? `<circle class="medaillon-puls" r="34" fill="var(--gold)"/>` : ""}
-      <circle r="30" fill="var(--pergament)" stroke="${ort.farbe}" stroke-width="3" class="${ringKlasse}"/>
+      <circle r="33" fill="#2b241d" opacity="0.22" transform="translate(1.5 3)"/>
+      <circle r="30" fill="url(#med-glas)" stroke="${ort.farbe}" stroke-width="3.4" class="${ringKlasse}"/>
+      <circle r="26.5" fill="none" stroke="${siegel ? "var(--gold)" : "#ffffff"}" stroke-width="${siegel ? 1.6 : 1}" opacity="${siegel ? 0.95 : 0.7}"/>
+      <path d="M-19 -13 A 23 23 0 0 1 8 -22" fill="none" stroke="#ffffff" stroke-width="3" stroke-linecap="round" opacity="0.75"/>
       <text y="9" text-anchor="middle" class="medaillon-icon">${ort.icon}</text>
-      ${wartetBegegnung ? `<g transform="translate(-22,-22)"><circle r="11" fill="var(--gold)" stroke="var(--gold-tief)"/><text y="4.5" text-anchor="middle" class="medaillon-siegel">!</text></g>` : ""}
-      ${siegel ? `<g transform="translate(22,-22)"><circle r="11" fill="var(--gold)" stroke="var(--gold-tief)"/><text y="4.5" text-anchor="middle" class="medaillon-siegel">✦</text></g>` : ""}
+      ${wartetBegegnung ? `<g class="medaillon-ruf" transform="translate(-22,-22)"><circle r="11.5" fill="url(#med-gold)" stroke="var(--gold-tief)"/><text y="4.5" text-anchor="middle" class="medaillon-siegel">!</text></g>` : ""}
+      ${siegel ? `<g transform="translate(22,-22)"><circle r="11.5" fill="url(#med-gold)" stroke="var(--gold-tief)"/><text y="4.5" text-anchor="middle" class="medaillon-siegel">✦</text></g>` : ""}
       ${klein ? "" : `<text y="${yName}" text-anchor="middle" class="medaillon-name">${esc(kurzname(ort))}</text>
       ${ort.denkmal ? `<text y="${yJahre}" text-anchor="middle" class="medaillon-jahre">${esc(ort.jahre || "")}</text>` : ""}
       <text y="${yDist}" text-anchor="middle" class="medaillon-distanz" data-dist="${ort.id}">${distanzText(ort)}</text>`}
+      </g>
     </g>`;
   }
 
@@ -259,48 +278,115 @@
     return `translate(${p.x.toFixed(1)},${p.y.toFixed(1)})`;
   }
 
-  function render(container) {
-    const pos = positionen();
-    const orte = window.Daten.orte;
-    const seiten = labelSeiten(pos);
-    nachbarnAnlegen(pos, seiten);
-    const hg = hintergrund();
-    const spieler = spielerTransform();
+  /* Die Karte besteht aus zwei übereinanderliegenden Ebenen:
+     - Grund (Pergament, Straßen, Rahmen): schwer, wird nur einmal gemalt
+     - Ebene (Weg, Medaillons, eigener Standort): leicht, wird bei jedem
+       Zustandswechsel neu gebaut und darf sich bewegen, ohne dass der Browser
+       hunderte Straßen neu zeichnen muss. Dazwischen ziehen Wolkenschatten. */
+  let ersteAnsicht = true;
 
-    container.innerHTML = `
-      <svg viewBox="0 0 ${W} ${H}" class="pilgerkarte" role="img" aria-label="Karte der Gemeindeorte in Staaken">
+  function grundSVG() {
+    const hg = hintergrund();
+    return `<svg viewBox="0 0 ${W} ${H}" class="pilgerkarte karte-grund" aria-hidden="true">
         <defs>
           <radialGradient id="pergamentTon" cx="50%" cy="42%" r="75%">
-            <stop offset="0%" stop-color="var(--pergament)"/>
-            <stop offset="100%" stop-color="var(--pergament-tief)"/>
+            <stop offset="0%" stop-color="#fbf3df"/>
+            <stop offset="70%" stop-color="#eedfbb"/>
+            <stop offset="100%" stop-color="#d9c192"/>
           </radialGradient>
+          <radialGradient id="pergamentRand" cx="50%" cy="50%" r="72%">
+            <stop offset="72%" stop-color="#6b4a16" stop-opacity="0"/>
+            <stop offset="100%" stop-color="#6b4a16" stop-opacity="0.42"/>
+          </radialGradient>
+          <linearGradient id="kartenGold" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="${W}" y2="${H}">
+            <stop offset="0" stop-color="#8f6a1c"/><stop offset="0.25" stop-color="#f3d98c"/><stop offset="0.5" stop-color="#b98a26"/>
+            <stop offset="0.75" stop-color="#fff1c2"/><stop offset="1" stop-color="#8f6a1c"/>
+          </linearGradient>
+          <pattern id="waldMuster" width="22" height="20" patternUnits="userSpaceOnUse">
+            <path d="M6 14 l4 -9 l4 9 Z M10 14 v3" fill="#8fa06a" stroke="#7d8e5c" stroke-width="0.8" opacity="0.55"/>
+            <path d="M17 6 l3 -6 l3 6 Z" fill="#8fa06a" opacity="0.35"/>
+          </pattern>
           <clipPath id="kartenRahmen"><rect x="20" y="20" width="${W - 40}" height="${H - 40}" rx="6"/></clipPath>
           ${hg.defs}
         </defs>
-        <rect x="4" y="4" width="${W - 8}" height="${H - 8}" rx="14" fill="var(--pergament)"/>
-        <rect x="4" y="4" width="${W - 8}" height="${H - 8}" rx="14" fill="url(#pergamentTon)" opacity="0.5"/>
+        <rect x="4" y="4" width="${W - 8}" height="${H - 8}" rx="14" fill="url(#pergamentTon)"/>
+        <ellipse cx="${W * 0.22}" cy="${H * 0.8}" rx="150" ry="90" fill="#a8823e" opacity="0.07"/>
+        <ellipse cx="${W * 0.82}" cy="${H * 0.3}" rx="120" ry="80" fill="#a8823e" opacity="0.06"/>
         <g clip-path="url(#kartenRahmen)" class="karten-hintergrund">${hg.ebenen}</g>
-        <rect x="14" y="14" width="${W - 28}" height="${H - 28}" rx="8" fill="none" stroke="var(--gold-tief)" stroke-width="1.5" opacity="0.65"/>
-        <rect x="20" y="20" width="${W - 40}" height="${H - 40}" rx="6" fill="none" stroke="var(--gold-tief)" stroke-width="0.75" opacity="0.4"/>
+        <rect x="4" y="4" width="${W - 8}" height="${H - 8}" rx="14" fill="url(#pergamentRand)"/>
+        <rect x="13" y="13" width="${W - 26}" height="${H - 26}" rx="9" fill="none" stroke="url(#kartenGold)" stroke-width="3"/>
+        <rect x="21" y="21" width="${W - 42}" height="${H - 42}" rx="5" fill="none" stroke="var(--gold-tief)" stroke-width="0.9" opacity="0.6"/>
+        ${[[13, 13, 1, 1], [W - 13, 13, -1, 1], [13, H - 13, 1, -1], [W - 13, H - 13, -1, -1]].map(e =>
+          `<g transform="translate(${e[0]},${e[1]}) scale(${e[2]},${e[3]})"><path d="M0 46 Q0 0 46 0 M8 30 Q10 10 30 8" fill="none" stroke="url(#kartenGold)" stroke-width="3"/><circle cx="14" cy="14" r="4.5" fill="url(#kartenGold)"/></g>`).join("")}
         <g class="kartusche">
-          <rect x="30" y="30" width="300" height="36" rx="6" fill="var(--pergament)" stroke="var(--gold-tief)" stroke-width="1" opacity="0.94"/>
-          <text x="180" y="55" text-anchor="middle" class="karte-titel">Staaken · Orte der Gemeinde</text>
+          <path d="M34 36 h306 l-12 19 l12 19 h-306 l12 -19 Z" fill="#f6ecd7" stroke="url(#kartenGold)" stroke-width="1.8" opacity="0.96"/>
+          <text x="187" y="62" text-anchor="middle" class="karte-titel">Staaken · Orte der Gemeinde</text>
         </g>
-        ${kompass(W - 70, 100)}
-        <path d="${wegPfad(pos)}" fill="none" stroke="var(--gold-tief)" stroke-width="3" stroke-dasharray="2 9" stroke-linecap="round" opacity="0.9"/>
-        ${orte.filter(istNachbar).map(o => pos[o.id].haupt ? `<line class="nachbar-linie" x1="${pos[o.id].haupt.x.toFixed(1)}" y1="${pos[o.id].haupt.y.toFixed(1)}" x2="${pos[o.id].x.toFixed(1)}" y2="${pos[o.id].y.toFixed(1)}"/>` : "").join("")}
-        ${orte.filter(o => !istNachbar(o)).map(o => medaillon(o, pos[o.id], seiten[o.id])).join("")}
-        ${orte.filter(istNachbar).map(o => medaillon(o, pos[o.id], "unten")).join("")}
-        <g id="spieler" class="spieler" transform="${spieler || "translate(-100,-100)"}" style="${spieler ? "" : "display:none"}" aria-label="Deine Position">
-          <circle class="spieler-puls" r="14" fill="var(--gold)"/>
-          <circle r="7" fill="var(--gold)" stroke="var(--pergament)" stroke-width="2.5"/>
-        </g>
-        ${hg.quelle ? `<text x="28" y="${H - 26}" class="karte-quelle">${esc(hg.quelle)}</text>` : ""}
+        ${kompass(W - 74, 96)}
+        ${hg.quelle ? `<text x="30" y="${H - 28}" class="karte-quelle">${esc(hg.quelle)}</text>` : ""}
       </svg>`;
+  }
 
+  function ebeneInhalt(pos, seiten) {
+    const orte = window.Daten.orte;
+    const spieler = spielerTransform();
+    const weg = wegPfad(pos);
+    const lebendig = window.Fx.an();
+    const lichter = (weg && lebendig) ? [0, -5.5, -11].map(start =>
+      `<g class="weg-licht"><circle r="7" fill="#fff3c8" opacity="0.35"/><circle r="3" fill="#fffbe8"/>
+         <animateMotion dur="16.5s" begin="${start}s" repeatCount="indefinite" path="${weg}"/></g>`).join("") : "";
+    let i = 0;
+    return `
+      <defs>
+        <radialGradient id="med-glas" cx="38%" cy="30%" r="80%">
+          <stop offset="0%" stop-color="#ffffff"/>
+          <stop offset="45%" stop-color="#f6ecd7"/>
+          <stop offset="100%" stop-color="#dcc79a"/>
+        </radialGradient>
+        <radialGradient id="med-gold" cx="35%" cy="30%" r="80%">
+          <stop offset="0%" stop-color="#fff3c8"/>
+          <stop offset="60%" stop-color="#d4a73a"/>
+          <stop offset="100%" stop-color="#a47a22"/>
+        </radialGradient>
+      </defs>
+      <path d="${weg}" fill="none" stroke="#fff3c8" stroke-width="6" stroke-linecap="round" opacity="0.35"/>
+      <path d="${weg}" fill="none" stroke="var(--gold-tief)" stroke-width="3" stroke-dasharray="2 9" stroke-linecap="round" opacity="0.95"/>
+      ${lichter}
+      ${orte.filter(istNachbar).map(o => pos[o.id].haupt ? `<line class="nachbar-linie" x1="${pos[o.id].haupt.x.toFixed(1)}" y1="${pos[o.id].haupt.y.toFixed(1)}" x2="${pos[o.id].x.toFixed(1)}" y2="${pos[o.id].y.toFixed(1)}"/>` : "").join("")}
+      ${orte.filter(o => !istNachbar(o)).map(o => medaillon(o, pos[o.id], seiten[o.id], i++)).join("")}
+      ${orte.filter(istNachbar).map(o => medaillon(o, pos[o.id], "unten", i++)).join("")}
+      <g id="spieler" class="spieler" transform="${spieler || "translate(-100,-100)"}" style="${spieler ? "" : "display:none"}" aria-label="Deine Position">
+        <circle class="spieler-puls" r="16" fill="var(--gold)"/>
+        <circle r="13" fill="#fff3c8" opacity="0.45"/>
+        <circle r="7.5" fill="url(#med-gold)" stroke="#ffffff" stroke-width="2.5"/>
+      </g>`;
+  }
+
+  function render(container) {
+    const pos = positionen();
+    const seiten = labelSeiten(pos);
+    nachbarnAnlegen(pos, seiten);
+
+    const grundSig = window.Daten.orte.map(o => o.id + ":" + o.lat + ":" + o.lng).join("|");
+    let stapel = container.querySelector(".karte-stapel");
+    if (!stapel || stapel.dataset.sig !== grundSig) {
+      container.innerHTML = `<div class="karte-stapel" role="img" aria-label="Karte der Gemeindeorte in Staaken">
+        ${grundSVG()}
+        <div class="karte-korn" aria-hidden="true"></div>
+        <div class="karte-wolken" aria-hidden="true"><i></i><i></i><i></i></div>
+        <svg viewBox="0 0 ${W} ${H}" class="karte-ebene${ersteAnsicht ? " neu" : ""}"></svg>
+      </div>`;
+      stapel = container.querySelector(".karte-stapel");
+      stapel.dataset.sig = grundSig;
+      ersteAnsicht = false;
+    } else {
+      stapel.querySelector(".karte-ebene").classList.remove("neu");
+    }
+    const ebene = stapel.querySelector(".karte-ebene");
+    ebene.innerHTML = ebeneInhalt(pos, seiten);
     letzteSignatur = signatur();
 
-    container.querySelectorAll("[data-ort]").forEach(el => {
+    ebene.querySelectorAll("[data-ort]").forEach(el => {
       const oeffnen = () => window.App.zeigeOrt(el.getAttribute("data-ort"));
       el.addEventListener("click", oeffnen);
       el.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); oeffnen(); } });
@@ -309,7 +395,7 @@
 
   /* Leichtes Update bei GPS-Fixes: nur Punkt + Entfernungen, Neuaufbau nur bei Zustandswechsel. */
   function aktualisiere(container) {
-    if (!container || !container.querySelector("svg.pilgerkarte") || signatur() !== letzteSignatur) {
+    if (!container || !container.querySelector(".karte-stapel") || signatur() !== letzteSignatur) {
       if (container) render(container);
       return;
     }

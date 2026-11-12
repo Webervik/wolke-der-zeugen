@@ -14,6 +14,34 @@
     return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
   }
 
+  /* Die Wolke als Zeichen: In ihr leuchtet für jede gesammelte Zeug:in ein farbiger Punkt,
+     ein goldener Ring zeigt den Fortschritt. */
+  function wolkenLogo() {
+    const figuren = (window.Daten && window.Daten.figuren) || [];
+    const n = window.Store.anzahlGesammelt(), alle = figuren.length || 1;
+    const umfang = 2 * Math.PI * 46;
+    let k = 0;
+    const lichter = figuren.map((f, i) => {
+      if (!window.Store.istGesammelt(f.id)) return "";
+      const reihe = Math.floor(i / 9), spalte = i % 9;
+      const x = 28 + spalte * 5.6 + (reihe % 2) * 2.8, y = 50 + reihe * 7 - Math.sin(spalte / 8 * Math.PI) * 5;
+      return `<circle class="logo-licht" style="animation-delay:${(-(k++) * 0.37).toFixed(2)}s" cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="2.1" fill="${window.Fx.mische(f.farbe, "#ffffff", 0.35)}"/>`;
+    }).join("");
+    return `<svg viewBox="0 0 100 100" class="wolken-logo" aria-hidden="true">
+      <defs>
+        <linearGradient id="logo-wolke" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#b9c4e6"/></linearGradient>
+        <linearGradient id="logo-gold" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff3c8"/><stop offset="1" stop-color="#d4a73a"/></linearGradient>
+      </defs>
+      <circle cx="50" cy="50" r="46" fill="rgba(19,26,48,0.55)" stroke="rgba(174,185,217,0.28)" stroke-width="3"/>
+      <circle class="logo-ring" cx="50" cy="50" r="46" fill="none" stroke="url(#logo-gold)" stroke-width="3.4" stroke-linecap="round"
+        stroke-dasharray="${(umfang * n / alle).toFixed(1)} ${umfang.toFixed(1)}" transform="rotate(-90 50 50)"/>
+      <g class="logo-wolke">
+        <path d="M27 66 a13 13 0 0 1 2 -25.5 a17 17 0 0 1 32.5 -4 a13.5 13.5 0 0 1 12 29.5 Z" fill="url(#logo-wolke)" opacity="0.96"/>
+        ${lichter}
+      </g>
+    </svg>`;
+  }
+
   /* ---------- Init ---------- */
   async function init() {
     const [config, orte, figuren, hintergrund] = await Promise.all([
@@ -24,6 +52,7 @@
       fetch("data/karte-hintergrund.json").then(r => r.json()).catch(() => null)
     ]);
     window.Daten = { config, orte: orte.orte, figuren: figuren.figuren, hintergrund };
+    window.Fx.himmel.zeugen(); // für jede gesammelte Zeug:in leuchtet ein Stern
 
     const params = new URLSearchParams(location.search);
     window.Rotation.init(config, params.get("heute"));
@@ -78,6 +107,7 @@
     // Kamera/Lagesensor nie im Hintergrund weiterlaufen lassen
     if (name !== "ar" && window.AR) window.AR.stoppe();
     aktuelleView = name;
+    if (name === "home" || name === "wolke") window.Fx.himmel.zeugen();
     document.querySelectorAll(".view").forEach(v => v.classList.remove("aktiv"));
     const view = document.getElementById("view-" + name);
     if (view) view.classList.add("aktiv");
@@ -118,7 +148,7 @@
       if (schritt === 0) {
         view.innerHTML = `
           <div class="onboarding">
-            <div class="onboarding-wolke">☁️</div>
+            <div class="onboarding-wolke">${wolkenLogo()}</div>
             <h1 class="app-titel">Wolke der Zeugen</h1>
             <div class="sendung panel-pergament">
               ${c.rahmen.sendung.map(z => `<p>${esc(z)}</p>`).join("")}
@@ -199,9 +229,9 @@
       <header class="home-kopf">
         <div>
           <div class="home-gruss">Hey ${esc(s.name || "du")} 👋</div>
-          <div class="home-sub">Deine Wolke: <strong>${n} / ${figuren.length}</strong> Zeug:innen</div>
+          <div class="home-sub">Deine Wolke: <strong><span id="home-zahl">${n}</span> / ${figuren.length}</strong> Zeug:innen</div>
         </div>
-        <div class="home-logo">☁️</div>
+        <button class="home-logo" id="home-logo" aria-label="Zu deiner Wolke">${wolkenLogo()}</button>
       </header>
       ${window.Installieren.karteHTML()}
       <div id="naechster-ort" class="naechster-ort"></div>
@@ -215,6 +245,8 @@
       </section>`;
 
     hinweisSchluessel = "";
+    window.Fx.zaehle(view.querySelector("#home-zahl"), n);
+    view.querySelector("#home-logo").addEventListener("click", () => zeigeView("wolke"));
     window.Installieren.verdrahteKarte(view);
     window.Karte.render(view.querySelector("#karte-container"));
     aktualisiereHinweise();
@@ -373,8 +405,8 @@
 
     if (status.frei && offen.length) {
       begegnungsBereich = offen.map(f => `
-        <div class="ort-begegnung panel-pergament wartet-panel">
-          <div class="ort-begegnung-nische">${window.Gestalt.svg(f, { praefix: "ort" })}</div>
+        <div class="ort-begegnung panel-pergament wartet-panel" style="--farbe-rgb:${window.Fx.rgb(f.farbe)}">
+          <div class="ort-begegnung-nische"><div class="lichtkranz" aria-hidden="true"></div>${window.Gestalt.svg(f, { praefix: "ort", lebendig: true })}</div>
           <div class="ort-begegnung-text">
             <strong>${esc(f.name)}</strong> wartet hier auf dich${window.Store.istProbelauf(f.id) ? " — diesmal in echt!" : "."}
             <small>${window.Store.istProbelauf(f.id) ? "Aus eurem Probelauf wird jetzt eine richtige Begegnung." : esc(f.kurzvorstellung)}</small>
@@ -393,7 +425,8 @@
       </div>`;
     } else {
       begegnungsBereich = `
-        <div class="panel-nacht ort-info">
+        <div class="panel-nacht ort-info ort-fern">
+          ${aktiv ? `<div class="ort-fern-nische" aria-hidden="true">${window.Gestalt.svg(aktiv, { praefix: "fern", unbekannt: !window.Store.istGesammelt(aktiv.id) })}</div>` : ""}
           <p>${aktiv ? `Diese Woche wartet hier: <strong>${window.Store.istGesammelt(aktiv.id) ? esc(aktiv.name) : "??? (" + esc(aktiv.themaLabel) + ")"}</strong>` : ""}</p>
           <p class="ort-distanz">📍 <span id="ort-distanz-text">${esc(ortDistanzText(status))}</span></p>
           ${s.geoErlaubt ? "" : `<button class="btn btn-gold" id="ort-geo-an">📍 Standort einschalten</button>`}
@@ -413,7 +446,7 @@
 
     view.innerHTML = `
       <button class="zurueck" data-zurueck>‹ Karte</button>
-      <header class="ort-kopf" style="--ort-farbe:${ort.farbe}">
+      <header class="ort-kopf" style="--ort-farbe:${ort.farbe};--farbe-rgb:${window.Fx.rgb(ort.farbe)}">
         <div class="ort-icon">${ort.icon}</div>
         <div>
           <h1>${esc(ort.name)}</h1>
@@ -540,6 +573,11 @@
         <label class="schalter"><input type="checkbox" id="e-kamera" ${s.kameraAus ? "" : "checked"}> Kamerabild verwenden</label>
       </div>
       <div class="panel-nacht einstellung">
+        <h3>✨ Effekte</h3>
+        <p class="dezent">Funkelnder Himmel, Lichtstrahlen, bewegte Karten. Ausschalten schont den Akku und hilft auf älteren Handys.</p>
+        <label class="schalter"><input type="checkbox" id="e-effekte" ${s.effekteAus ? "" : "checked"}> Effekte und Animationen zeigen</label>
+      </div>
+      <div class="panel-nacht einstellung">
         <h3>🧪 Demo-Modus</h3>
         <p class="dezent">Zum Ausprobieren zu Hause: Beam dich zu den Orten. Begegnungen zählen als »Probelauf« — der echte Besuch wertet sie auf.</p>
         <label class="schalter"><input type="checkbox" id="e-demo" ${s.demo ? "checked" : ""}> Demo-Modus aktivieren</label>
@@ -591,6 +629,11 @@
       renderEinstellungen();
     });
 
+    view.querySelector("#e-effekte").addEventListener("change", e => {
+      window.Store.setEffekteAus(!e.target.checked);
+      window.Fx.aktualisiere();
+      toast(e.target.checked ? "Effekte an ✨" : "Effekte aus — ruhige Darstellung");
+    });
     view.querySelector("#e-kamera").addEventListener("change", e => {
       window.Store.setKameraAus(!e.target.checked);
     });
@@ -651,12 +694,15 @@
     if (!m) { overlay.hidden = true; return; }
     overlay.hidden = false;
     overlay.innerHTML = `
+      <div class="lichtkranz" aria-hidden="true"></div>
       <div class="meilenstein panel-pergament">
-        <div class="meilenstein-zeichen">☁️ ✦ ☁️</div>
+        <div class="meilenstein-zeichen">${m.beiOrtKomplett ? `<span class="siegel-stempel">✦</span>` : "☁️ ✦ ☁️"}</div>
         <p>${esc(m.text.replace("{anzahl}", window.Wolke.zahlwort(window.Daten.figuren.length, true)))}</p>
         <button class="btn btn-gold" id="meilenstein-weiter">Amen. Weiter! →</button>
       </div>`;
     overlay.querySelector("#meilenstein-weiter").addEventListener("click", zeigeNaechstenMeilenstein);
+    setTimeout(() => { if (!overlay.hidden) window.Fx.feier(overlay.querySelector(".meilenstein-zeichen"), "#d4a73a", { gross: !!m.beiAllen }); }, 350);
+    if (m.beiAllen) window.Fx.regen({ dauer: 3200 });
   }
 
   /* ---------- Toast ---------- */

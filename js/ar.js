@@ -82,6 +82,7 @@
     if (laufendeGeste) { laufendeGeste.stop(); laufendeGeste = null; }
     orientierungsHoerer.clear();
     bewegungsHoerer.clear();
+    window.Fx.himmel.begegnung(false);
     zustand = "aus";
   }
 
@@ -118,6 +119,8 @@
     if (!$("view-ar").classList.contains("aktiv") || zustand !== "laedt") { if (stream) { stream.getTracks().forEach(t => t.stop()); stream = null; } return; }
 
     render(view, modus);
+    // Ohne Kamerabild stehen die Sterne fest im Raum und wandern beim Drehen mit
+    window.Fx.himmel.begegnung(true, modus === "kamera");
     if (modus === "kamera") {
       const v = $("ar-video");
       if (v) {
@@ -169,6 +172,7 @@
     }
     const p = bildPosition();
     setzePosition(p.x, p.y);
+    window.Fx.himmel.blick(glatt.alpha, glatt.beta);
     if (zustand === "suchen" || zustand === "gefunden") aktualisiereRichtung(p.x, p.y);
     if (zustand === "suchen") pruefeFund(p.x, p.y);
     orientierungsHoerer.forEach(fn => { try { fn(); } catch (x) {} });
@@ -297,6 +301,7 @@
     setzeStatus(`✨ Du hast ${figur.name} gefunden! Tipp die Gestalt an.`);
     hauptknopf("👋 Hallo sagen", false, gruesse);
     vibriere([40, 60, 90]);
+    window.Fx.feier($("ar-gestalt"), figur.farbe);
   }
 
   function gruesse() {
@@ -398,7 +403,10 @@
     huepfen();
     setzeStatus(erlebt ? "✨ Geschafft!" : "");
     hauptknopf(optionen.replay ? `💬 Nochmal mit ${figur.name} reden` : `💬 ${figur.name} ansprechen`, true, ansprechen);
-    if (erlebt) vibriere([30, 50, 120]);
+    if (erlebt) {
+      vibriere([30, 50, 120]);
+      timer.push(setTimeout(() => window.Fx.feier($("ar-gestalt"), figur.farbe, { gross: true }), 450));
+    }
   }
 
   function tippeGestalt() {
@@ -437,12 +445,14 @@
         <div class="ar-welt" aria-hidden="${laden}">
           ${laden ? "" : `
             <div class="ar-gestalt-anker">
-              <div id="ar-gestalt-pos" class="ar-gestalt-pos">
+              <div id="ar-gestalt-pos" class="ar-gestalt-pos" style="--farbe-rgb:${window.Fx.rgb(figur.farbe)}">
+                <div class="ar-aura" aria-hidden="true"></div>
+                <div class="lichtkranz" aria-hidden="true"></div>
                 <div id="ar-blase" class="ar-blase" role="status"></div>
                 <button id="ar-gestalt" class="ar-gestalt" aria-label="${esc(figur.name)} antippen">
-                  ${window.Gestalt.svg(figur, { praefix: "ar" })}
+                  ${window.Gestalt.svg(figur, { praefix: "ar", lebendig: true })}
                 </button>
-                <div class="ar-funken" aria-hidden="true">${Array.from({ length: 14 }, (_, i) => `<span style="--i:${i}"></span>`).join("")}</div>
+                <div class="ar-staub" aria-hidden="true">${Array.from({ length: 10 }, (_, i) => `<i style="--x:${(8 + (i * 37) % 84)}%;--d:${(4 + (i * 1.3) % 4).toFixed(1)}s;--v:${(-(i * 0.9)).toFixed(1)}s;--g:${3 + i % 3}px"></i>`).join("")}</div>
               </div>
             </div>`}
         </div>

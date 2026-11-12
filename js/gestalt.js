@@ -3,7 +3,12 @@
    Symbol (Emoji) wie ein Attribut vor der Brust — angelehnt an die Tradition,
    Zeug:innen des Glaubens mit einem Erkennungszeichen darzustellen.
    Bewusst ohne Gesichtszüge: Die Gestalt lässt Raum für die eigene Vorstellung.
-   Die Glas-Facetten sind pro Figur zufällig, aber reproduzierbar (Seed = id). */
+   Die Glas-Facetten sind pro Figur zufällig, aber reproduzierbar (Seed = id).
+
+   Licht: Hinter dem Kopf steht ein Strahlenkranz, das Symbol leuchtet wie eine
+   Lampe durchs Glas, einzelne Scheiben tragen Glanzkanten. Mit opts.lebendig
+   (große Einzeldarstellung: Begegnung, Ort) dreht sich der Kranz langsam und
+   einzelne Facetten funkeln auf — in Listen und Karten bleibt alles ruhig. */
 (function () {
   // Gewand mit Schultern und weiten, herabhängenden Ärmeln
   const ROBE = "M100 84 C86 84 70 88 57 98 C44 108 39 130 37 154 C35 176 34 196 44 208 C41 244 37 284 33 322 Q100 337 167 322 C163 284 159 244 156 208 C166 196 165 176 163 154 C161 130 156 108 143 98 C130 88 114 84 100 84 Z";
@@ -51,8 +56,10 @@
     ];
   }
 
-  /* Facetten: schräge Reihen, pro Kante verschobene Spalten → Buntglas-Raster */
-  function facetten(zufall, pal, reihen, spalten, mitGold) {
+  /* Facetten: schräge Reihen, pro Kante verschobene Spalten → Buntglas-Raster.
+     "deko" ist eine eigene Zufallsfolge für Glanzkanten und Funkeln — so bleibt
+     das Glasmuster jeder Figur genau, wie es war. */
+  function facetten(zufall, pal, reihen, spalten, mitGold, deko, funkel) {
     const zeilen = reihen.map(y => ({ l: y + (zufall() - 0.5) * 18, r: y + (zufall() - 0.5) * 18 }));
     const yBei = (z, x) => z.l + (z.r - z.l) * (x / 200);
     const kanten = zeilen.map(() => spalten.map((x, k) => (k === 0 || k === spalten.length - 1) ? x : x + (zufall() - 0.5) * 22));
@@ -63,16 +70,46 @@
         const pts = [[x1, yBei(zeilen[i], x1)], [x2, yBei(zeilen[i], x2)], [x3, yBei(zeilen[i + 1], x3)], [x4, yBei(zeilen[i + 1], x4)]];
         const gold = zufall() < 0.08;
         const farbe = (gold && mitGold) ? "#d4a73a" : pal[Math.floor(zufall() * (pal.length - 1))];
-        out += `<polygon points="${pts.map(p => p[0].toFixed(1) + "," + p[1].toFixed(1)).join(" ")}" fill="${farbe}" stroke="${BLEI}" stroke-width="2.6" stroke-linejoin="round"/>`;
+        const punkte = pts.map(p => p[0].toFixed(1) + "," + p[1].toFixed(1)).join(" ");
+        out += `<polygon points="${punkte}" fill="${farbe}" stroke="${BLEI}" stroke-width="2.6" stroke-linejoin="round"/>`;
+        if (deko) {
+          // Glanzkante: kurzer heller Strich an der oberen Kante, leicht nach innen versetzt
+          if (deko() < 0.42) {
+            const mx = (pts[0][0] + pts[1][0] + pts[2][0] + pts[3][0]) / 4, my = (pts[0][1] + pts[1][1] + pts[2][1] + pts[3][1]) / 4;
+            const a = [pts[0][0] + (pts[1][0] - pts[0][0]) * 0.18, pts[0][1] + (pts[1][1] - pts[0][1]) * 0.18];
+            const b = [pts[0][0] + (pts[1][0] - pts[0][0]) * 0.66, pts[0][1] + (pts[1][1] - pts[0][1]) * 0.66];
+            const nach = q => [(q[0] + (mx - q[0]) * 0.16).toFixed(1), (q[1] + (my - q[1]) * 0.16 + 1.2).toFixed(1)];
+            const p1 = nach(a), p2 = nach(b);
+            out += `<path d="M${p1[0]} ${p1[1]} L${p2[0]} ${p2[1]}" stroke="#ffffff" stroke-opacity="0.34" stroke-width="1.5" stroke-linecap="round" fill="none"/>`;
+          }
+          const blinkt = deko() < 0.3; // immer ziehen: gleiche Glanzkanten in jeder Darstellung
+          if (funkel && blinkt) funkel.push(punkte);
+        }
       }
     }
     return out;
   }
 
-  /* opts: { unbekannt: bool, id-Präfix für eindeutige defs } */
+  /* Strahlenkranz hinter dem Kopf: abwechselnd lange und kurze Lichtzacken */
+  function strahlenkranz() {
+    let d = "";
+    for (let i = 0; i < 16; i++) {
+      const a = (i * 22.5 - 90) * Math.PI / 180, halb = 3.4 * Math.PI / 180;
+      const ri = 29, ra = i % 2 ? 49 : 63;
+      d += `M${(100 + Math.cos(a - halb) * ri).toFixed(1)} ${(58 + Math.sin(a - halb) * ri).toFixed(1)} L${(100 + Math.cos(a) * ra).toFixed(1)} ${(58 + Math.sin(a) * ra).toFixed(1)} L${(100 + Math.cos(a + halb) * ri).toFixed(1)} ${(58 + Math.sin(a + halb) * ri).toFixed(1)} Z `;
+    }
+    return d;
+  }
+  const KRANZ = strahlenkranz();
+
+  /* opts: { unbekannt, praefix (eindeutige defs), lebendig (bewegtes Licht),
+             ausschnitt (eigene viewBox, z. B. Brustbild) } */
   function svg(figur, opts) {
     opts = opts || {};
     const unbekannt = !!opts.unbekannt;
+    const lebendig = !!opts.lebendig && !unbekannt;
+    const deko = unbekannt ? null : prng(seedAus(figur.id) ^ 0x51ed270b);
+    const funkel = [];
     const farbe = unbekannt ? "#5a6480" : figur.farbe;
     const pal = unbekannt
       ? ["#3c4663", "#46506e", "#515b78", "#5d6784", "#353e58", "#4a5472"]
@@ -82,14 +119,16 @@
     const mitKapuze = zufall() < 0.6;
     const mitMantel = zufall() < 0.5;
 
-    const robenFacetten = facetten(zufall, pal, [92, 128, 166, 210, 258, 336], [0, 58, 100, 142, 200], !unbekannt);
-    const kapuzenFacetten = facetten(zufall, pal.slice(2), [24, 60, 104], [0, 100, 200], !unbekannt);
+    const robenFacetten = facetten(zufall, pal, [92, 128, 166, 210, 258, 336], [0, 58, 100, 142, 200], !unbekannt, deko, lebendig ? funkel : null);
+    const kapuzenFacetten = facetten(zufall, pal.slice(2), [24, 60, 104], [0, 100, 200], !unbekannt, deko, null);
+    const funkeln = funkel.slice(0, 7).map((punkte, i) =>
+      `<polygon class="g-funkel" points="${punkte}" fill="#ffffff" style="animation-delay:${(-i * 0.83).toFixed(2)}s"/>`).join("");
 
     const emblem = unbekannt
       ? `<text x="100" y="180" text-anchor="middle" font-size="28" font-family="Georgia, serif" font-weight="700" fill="#aeb9d9">?</text>`
       : `<text x="100" y="180" text-anchor="middle" font-size="27">${figur.emoji}</text>`;
 
-    return `<svg viewBox="0 0 200 340" class="gestalt${unbekannt ? " unbekannt" : ""}" role="img" aria-label="${unbekannt ? "Unbekannte Gestalt" : "Lichtgestalt: " + figur.name}">
+    return `<svg viewBox="${opts.ausschnitt || "0 0 200 340"}" class="gestalt${unbekannt ? " unbekannt" : ""}${lebendig ? " lebendig" : ""}" role="img" aria-label="${unbekannt ? "Unbekannte Gestalt" : "Lichtgestalt: " + figur.name}">
       <defs>
         <radialGradient id="${uid}-schein" cx="50%" cy="45%" r="55%">
           <stop offset="0%" stop-color="${unbekannt ? "#aeb9d9" : "#f0d284"}" stop-opacity="${unbekannt ? 0.18 : 0.55}"/>
@@ -104,24 +143,49 @@
           <stop offset="0%" stop-color="#ffffff" stop-opacity="0.28"/>
           <stop offset="45%" stop-color="#ffffff" stop-opacity="0"/>
         </linearGradient>
+        <radialGradient id="${uid}-kern" gradientUnits="userSpaceOnUse" cx="100" cy="171" r="98">
+          <stop offset="0%" stop-color="#fff6d8" stop-opacity="${unbekannt ? 0.1 : 0.62}"/>
+          <stop offset="38%" stop-color="#ffe9a8" stop-opacity="${unbekannt ? 0.04 : 0.22}"/>
+          <stop offset="100%" stop-color="#ffe9a8" stop-opacity="0"/>
+        </radialGradient>
+        <linearGradient id="${uid}-tiefe" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="55%" stop-color="#0b1021" stop-opacity="0"/>
+          <stop offset="100%" stop-color="#0b1021" stop-opacity="0.36"/>
+        </linearGradient>
+        <radialGradient id="${uid}-emblemschein" cx="50%" cy="50%" r="50%">
+          <stop offset="45%" stop-color="#fff3c8" stop-opacity="${unbekannt ? 0.12 : 0.85}"/>
+          <stop offset="100%" stop-color="#f0d284" stop-opacity="0"/>
+        </radialGradient>
+        <radialGradient id="${uid}-haut" cx="38%" cy="32%" r="75%">
+          <stop offset="0%" stop-color="${unbekannt ? "#7e88a6" : "#fff0d6"}"/>
+          <stop offset="100%" stop-color="${unbekannt ? "#5c6684" : "#e3c69a"}"/>
+        </radialGradient>
         <clipPath id="${uid}-robe"><path d="${ROBE}"/></clipPath>
         <clipPath id="${uid}-kapuze"><path d="${KAPUZE}"/></clipPath>
       </defs>
       <ellipse cx="100" cy="185" rx="98" ry="165" fill="url(#${uid}-schein)"/>
-      <ellipse cx="100" cy="328" rx="82" ry="9" fill="${unbekannt ? "#aeb9d9" : "#f0d284"}" opacity="${unbekannt ? 0.1 : 0.22}"/>
+      <ellipse cx="100" cy="328" rx="86" ry="10" fill="${unbekannt ? "#aeb9d9" : "#f0d284"}" opacity="${unbekannt ? 0.1 : 0.24}"/>
+      ${unbekannt ? "" : `<ellipse cx="100" cy="329" rx="62" ry="6.5" fill="${farbe}" opacity="0.4"/>`}
       <circle cx="100" cy="58" r="46" fill="url(#${uid}-kopfschein)"/>
+      ${unbekannt ? "" : `<path class="g-strahlen" d="${KRANZ}" fill="#f0d284" opacity="0.34"/>
+      <circle cx="100" cy="58" r="34.5" fill="none" stroke="#f0d284" stroke-width="1.7" opacity="0.8"/>
+      <circle cx="100" cy="58" r="39" fill="none" stroke="#fff3c8" stroke-width="0.8" opacity="0.4"/>`}
       ${mitKapuze ? `<g clip-path="url(#${uid}-kapuze)">${kapuzenFacetten}</g>
         <path d="${KAPUZE}" fill="none" stroke="${BLEI}" stroke-width="4.5" stroke-linejoin="round"/>` : ""}
       <g clip-path="url(#${uid}-robe)">
         ${robenFacetten}
+        ${funkeln}
+        <rect x="0" y="80" width="200" height="260" fill="url(#${uid}-kern)"/>
+        <rect x="0" y="80" width="200" height="260" fill="url(#${uid}-tiefe)"/>
         <rect x="0" y="80" width="200" height="260" fill="url(#${uid}-licht)"/>
       </g>
       ${mitMantel ? `<path d="${MANTEL}" fill="none" stroke="${BLEI}" stroke-width="3.5" stroke-linecap="round" clip-path="url(#${uid}-robe)"/>` : ""}
       <path d="${ROBE}" fill="none" stroke="${BLEI}" stroke-width="5" stroke-linejoin="round"/>
       <path d="${ARM_L}" fill="none" stroke="${BLEI}" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
       <path d="${ARM_R}" fill="none" stroke="${BLEI}" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
-      <circle cx="100" cy="58" r="24" fill="${unbekannt ? "#6b7592" : "#f2dcb9"}" stroke="${BLEI}" stroke-width="4"/>
+      <circle cx="100" cy="58" r="24" fill="url(#${uid}-haut)" stroke="${BLEI}" stroke-width="4"/>
       <path d="M87 50 C91 41 104 37 111 43" fill="none" stroke="#ffffff" stroke-opacity="${unbekannt ? 0.15 : 0.5}" stroke-width="3" stroke-linecap="round"/>
+      <circle class="g-emblemschein" cx="100" cy="171" r="40" fill="url(#${uid}-emblemschein)"/>
       <circle cx="100" cy="171" r="25" fill="${unbekannt ? "#2a3a63" : "#f6ecd7"}" stroke="${BLEI}" stroke-width="4"/>
       <circle cx="100" cy="171" r="21" fill="none" stroke="${unbekannt ? "#5a6480" : "#d4a73a"}" stroke-width="2.5"/>
       ${emblem}

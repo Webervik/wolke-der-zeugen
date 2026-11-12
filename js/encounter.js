@@ -13,6 +13,7 @@
   let aufgenommen = null;   // nach der Zeremonie: { neuesSiegel }
   let sperreBis = 0;
   let erlebt = false;       // Glaubensgeste in der AR-Begegnung gemacht?
+  let lauf = 0;             // zählt Begegnungen — verspätete Zeitgeber der alten tun nichts mehr
 
   /* Schutz gegen Doppel-Taps: Ein schneller zweiter Tipp würde sonst den gerade
      neu erschienenen "Weiter"-Button treffen und eine Dialogzeile überspringen. */
@@ -43,6 +44,7 @@
     aufgenommen = null;
     sperreBis = 0;
     erlebt = !!opts.erlebt;
+    lauf++;
 
     if (replay && erlebt) window.Store.markiereErlebt(f.id); // nur das Merkmal nachtragen
 
@@ -61,10 +63,11 @@
   function renderRahmen() {
     const ort = window.Daten.orte.find(o => o.id === figur.ortId);
     container.innerHTML = `
+      <div class="begegnung-licht" style="--farbe-rgb:${window.Fx.rgb(figur.farbe)}" aria-hidden="true"></div>
       <div class="begegnung-kopf">
         <button class="zurueck" id="beg-abbruch" aria-label="Begegnung verlassen">‹</button>
         <div class="begegnung-titel">
-          <span class="begegnung-emoji" style="border-color:${figur.farbe}">${figur.emoji}</span>
+          <span class="begegnung-avatar" style="--farbe-rgb:${window.Fx.rgb(figur.farbe)}">${window.Gestalt.svg(figur, { praefix: "beg", ausschnitt: "30 6 140 140" })}</span>
           <div>
             <div class="begegnung-name">${esc(figur.name)}</div>
             <div class="begegnung-ort">${ort ? ort.icon + " " + esc(ort.name) : ""}</div>
@@ -94,6 +97,25 @@
     el.scrollIntoView({ behavior: "smooth", block: "end" });
   }
 
+  /* Die Figur "überlegt" kurz (drei Punkte), dann erscheint ihre Sprechblase */
+  function sprich(text, dann) {
+    const chat = container.querySelector("#beg-chat");
+    if (!chat) return;
+    if (!window.Fx.an()) { bubble(text, "figur"); dann(); return; }
+    const meiner = lauf;
+    const punkte = document.createElement("div");
+    punkte.className = "tippt";
+    punkte.innerHTML = "<i></i><i></i><i></i>";
+    chat.appendChild(punkte);
+    punkte.scrollIntoView({ behavior: "smooth", block: "end" });
+    setTimeout(() => {
+      punkte.remove();
+      if (meiner !== lauf || !container.querySelector("#beg-chat")) return;
+      bubble(text, "figur");
+      dann();
+    }, 520);
+  }
+
   function naechsterSchritt() {
     const aktionen = container.querySelector("#beg-aktionen");
     aktionen.innerHTML = "";
@@ -105,14 +127,15 @@
 
     const schritt = figur.dialog[dialogIndex];
     if (schritt.sprecher === "figur") {
-      bubble(schritt.text, "figur");
       dialogIndex++;
-      const weiter = document.createElement("button");
-      weiter.className = "btn btn-gold";
-      weiter.textContent = dialogIndex >= figur.dialog.length ? "Weiter" : "Weiter …";
-      weiter.addEventListener("click", () => { if (!zuSchnell()) naechsterSchritt(); });
-      aktionen.appendChild(weiter);
-      sperre(350); // frisch erschienene Buttons kurz gegen den "Nachklapp"-Tipp sperren
+      sprich(schritt.text, () => {
+        const weiter = document.createElement("button");
+        weiter.className = "btn btn-gold";
+        weiter.textContent = dialogIndex >= figur.dialog.length ? "Weiter" : "Weiter …";
+        weiter.addEventListener("click", () => { if (!zuSchnell()) naechsterSchritt(); });
+        aktionen.appendChild(weiter);
+        sperre(350); // frisch erschienene Buttons kurz gegen den "Nachklapp"-Tipp sperren
+      });
     } else {
       // Wahlmoment: Du antwortest, die Figur reagiert
       schritt.optionen.forEach(opt => {
@@ -123,11 +146,12 @@
           if (zuSchnell()) return;
           aktionen.querySelectorAll("button").forEach(x => { x.disabled = true; });
           bubble(opt.text, "du");
+          aktionen.innerHTML = "";
+          const meiner = lauf;
           setTimeout(() => {
-            bubble(opt.reaktion, "figur");
-            dialogIndex++;
-            naechsterSchritt();
-          }, 350);
+            if (meiner !== lauf) return;
+            sprich(opt.reaktion, () => { dialogIndex++; naechsterSchritt(); });
+          }, 250);
         });
         aktionen.appendChild(b);
       });
@@ -198,6 +222,8 @@
       if (versuch === 1) glanz = true;
       container.querySelectorAll(".btn-antwort").forEach(b => b.disabled = true);
       button.classList.add("richtig");
+      window.Fx.funken(button, { anzahl: versuch === 1 ? 30 : 14, farben: ["#f0d284", "#fff3c8", "#7fd6a0"], kraft: [2, 8] });
+      if (versuch === 1) window.Fx.ring(button, { radius: 200, farbe: "#f0d284" });
       feedback.innerHTML = `
         <div class="feedback-richtig">${versuch === 1 ? "✨ Stark! Erste Antwort — deine Karte bekommt Goldglanz." : "Genau! 💛"}</div>
         <p>${esc(f.erklaerung)}</p>
@@ -244,16 +270,28 @@
 
     const inhalt = container.querySelector("#beg-inhalt");
     inhalt.innerHTML = `
-      <div class="zeremonie">
-        <div class="zeremonie-karte">
-          ${window.Wolke.kartenSVG(figur, { glanz })}
-          <div class="zeremonie-funken" aria-hidden="true">${Array.from({ length: 18 }, (_, i) => `<span style="--i:${i}"></span>`).join("")}</div>
+      <div class="zeremonie" style="--farbe-rgb:${window.Fx.rgb(figur.farbe)}">
+        <div class="zeremonie-buehne">
+          <div class="lichtkranz" aria-hidden="true"></div>
+          <div class="zeremonie-karte"><div class="neig">${window.Wolke.holoKarte(figur, { glanz })}</div></div>
         </div>
         <h2 class="zeremonie-titel">${esc(figur.name)} ist jetzt Teil deiner Wolke ☁️</h2>
+        ${glanz ? `<div class="zeremonie-glanz">✨ Goldglanz — erste Antwort richtig!</div>` : ""}
         <p class="zeremonie-spruch">»${esc(figur.kartenspruch)}«</p>
         <button class="btn btn-gold" id="zeremonie-weiter">Zur Wolke →</button>
       </div>`;
     vibriere(glanz ? [60, 50, 60, 50, 140] : [60, 60, 120]);
+    window.scrollTo(0, 0);
+    window.Wolke.merkeNeu(figur.id);
+    window.Fx.himmel.zeugen(figur.id);
+    window.Fx.holo(inhalt.querySelector(".neig"));
+    // Die Karte dreht sich herein — genau dann zerspringt das Licht in Buntglas-Scherben
+    const meiner = lauf, karte = inhalt.querySelector(".zeremonie-karte");
+    setTimeout(() => {
+      if (meiner !== lauf || !karte.isConnected) return;
+      window.Fx.feier(karte, figur.farbe, { gross: true });
+      if (glanz) window.Fx.regen({ dauer: 1800 });
+    }, 620);
 
     inhalt.querySelector("#zeremonie-weiter").addEventListener("click", zurWolke);
   }

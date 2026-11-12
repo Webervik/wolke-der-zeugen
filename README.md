@@ -60,6 +60,18 @@ Jede Geste hat einen Rückfall ohne Sensor (Dinge auf dem Bildschirm, Finger auf
 
 **Lichtgestalten** (`js/gestalt.js`): Jede Figur wird als Kirchenfenster-Gestalt in ihrer Farbe gezeichnet und hält ihr Symbol wie ein Attribut vor der Brust — bewusst ohne Gesichtszüge. Reines SVG, keine Bilddateien; die Glasfacetten sind pro Figur zufällig, aber reproduzierbar.
 
+## Effekte (`js/fx.js`, `css/fx.css`)
+
+Alles wird zur Laufzeit gezeichnet, ohne Bilddateien und ohne Fremd-Requests:
+- **Sternenhimmel** hinter der ganzen App, mit Sternschnuppen. Für jede gesammelte Zeug:in leuchtet ein Stern in ihrer Farbe. In der Begegnung ohne Kamera stehen die Sterne fest im Raum und wandern beim Drehen mit.
+- **Partikel:** Funken, Buntglas-Scherben, Ringe, Strahlen, fliegende Zeichen (`Fx.funken`, `Fx.feier`, `Fx.flug` …).
+- **Holo-Karten:** In Einzelansicht und Zeremonie kippt die Karte in 3D; Glanzlicht, Regenbogenfolie und Glitzer folgen Finger oder Handyneigung.
+- **Lichtgestalten** mit Strahlenkranz und funkelnden Facetten (`lebendig`), Lichtkranz hinter Karten und Gestalten.
+- **Pilgerkarte** in zwei Ebenen (Grund wird einmal gemalt, Medaillons bewegen sich darüber), Papierkorn, Wolkenschatten, wandernde Lichter auf dem Weg.
+- **Kirchenfenster** mit Rosette, Lichtbahnen und farbigem Licht auf dem Boden.
+
+Akku und Zugänglichkeit: Der Himmel läuft mit ~30 Bildern/s und pausiert bei verdeckter Seite oder laufender Kamera. Unter *Mehr → Effekte* lässt sich alles abschalten; „Bewegung reduzieren“ des Geräts wird respektiert (`html.fx-aus`).
+
 ## Datenschutz (wichtig: Minderjährige!)
 
 - **Kein Backend, kein Konto, keine Cloud.** Alles liegt im localStorage des Geräts.

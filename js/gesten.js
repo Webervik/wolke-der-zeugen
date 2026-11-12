@@ -64,6 +64,7 @@
   }
 
   function zufall(a, b) { return a + Math.random() * (b - a); }
+  const Fx = window.Fx;
 
   /* ---------- Sammeln: Dinge rund um dich im Raum antippen ---------- */
   function sammeln(g, ctx) {
@@ -135,6 +136,11 @@
     function sammle(d) {
       if (d.weg || d.el.classList.contains("rand")) return;
       d.weg = true;
+      // Das Ding fliegt mit Lichtspur zum Fortschrittsbalken
+      const ziel = document.querySelector("#ar-fortschritt .ar-fortschritt-balken");
+      Fx.funken(d.el, { anzahl: 14, kraft: [1.5, 6], dauer: [400, 900] });
+      Fx.ring(d.el, { radius: 70, dauer: 500 });
+      Fx.flug(d.el, ziel || d.el, { zeichen: d.el.textContent, amZiel: () => { if (ziel) { ziel.classList.remove("puls"); void ziel.offsetWidth; ziel.classList.add("puls"); } } });
       d.el.classList.add("gesammelt");
       setTimeout(() => d.el.remove(), 450);
       gesammelt++;
@@ -210,12 +216,14 @@
         if (bewegungKam && !rueckfall) ruhig = unruhe < 22; else ruhig = gedrueckt;
         fortschritt = ruhig ? fortschritt + 0.1 : Math.max(0, fortschritt - 0.12);
         box.classList.toggle("ruhig", ruhig);
+        if (ruhig && Math.round(fortschritt * 10) % 10 === 0) Fx.ring(kreis, { radius: 120, dauer: 1400, breite: 2, farbe: "#f0d284" });
         if (lichter) [...lichter.children].forEach((l, i) => l.classList.toggle("an", i < Math.floor(fortschritt / ziel * g.lichter + 0.0001)));
         ctx.fortschritt(Math.min(1, fortschritt / ziel), `${Math.min(ziel, Math.floor(fortschritt))} / ${ziel} s`);
         if (!rueckfall && bewegungKam) ctx.status(ruhig ? "🤫 Ganz ruhig …" : "🤫 Noch ein bisschen ruhiger …");
         if (fortschritt >= ziel) {
           beendet = true;
           aufraeumen();
+          Fx.ring(kreis, { radius: 260, dauer: 1600, breite: 3 });
           box.classList.add("erfuellt");
           const ende = g.ende || (g.vorspiel === true ? "… ein leises Säuseln …" : "");
           if (ende) ctx.ebene.appendChild(element("div", "geste-gross leise", ende));
@@ -299,6 +307,7 @@
       if (beendet) return;
       // Nachsichtig: Loslassen setzt nicht zurück, es geht nur langsam etwas verloren
       gehalten = druck ? gehalten + 50 : Math.max(0, gehalten - 20);
+      if (druck) { Fx.sog(knopf, 74, "#f0d284"); Fx.sog(knopf, 74, "#fff3c8"); }
       const anteil = Math.min(1, gehalten / ziel);
       ring.setAttribute("stroke-dashoffset", (100 - anteil * 100).toFixed(1));
       ctx.fortschritt(anteil, "");
@@ -312,6 +321,8 @@
         knopf.classList.add("erfuellt");
         if (effekt === "zittern") symbol.textContent = "✨";
         if (effekt === "siegel") { symbol.textContent = "🔴"; knopf.classList.add("gestempelt"); }
+        Fx.ring(knopf, { radius: 190 });
+        Fx.funken(knopf, { anzahl: 26, kraft: [2, 8] });
         ctx.vibriere([30, 40, 80]);
         setTimeout(() => knopf.remove(), 900);
         ctx.fertig();
@@ -403,6 +414,7 @@
       const p = punkt(e);
       c.beginPath(); c.moveTo(letzter.x, letzter.y); c.lineTo(p.x, p.y); c.stroke();
       letzter = p;
+      if (zuege % 3 === 0) Fx.funken({ x: e.clientX, y: e.clientY }, { anzahl: 2, kraft: [0.5, 2.5], dauer: [300, 600], groesse: [1.2, 2.6], schwerkraft: 0.02 });
       if (++zuege % 6 === 0) pruefe();
     });
     ["pointerup", "pointercancel"].forEach(t => leinwand.addEventListener(t, () => { unten = false; pruefe(); }));
@@ -424,7 +436,7 @@
       if (anteil >= 0.6) {
         beendet = true;
         leinwand.classList.add("weg");
-        if (enthuellt) enthuellt.classList.add("sichtbar");
+        if (enthuellt) { enthuellt.classList.add("sichtbar"); Fx.strahlen(enthuellt, { laenge: 170 }); Fx.funken(enthuellt, { anzahl: 24, kraft: [2, 7] }); }
         setTimeout(() => leinwand.remove(), 700);
         ctx.vibriere([20, 30, 60]);
         ctx.fertig();
@@ -483,6 +495,9 @@
       const welle = element("span", "schuettel-welle");
       buehne.appendChild(welle);
       setTimeout(() => welle.remove(), 700);
+      Fx.funken(symbol, art === "tamburin"
+        ? { anzahl: 7, formen: ["zeichen", "stern"], zeichen: ["♪", "♫"], kraft: [2, 6], groesse: [3, 5.5], schwerkraft: -0.03, dauer: [700, 1300] }
+        : { anzahl: 9, formen: ["stern", "glut"], kraft: [2, 7] });
       if (art === "lachen") {
         const ha = element("span", "schuettel-ha", ["Ha!", "Haha!", "Hihi!", "Ha ha!"][zahl % 4]);
         ha.style.left = zufall(10, 75) + "%";
@@ -527,6 +542,8 @@
       const s = leier.children[i];
       s.classList.remove("schwingt"); void s.offsetWidth; s.classList.add("schwingt", "gezupft");
       zupfe(toene[i % toene.length]);
+      const r = s.getBoundingClientRect();
+      Fx.funken({ x: r.left + r.width / 2, y: r.top + 10 }, { anzahl: 4, formen: ["zeichen", "glut"], zeichen: ["♪", "♫", "♬"], winkel: -Math.PI / 2, streuung: 1, kraft: [2, 4.5], groesse: [3.5, 5.5], schwerkraft: -0.02, dauer: [800, 1400] });
       ctx.vibriere(10);
       gezupft.add(i);
       ctx.fortschritt(gezupft.size / n, `${gezupft.size} / ${n}`);

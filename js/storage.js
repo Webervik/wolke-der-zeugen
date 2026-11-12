@@ -15,7 +15,8 @@
     ortsSiegel: {},         // ortId -> true
     gelesen: {},            // meilensteinId -> true
     installHinweisAus: false,
-    kameraAus: false        // true: Begegnungen vor Sternenhimmel statt Kamerabild
+    kameraAus: false,       // true: Begegnungen vor Sternenhimmel statt Kamerabild
+    effekteAus: false       // true: ruhige Darstellung ohne Animationen (schont Akku und alte Handys)
   };
 
   // JSON-Kopie statt structuredClone: läuft auch auf älteren Handys (iOS < 15.4)
@@ -56,6 +57,7 @@
     setDemo(v) { state.demo = !!v; save(); },
     setInstallHinweisAus(v) { state.installHinweisAus = !!v; save(); },
     setKameraAus(v) { state.kameraAus = !!v; save(); },
+    setEffekteAus(v) { state.effekteAus = !!v; save(); },
 
     istGesammelt(figurId) { return !!state.gesammelt[figurId]; },
 
